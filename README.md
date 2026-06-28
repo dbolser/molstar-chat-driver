@@ -15,7 +15,7 @@ works standalone wherever you want a "chat → molecular view" loop.
 
 ```
   prompt ──▶ endpoint ──▶ MVSJ ──▶ Mol* renders ──▶ evaluator rates ──▶ capture
-            (your LLM)   (scene             (3D view)   (failed/OK/…)   (Supabase)
+            (your LLM)   (scene     (3D view)        (failed/OK/…)     (Supabase)
              server)      tree)
 ```
 
