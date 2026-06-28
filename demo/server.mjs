@@ -20,6 +20,23 @@ import dotenv from 'dotenv';
 const PORT = 8787;
 const DEFAULT_MODEL = 'anthropic:claude-haiku-4-5'; // small + cheap, plenty good for MVS
 
+// One representative model per non-OpenRouter provider, offered in the demo's picker when that
+// provider's key is set. (OpenRouter is handled separately — it has hundreds of models, so the
+// operator lists which to offer via OPENROUTER_ALLOWED_MODELS.)
+const PROVIDER_DEFAULT_MODEL = {
+  anthropic: 'anthropic:claude-haiku-4-5',
+  openai: 'openai:gpt-4o-mini',
+  gemini: 'gemini:gemini-2.5-flash',
+};
+
+// OpenRouter picks when OPENROUTER_ALLOWED_MODELS is unset: a few recent open-weight models.
+// Slugs verified against https://openrouter.ai/api/v1/models — keep them exact.
+const DEFAULT_OPENROUTER_MODELS = [
+  'deepseek/deepseek-v4-flash',
+  'qwen/qwen3.6-27b',
+  'mistralai/mistral-small-2603',
+];
+
 // --- config: .env file, hot-reloaded -------------------------------------------------
 function readEnvFile() {
   const p = path.resolve(process.cwd(), '.env');
@@ -57,6 +74,23 @@ function resolveProvider(spec) {
     default:
       return null;
   }
+}
+
+// Which models to offer in the demo's picker, built from whichever provider keys are present.
+// The UI shows a selector only when this yields 2+ entries (i.e. multiple keys configured).
+// `lookup` is injected so the logic is testable without touching the real environment.
+export function availableModels(lookup = env) {
+  const models = [];
+  for (const spec of Object.values(PROVIDER_DEFAULT_MODEL)) {
+    const prov = resolveProvider(spec);
+    if (prov && lookup(prov.keyVar)) models.push(spec);
+  }
+  if (lookup('OPENROUTER_API_KEY')) {
+    const raw = lookup('OPENROUTER_ALLOWED_MODELS');
+    const ids = (raw ? raw.split(',') : DEFAULT_OPENROUTER_MODELS).map((s) => s.trim()).filter(Boolean);
+    for (const id of ids) models.push(`openrouter:${id}`);
+  }
+  return models;
 }
 
 // --- keyword mode: hand-authored MVS (valid MVSJ, no Mol* dependency) -----------------
@@ -224,6 +258,11 @@ export function startChatServer({ port = PORT } = {}) {
     res.setHeader('Access-Control-Allow-Origin', '*'); // let the browser demo call us
     res.setHeader('Access-Control-Allow-Headers', 'content-type');
     if (req.method === 'OPTIONS') return void res.writeHead(204).end();
+    // The demo asks which models to offer (it can't see the keys, which stay server-side).
+    if (req.method === 'GET' && (req.url === '/models' || req.url.startsWith('/models?'))) {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return void res.end(JSON.stringify({ models: availableModels(), default: env('MODEL') || DEFAULT_MODEL }));
+    }
     if (req.method !== 'POST') return void res.writeHead(405).end();
 
     let body = '';
