@@ -2,7 +2,7 @@
   "name": "molstar-chat-driver",
   "version": "0.2.0",
   "description": "A chat interface for Mol*: type natural-language prompts and drive the Mol* viewer via MolViewSpec (MVS) scenes.",
-  "license": "PolyForm-Noncommercial-1.0.0",
+  "license": "MIT",
   "author": "Dan Bolser",
   "type": "module",
   "main": "./dist/index.js",

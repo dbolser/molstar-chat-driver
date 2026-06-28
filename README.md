@@ -5,7 +5,7 @@ A LLM backed **chat interface for [Mol\*](https://molstar.org/)** powered by
 
 For context, you should see [the Mol\* viewer](https://molstar.org/viewer/).
 
-> **Licence:** free for academic, research, and other noncommercial use.
+> **Licence:** [MIT](./LICENSE.md) — free and open for any use, including commercial.
 
 ---
 
@@ -167,8 +167,5 @@ The unit of exchange is **MVSJ text**, which keeps the pieces independent:
 
 ## Licence
 
-[PolyForm Noncommercial License 1.0.0](./LICENSE.md).
-- Free for any noncommercial purpose(academic, research, education, government, personal).
-- **Commercial use requires a separate licence** — contact **dan.bolser@gmail.com**.
-
-Mol\* is MIT-licensed and is used here as a peer dependency.
+[MIT](./LICENSE.md) — free and open for any use, commercial or non-commercial; just keep the
+copyright notice. Chosen so it drops cleanly into any Mol\* deployment (Mol\* is MIT too).
