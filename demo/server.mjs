@@ -1,34 +1,70 @@
 // The demo's chat backend — one /chat endpoint honouring the molstar-chat-driver
 // backend contract: take { prompt, model }, return { mvsj, text?, error? }.
 //
-// Two modes, chosen by whether ANTHROPIC_API_KEY is set (see .env / .env.example):
-//   • no key  → keyword mode: maps a few keywords to a hand-authored MVS scene. No
-//               network model call, no API key. Good enough to exercise the pipeline.
-//   • key set → LLM mode: relays the prompt to Claude and returns whatever MVS it emits.
+// Modes, chosen by what's in .env (see .env.example):
+//   • no key for the active model → keyword mode: maps a few keywords to a
+//     hand-authored MVS scene. No model call, no key.
+//   • key present                 → relays the prompt to that provider.
 //
-// Started automatically by `npm run demo`; can also be run directly: `node demo/server.mjs`.
+// Providers follow MolBench's `provider:model-id` spec — anthropic / openai /
+// gemini / openrouter (the last three share the OpenAI-compatible wire format).
+//
+// `npm run demo` starts this and watches .env, so editing the file takes effect
+// without a restart. Can also be run directly: `node demo/server.mjs`.
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const PORT = 8787;
+const DEFAULT_MODEL = 'anthropic:claude-haiku-4-5'; // small + cheap, plenty good for MVS
 
-// --- tiny .env loader (Node 18 has no built-in --env-file) ---------------------------
-function loadEnv() {
-  const envPath = path.resolve(process.cwd(), '.env');
-  if (!fs.existsSync(envPath)) return;
-  for (const raw of fs.readFileSync(envPath, 'utf8').split('\n')) {
+// --- config: .env file, hot-reloaded -------------------------------------------------
+function readEnvFile() {
+  const out = {};
+  const p = path.resolve(process.cwd(), '.env');
+  if (!fs.existsSync(p)) return out;
+  for (const raw of fs.readFileSync(p, 'utf8').split('\n')) {
     const m = raw.match(/^\s*([\w.-]+)\s*=\s*(.*?)\s*$/);
     if (!m) continue;
     let [, key, val] = m;
     if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
       val = val.slice(1, -1);
     }
-    if (process.env[key] === undefined) process.env[key] = val;
+    out[key] = val;
+  }
+  return out;
+}
+
+let envFile = readEnvFile();
+
+// Already-exported shell vars win (matching MolBench); else the .env file; empty = unset.
+function env(name) {
+  const shell = process.env[name];
+  if (shell !== undefined && shell !== '') return shell;
+  const file = envFile[name];
+  return file === undefined || file === '' ? undefined : file;
+}
+
+// --- provider resolution (MolBench's provider:model-id spec) --------------------------
+function resolveProvider(spec) {
+  const idx = spec.indexOf(':');
+  const provider = idx === -1 ? 'anthropic' : spec.slice(0, idx);
+  const id = idx === -1 ? spec : spec.slice(idx + 1);
+  switch (provider) {
+    case 'anthropic':
+      return { kind: 'anthropic', keyVar: 'ANTHROPIC_API_KEY', id };
+    case 'openai':
+      return { kind: 'openai', keyVar: 'OPENAI_API_KEY', baseUrl: env('OPENAI_BASE_URL') || 'https://api.openai.com/v1', id };
+    case 'openrouter':
+      return { kind: 'openai', keyVar: 'OPENROUTER_API_KEY', baseUrl: 'https://openrouter.ai/api/v1', id };
+    case 'gemini':
+    case 'google':
+      return { kind: 'openai', keyVar: 'GEMINI_API_KEY', baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/', id };
+    default:
+      return null;
   }
 }
-loadEnv();
 
 // --- keyword mode: hand-authored MVS (valid MVSJ, no Mol* dependency) -----------------
 const NAMED_ENTRIES = {
@@ -74,11 +110,7 @@ function component(selector, type, color) {
     kind: 'component',
     params: { selector },
     children: [
-      {
-        kind: 'representation',
-        params: { type },
-        children: [{ kind: 'color', params: { color } }],
-      },
+      { kind: 'representation', params: { type }, children: [{ kind: 'color', params: { color } }] },
     ],
   };
 }
@@ -93,7 +125,7 @@ function buildKeywordMvs(prompt) {
     components.push(component('ligand', 'ball_and_stick', '#FF7F0E'));
   }
 
-  const mvs = {
+  return JSON.stringify({
     metadata: { version: '1', timestamp: new Date().toISOString() },
     root: {
       kind: 'root',
@@ -112,32 +144,57 @@ function buildKeywordMvs(prompt) {
         },
       ],
     },
-  };
-  return JSON.stringify(mvs);
+  });
 }
 
-// --- LLM mode: relay the prompt to Claude --------------------------------------------
+// --- LLM modes -----------------------------------------------------------------------
 const SYSTEM = `You turn a user's request into a MolViewSpec (MVS) scene tree.
 Reply with ONLY the MVSJ JSON object — no prose, no markdown code fences.
 Shape: { "metadata": { "version": "1" }, "root": { "kind": "root", "children": [ ... ] } },
 nesting download -> parse -> structure -> component -> representation -> color nodes.`;
 
-let anthropic; // created lazily on first LLM request
-async function buildLlmMvs(prompt, model) {
-  if (!anthropic) {
-    const { default: Anthropic } = await import('@anthropic-ai/sdk');
-    anthropic = new Anthropic(); // reads ANTHROPIC_API_KEY from the environment
-  }
-  const message = await anthropic.messages.create({
-    model: model || process.env.MODEL || 'claude-opus-4-8',
+async function callAnthropic(key, id, prompt) {
+  const { default: Anthropic } = await import('@anthropic-ai/sdk');
+  const client = new Anthropic({ apiKey: key });
+  const message = await client.messages.create({
+    model: id,
     max_tokens: 16000,
     system: SYSTEM,
     messages: [{ role: 'user', content: prompt }],
   });
-  const text = message.content.find((b) => b.type === 'text')?.text ?? '';
+  return message.content.find((b) => b.type === 'text')?.text ?? '';
+}
+
+// OpenAI-compatible: OpenAI, Gemini (compat layer), OpenRouter, local hosts.
+async function callOpenAiCompat(baseUrl, key, id, prompt) {
+  const url = `${baseUrl.replace(/\/$/, '')}/chat/completions`;
+  const messages = [
+    { role: 'system', content: SYSTEM },
+    { role: 'user', content: prompt },
+  ];
+  const send = async (tokenField) => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
+      body: JSON.stringify({ model: id, messages, [tokenField]: 16000 }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error?.message || `HTTP ${res.status}`);
+    return data.choices?.[0]?.message?.content ?? '';
+  };
+  // gpt-5 / o-series want max_completion_tokens; older + most compat hosts want max_tokens.
+  try {
+    return await send('max_tokens');
+  } catch (e) {
+    if (!String(e.message).includes('max_completion_tokens')) throw e;
+    return await send('max_completion_tokens');
+  }
+}
+
+function toResult(text) {
   let mvsj = null;
   try {
-    JSON.parse(text); // Tier 0: did the model return parseable JSON?
+    JSON.parse(text); // Tier 0: parseable JSON?
     mvsj = text;
   } catch {
     /* not valid MVS JSON */
@@ -146,10 +203,14 @@ async function buildLlmMvs(prompt, model) {
 }
 
 // --- server --------------------------------------------------------------------------
-export function startChatServer({ port = PORT } = {}) {
-  const hasKey = !!process.env.ANTHROPIC_API_KEY;
-  const modelName = process.env.MODEL || 'claude-opus-4-8';
+function describeMode() {
+  const spec = env('MODEL') || DEFAULT_MODEL;
+  const prov = resolveProvider(spec);
+  if (prov && env(prov.keyVar)) return `LLM mode → ${spec}`;
+  return `keyword mode — no key for ${spec} (set ${prov ? prov.keyVar : 'a key'} in .env)`;
+}
 
+export function startChatServer({ port = PORT } = {}) {
   const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*'); // let the browser demo call us
     res.setHeader('Access-Control-Allow-Headers', 'content-type');
@@ -167,14 +228,25 @@ export function startChatServer({ port = PORT } = {}) {
     }
 
     try {
-      const result = hasKey
-        ? await buildLlmMvs(prompt, model)
-        : { mvsj: buildKeywordMvs(prompt) };
-      if (!hasKey && !result.mvsj) {
-        result.text =
-          'Keyword mode: name a structure like “lysozyme”, “hemoglobin”, or a PDB id (e.g. 4ins). ' +
-          'Set ANTHROPIC_API_KEY in .env to chat with a real model.';
+      const spec = model || env('MODEL') || DEFAULT_MODEL;
+      const prov = resolveProvider(spec);
+      const key = prov && env(prov.keyVar);
+
+      let result;
+      if (!prov || !key) {
+        // Keyword mode — no usable key for the active model.
+        result = { mvsj: buildKeywordMvs(prompt) };
+        if (!result.mvsj) {
+          result.text =
+            `Keyword mode (no ${prov ? prov.keyVar : 'API key'} set): name a structure like ` +
+            `“lysozyme”, “hemoglobin”, or a PDB id (e.g. 4ins). Add a key to .env to chat with ${spec}.`;
+        }
+      } else if (prov.kind === 'anthropic') {
+        result = toResult(await callAnthropic(key, prov.id, prompt));
+      } else {
+        result = toResult(await callOpenAiCompat(prov.baseUrl, key, prov.id, prompt));
       }
+
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify(result));
     } catch (err) {
@@ -183,9 +255,23 @@ export function startChatServer({ port = PORT } = {}) {
     }
   });
 
+  // Hot-reload .env so editing it (e.g. pasting a key) takes effect without a restart.
+  try {
+    let timer;
+    fs.watch(process.cwd(), (_event, filename) => {
+      if (filename && filename !== '.env') return;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        envFile = readEnvFile();
+        console.log(`  .env reloaded → [${describeMode()}]`);
+      }, 150);
+    });
+  } catch {
+    /* fs.watch unsupported here — keys still load at startup */
+  }
+
   server.listen(port, () => {
-    const mode = hasKey ? `LLM mode (${modelName})` : 'keyword mode — no ANTHROPIC_API_KEY set';
-    console.log(`  chat backend → http://localhost:${port}/chat  [${mode}]`);
+    console.log(`  chat backend → http://localhost:${port}/chat  [${describeMode()}]`);
   });
   return server;
 }

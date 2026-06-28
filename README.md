@@ -1,7 +1,9 @@
 # molstar-chat-driver
 
-A **chat interface for [Mol\*](https://molstar.org/)** powered by [MolViewSpec
-(MVS)](https://molstar.org/mol-view-spec-docs/).
+A LLM backed **chat interface for [Mol\*](https://molstar.org/)** powered by
+[MolViewSpec (MVS)](https://molstar.org/mol-view-spec-docs/).
+
+For context, you should see [the Mol\* viewer](https://molstar.org/viewer/).
 
 > **Licence:** free for academic, research, and other noncommercial use.
 
@@ -43,7 +45,7 @@ Instead, we call an HTTP endpoint (chat backend) that relays the user prompt to
 the configured LLM provider and returns the generated MVS scene tree JSON to
 Mol\*.
 
-The demo automatically starts a chat backend is with `npm run demo` (see
+The demo automatically starts a chat backend with `npm run demo` (see
 [`demo/server.mjs`](./demo/server.mjs)), however, any backend that supports the
 backend contract ([defined below](#the-backend-contract)) can be used.
 
