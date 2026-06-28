@@ -55,24 +55,25 @@ test('pickEntry does not mistake a bare number for a PDB id', () => {
   assert.equal(pickEntry('show me the 2024 cryo-EM model'), '1cbs'); // falls back via "show"
 });
 
-test('availableModels lists one model per configured non-OpenRouter key', () => {
+test('availableModels lists one model per configured non-OpenRouter key, plus keyword', () => {
   const models = availableModels(lookupFrom({ ANTHROPIC_API_KEY: 'a', GEMINI_API_KEY: 'g' }));
-  assert.deepEqual(models, ['anthropic:claude-haiku-4-5', 'gemini:gemini-2.5-flash']);
+  assert.deepEqual(models, ['anthropic:claude-haiku-4-5', 'gemini:gemini-2.5-flash', 'keyword']);
 });
 
 test('availableModels expands an explicit OpenRouter allow-list', () => {
   const models = availableModels(
     lookupFrom({ OPENROUTER_API_KEY: 'k', OPENROUTER_ALLOWED_MODELS: 'a/b, c/d' }),
   );
-  assert.deepEqual(models, ['openrouter:a/b', 'openrouter:c/d']);
+  assert.deepEqual(models, ['openrouter:a/b', 'openrouter:c/d', 'keyword']);
 });
 
 test('availableModels falls back to default open models for OpenRouter', () => {
   const models = availableModels(lookupFrom({ OPENROUTER_API_KEY: 'k' }));
-  assert.ok(models.length >= 2);
-  assert.ok(models.every((m) => m.startsWith('openrouter:')));
+  assert.ok(models.filter((m) => m.startsWith('openrouter:')).length >= 2);
 });
 
-test('availableModels is empty when no keys are configured', () => {
-  assert.deepEqual(availableModels(() => undefined), []);
+test('availableModels always offers keyword (and only keyword when no keys are set)', () => {
+  assert.deepEqual(availableModels(() => undefined), ['keyword']);
+  const withKeys = availableModels(lookupFrom({ ANTHROPIC_API_KEY: 'a' }));
+  assert.ok(withKeys.includes('keyword'));
 });

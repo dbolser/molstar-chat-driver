@@ -1,9 +1,6 @@
 # TODO
 
-## Nice-to-have
-
-- [ ] Surface the active backend mode (keyword vs LLM, and which model) in the demo UI, not just
-      the server banner — right now the browser can't tell which mode it's talking to.
+_Nothing open right now._
 
 ---
 
@@ -15,3 +12,6 @@
 - [x] Colour literals hoisted to a shared `COLORS` palette (removed the duplicated orange and the
       dead `blue` branch in `pickColor`).
 - [x] Dropped the `dotenv` dependency in favour of the built-in `util.parseEnv` (Node >= 20.12).
+- [x] Surface the active backend mode in the demo UI: `keyword` is now a selectable "model"
+      (always offered), and each turn is labelled with the model it used — so the browser can tell
+      keyword vs LLM without reading the server banner.
