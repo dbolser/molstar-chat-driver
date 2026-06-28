@@ -32,9 +32,8 @@ export interface MolstarViewerLike {
 /**
  * Build an {@link MvsRenderer} backed by a Mol* UMD `Viewer` instance.
  *
- * `sanityChecks: true` makes Mol* validate the scene tree before rendering — a second safety
- * net behind the endpoint's Tier-0 parse check. A model can emit valid JSON that is still
- * invalid MVS; this catches that before it reaches an evaluator's eyes.
+ * `sanityChecks: true` makes Mol* validate the scene tree before rendering, so an invalid scene
+ * surfaces as a clean rejection rather than a broken view.
  */
 export function createUmdRenderer(molstar: MolstarUmd, viewer: MolstarViewerLike): MvsRenderer {
   return {

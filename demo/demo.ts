@@ -1,19 +1,17 @@
 /**
- * Local demo: a fully playable chat-driver with NO backend and NO API keys.
+ * Local demo: a fully playable Mol* chat interface with NO backend and NO API keys.
  *
- * The "model" here is a mock endpoint that maps your prompt to a real MVS scene built with
- * Mol*'s own builder — so the entire prompt -> MVS -> render -> rate -> capture loop works
- * exactly as it will in production. Swap `createMockEndpoint` for `createHttpEndpoint(<url>)`
- * (pointing at a Supabase function) and nothing else changes.
+ * The backend here is a mock that maps your prompt to a real MVS scene built with Mol*'s own
+ * builder, so the whole prompt -> scene -> render loop works locally. To use a real model,
+ * swap `createMockBackend` for `createHttpBackend('https://your-service/...')` — nothing else
+ * changes.
  *
- * Mol* itself is loaded as the UMD bundle from a CDN (see index.html), exposed as
- * `window.molstar`.
+ * Mol* is loaded as the UMD bundle from a CDN (see index.html), exposed as `window.molstar`.
  */
 import {
-  consoleCaptureSink,
-  createMockEndpoint,
+  ChatRequest,
+  createMockBackend,
   createUmdRenderer,
-  EndpointRequest,
   mountChatDriver,
 } from '../src/index';
 
@@ -24,7 +22,7 @@ declare global {
   }
 }
 
-/** A few well-known structures keyed by words an evaluator might type. */
+/** A few well-known structures keyed by words you might type. */
 const NAMED_ENTRIES: Record<string, string> = {
   hemoglobin: '1hho',
   haemoglobin: '1hho',
@@ -35,14 +33,17 @@ const NAMED_ENTRIES: Record<string, string> = {
   retinol: '1cbs',
 };
 
-function pickEntry(prompt: string): string {
+function pickEntry(prompt: string): string | null {
   const p = prompt.toLowerCase();
   for (const [name, id] of Object.entries(NAMED_ENTRIES)) {
     if (p.includes(name)) return id;
   }
   // crude 4-character PDB-id detector: a digit followed by three alphanumerics.
   const m = p.match(/\b([0-9][a-z0-9]{3})\b/);
-  return m ? m[1] : '1cbs';
+  if (m) return m[1];
+  // No structure mentioned, but a clear "show me something" intent -> default to retinol.
+  if (/\b(show|render|display|view|load|draw)\b/.test(p)) return '1cbs';
+  return null;
 }
 
 function pickRepresentation(prompt: string): string {
@@ -62,12 +63,12 @@ function pickColor(prompt: string): string {
   return '#3050F8';
 }
 
-/** Build a valid MVSJ scene from a prompt using Mol*'s builder. Returns null to simulate a Tier-0 fail. */
-function buildMockMvs(req: EndpointRequest): string | null {
-  if (/\b(break|fail|gibberish|nonsense)\b/i.test(req.prompt)) return null;
+/** Build a valid MVSJ scene from a prompt using Mol*'s builder, or null if no structure is implied. */
+function buildMockMvs(req: ChatRequest): string | null {
+  const entry = pickEntry(req.prompt);
+  if (!entry) return null;
 
   const mvs = window.molstar.PluginExtensions.mvs;
-  const entry = pickEntry(req.prompt);
   const url = `https://www.ebi.ac.uk/pdbe/entry-files/download/${entry}_updated.cif`;
 
   const builder = mvs.MVSData.createBuilder();
@@ -100,15 +101,14 @@ async function main(): Promise<void> {
   });
 
   mountChatDriver('chat', {
-    endpoint: createMockEndpoint(buildMockMvs, { latencyMs: 350 }),
+    backend: createMockBackend(buildMockMvs, {
+      latencyMs: 350,
+      text: (req) => (pickEntry(req.prompt) ? undefined : 'I could not tell which structure you meant — try naming one, e.g. "lysozyme".'),
+    }),
     renderer: createUmdRenderer(window.molstar, viewer),
-    capture: consoleCaptureSink,
-    sessionId: 'demo-session',
-    evaluatorId: 'demo-user',
-    models: ['mock:claude-haiku-4-5', 'mock:gpt-5', 'mock:gemini-2.5'],
-    recordingNotice: true,
-    collectFeedback: true,
+    onTurn: (t) => console.log('[turn]', t.prompt, '→', t.rendered ? 'rendered' : t.response.mvsj ? 'render failed' : 'no scene'),
     placeholder: 'e.g. "show hemoglobin as cartoon coloured blue, with its ligands"',
+    welcome: 'Type a request to build a molecular scene. Try “lysozyme surface in green” or “4ins as ball and stick”.',
   });
 }
 

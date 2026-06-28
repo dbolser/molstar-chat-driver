@@ -1,13 +1,11 @@
 /**
  * molstar-chat-driver — public API.
  *
- * Turn natural-language prompts into MolViewSpec (MVS) scenes, render them in Mol*, and
- * reliably capture prompts + ratings + feedback. Built for the MolBench human-evaluation
- * effort, but usable standalone.
+ * A chat interface for Mol*: type a natural-language prompt, get a MolViewSpec (MVS) scene
+ * rendered in the Mol* viewer.
  */
 export * from './types';
-export * from './endpoint';
+export * from './backend';
 export * from './renderer';
-export * from './capture';
 export * from './driver';
 export * from './panel';

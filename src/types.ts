@@ -1,56 +1,32 @@
 /**
- * Shared types for molstar-chat-driver.
+ * Shared types for molstar-chat-driver — a chat interface for Mol*.
  *
- * The whole system turns on one artifact: a **MolViewSpec (MVS) scene tree**, carried as
- * MVSJ text. A model emits it, Mol* renders it, and (in MolBench) a grader scores it. Keeping
- * MVSJ as the contract is what lets the plugin, the evaluation harness, and the MolBench
- * grader stay decoupled.
+ * One idea runs through everything: a chat turn produces a **MolViewSpec (MVS) scene tree**,
+ * carried as MVSJ text, which Mol* renders natively. Keeping MVSJ as the unit of exchange is
+ * what lets the backend, the renderer, and the UI stay independent.
  */
 
-/** A grade an evaluator can give a single result. Configurable; see {@link DEFAULT_RATING_SCALE}. */
-export interface RatingOption {
-  value: string;
-  label: string;
-}
-
-/** Whether the model produced parseable MVS JSON at all (this is MolBench's "Tier 0"). */
-export type Tier0Status = 'pass' | 'fail';
-
-/**
- * Request sent to the LLM endpoint.
- *
- * The endpoint — NOT the browser — holds the model API keys. The browser only ever sends this.
- */
-export interface EndpointRequest {
-  /** The natural-language instruction from the user/evaluator. */
+/** A request to turn a prompt into a molecular scene. */
+export interface ChatRequest {
+  /** The natural-language instruction, e.g. "show hemoglobin as cartoon coloured blue". */
   prompt: string;
-  /** Identifier of the model to run, e.g. `"anthropic:claude-haiku-4-5"`. */
-  model: string;
-  /** Opaque session id, for correlating capture events server-side. */
-  sessionId?: string;
+  /** Optional model id, for backends that can route to more than one model. */
+  model?: string;
 }
 
-/**
- * Response from the LLM endpoint.
- *
- * This is the contract shared verbatim with the Supabase Edge Function (see CONTRACT.md).
- */
-export interface EndpointResponse {
-  /** The MVS scene tree as MVSJ text, or `null` if the model produced no parseable MVS. */
+/** The result of a chat turn. */
+export interface ChatResponse {
+  /** The MVS scene as MVSJ text, or `null` if the prompt produced no scene. */
   mvsj: string | null;
-  /** The model's raw, untouched output (useful for free-play capture + debugging). */
-  rawOutput: string;
-  /** Did the model produce parseable MVS JSON? `'fail'` means there is nothing to render. */
-  tier0: Tier0Status;
-  /** Echo of the model that produced this, as the server resolved it. */
-  model: string;
-  /** Optional human-readable error (network, provider, etc.). */
+  /** Optional assistant text to show in the chat (e.g. a short explanation). */
+  text?: string;
+  /** Optional error message, if the backend failed. */
   error?: string;
 }
 
-/** Something that can turn a prompt into model output. */
-export interface EndpointClient {
-  run(req: EndpointRequest): Promise<EndpointResponse>;
+/** Something that turns a {@link ChatRequest} into a {@link ChatResponse}. */
+export interface ChatBackend {
+  run(req: ChatRequest): Promise<ChatResponse>;
 }
 
 /** Something that can render an MVSJ scene tree into a molecular view. */
@@ -59,36 +35,15 @@ export interface MvsRenderer {
   loadMvsj(mvsj: string): Promise<void>;
 }
 
-/** Kinds of capture event emitted across the evaluation + free-play flows. */
-export type CaptureEventType = 'prompt' | 'render' | 'rating' | 'feedback';
-
-/**
- * A single thing worth recording. The {@link CaptureSink} decides where it goes — console in
- * dev, Supabase in production. Capture must be reliable: this is how we harvest real prompts.
- */
-export interface CaptureEvent {
-  type: CaptureEventType;
-  sessionId: string;
-  evaluatorId?: string;
+/** A completed exchange: what was asked, what came back, and whether it rendered. */
+export interface ChatTurn {
+  prompt: string;
   model?: string;
-  prompt?: string;
-  rawOutput?: string;
-  mvsj?: string | null;
-  tier0?: Tier0Status;
-  renderOk?: boolean;
-  rating?: string;
-  feedback?: string;
-  /** ISO-8601 timestamp, stamped at emit time. */
+  response: ChatResponse;
+  /** `true` only if a scene was produced AND rendered without error. */
+  rendered: boolean;
+  /** The render error, if rendering was attempted and failed. */
+  renderError?: unknown;
+  /** ISO-8601 timestamp of when the turn completed. */
   ts: string;
 }
-
-/** Where capture events go. Return a promise if the sink is async (e.g. network). */
-export type CaptureSink = (event: CaptureEvent) => void | Promise<void>;
-
-/** Default rating scale, matching Dan's "failed / OK / could be better" sketch. */
-export const DEFAULT_RATING_SCALE: RatingOption[] = [
-  { value: 'failed', label: 'Failed' },
-  { value: 'could_be_better', label: 'Could be better' },
-  { value: 'ok', label: 'OK' },
-  { value: 'good', label: 'Good' },
-];

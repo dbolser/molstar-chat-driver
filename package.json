@@ -1,7 +1,7 @@
 {
   "name": "molstar-chat-driver",
-  "version": "0.1.0",
-  "description": "A Mol* chat-driver: turn natural-language prompts into MolViewSpec (MVS) scenes, render them in Mol*, and reliably capture prompts, ratings, and feedback. Built for the MolBench human-evaluation effort.",
+  "version": "0.2.0",
+  "description": "A chat interface for Mol*: type natural-language prompts and drive the Mol* viewer via MolViewSpec (MVS) scenes.",
   "license": "PolyForm-Noncommercial-1.0.0",
   "author": "Dan Bolser",
   "type": "module",
@@ -14,7 +14,7 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "src", "LICENSE.md", "README.md", "CONTRACT.md"],
+  "files": ["dist", "src", "LICENSE.md", "README.md"],
   "scripts": {
     "build": "node esbuild.mjs build && tsc -p tsconfig.json --emitDeclarationOnly",
     "demo": "node esbuild.mjs demo",
@@ -37,9 +37,8 @@
     "molviewspec",
     "mvs",
     "molecular-visualization",
-    "llm",
-    "benchmark",
-    "molbench"
+    "chat",
+    "llm"
   ],
   "repository": {
     "type": "git",

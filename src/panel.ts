@@ -1,35 +1,24 @@
 /**
  * mountChatDriver — a small, dependency-free chat panel that drives a Mol* viewer.
  *
- * Renders next to a Mol* viewer (it does not own the viewer). Handles the three result states
- * a model can land in — rendered, no-valid-MVS (Tier-0 fail), render-failed — and collects a
- * rating (and optionally free-text feedback) per turn.
+ * Renders next to a Mol* viewer (it does not own the viewer). Each turn shows the prompt and a
+ * status line: rendered, no scene, or an error. That is the whole job — anything beyond it
+ * (ratings, recording, …) belongs to the consumer via the `onTurn` hook.
  */
 import { ChatDriver } from './driver';
-import {
-  CaptureSink,
-  DEFAULT_RATING_SCALE,
-  EndpointClient,
-  MvsRenderer,
-  RatingOption,
-} from './types';
+import { ChatBackend, ChatTurn, MvsRenderer } from './types';
 
 export interface ChatDriverPanelConfig {
-  endpoint: EndpointClient;
+  backend: ChatBackend;
   renderer: MvsRenderer;
-  capture?: CaptureSink;
-  sessionId: string;
-  evaluatorId?: string;
-  /** Models the user can pick from. The first is the default. */
-  models: string[];
-  /** Rating buttons shown under each result. Defaults to {@link DEFAULT_RATING_SCALE}. */
-  ratingScale?: RatingOption[];
-  /** Show a "your prompts are being recorded" banner (use in free-play). */
-  recordingNotice?: boolean;
-  /** Offer a free-text feedback box after each result (use in free-play). Default `false`. */
-  collectFeedback?: boolean;
+  /** Optional models the user can pick from. A selector is shown only when there are 2+. */
+  models?: string[];
+  /** Optional observer fired after each completed turn. */
+  onTurn?: (turn: ChatTurn) => void;
   /** Placeholder text for the prompt box. */
   placeholder?: string;
+  /** Optional intro line shown above the first turn. */
+  welcome?: string;
 }
 
 export interface ChatDriverPanelHandle {
@@ -40,8 +29,8 @@ export interface ChatDriverPanelHandle {
 const STYLE_ID = 'mcd-styles';
 const CSS = `
 .mcd-panel { display:flex; flex-direction:column; height:100%; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-size:14px; color:#1a1a1a; background:#fafafa; }
-.mcd-banner { padding:6px 12px; background:#fff7e6; border-bottom:1px solid #ffe2a8; color:#7a5b00; font-size:12px; }
 .mcd-transcript { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
+.mcd-welcome { color:#666; font-size:13px; padding:4px 2px; }
 .mcd-turn { border:1px solid #e6e6e6; border-radius:8px; background:#fff; overflow:hidden; }
 .mcd-prompt { padding:8px 12px; background:#f0f4ff; border-bottom:1px solid #e1e8ff; }
 .mcd-prompt .mcd-model { font-size:11px; color:#5566aa; margin-bottom:2px; }
@@ -49,15 +38,7 @@ const CSS = `
 .mcd-status.ok { color:#1a7f37; }
 .mcd-status.warn { color:#9a6700; }
 .mcd-status.err { color:#cf222e; }
-.mcd-raw { margin:0 12px 8px; padding:8px; background:#f6f8fa; border:1px solid #eaeaea; border-radius:6px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px; white-space:pre-wrap; word-break:break-word; max-height:160px; overflow:auto; }
-.mcd-rate { display:flex; flex-wrap:wrap; gap:6px; padding:0 12px 10px; }
-.mcd-rate button { cursor:pointer; border:1px solid #d0d0d0; background:#fff; border-radius:999px; padding:4px 12px; font-size:12px; }
-.mcd-rate button:hover { background:#f0f0f0; }
-.mcd-rate button.sel { background:#1a7f37; border-color:#1a7f37; color:#fff; }
-.mcd-rate.done button:not(.sel) { opacity:.4; }
-.mcd-fb { display:flex; flex-direction:column; gap:6px; padding:0 12px 12px; }
-.mcd-fb textarea { resize:vertical; min-height:48px; border:1px solid #d0d0d0; border-radius:6px; padding:6px; font:inherit; }
-.mcd-fb button { align-self:flex-start; cursor:pointer; border:1px solid #d0d0d0; background:#fff; border-radius:6px; padding:4px 12px; font-size:12px; }
+.mcd-text { padding:0 12px 10px; font-size:13px; color:#333; white-space:pre-wrap; }
 .mcd-form { display:flex; flex-direction:column; gap:8px; padding:12px; border-top:1px solid #e6e6e6; background:#fff; }
 .mcd-form .mcd-row { display:flex; gap:8px; align-items:center; }
 .mcd-form select { flex:0 0 auto; padding:6px; border:1px solid #d0d0d0; border-radius:6px; font:inherit; }
@@ -104,89 +85,51 @@ export function mountChatDriver(
 ): ChatDriverPanelHandle {
   ensureStyles();
   const root = resolveTarget(target);
-  const scale = config.ratingScale ?? DEFAULT_RATING_SCALE;
+  const models = config.models ?? [];
 
   const driver = new ChatDriver({
-    endpoint: config.endpoint,
+    backend: config.backend,
     renderer: config.renderer,
-    capture: config.capture,
-    sessionId: config.sessionId,
-    evaluatorId: config.evaluatorId,
+    onTurn: config.onTurn,
   });
 
   const panel = el('div', { class: 'mcd-panel' });
-  if (config.recordingNotice) {
-    panel.append(
-      el('div', { class: 'mcd-banner' }, '● Recording — your prompts and feedback are being saved to help build the benchmark.'),
-    );
-  }
-
   const transcript = el('div', { class: 'mcd-transcript' });
+  if (config.welcome) transcript.append(el('div', { class: 'mcd-welcome' }, config.welcome));
   panel.append(transcript);
 
   // Composer
   const textarea = el('textarea', { placeholder: config.placeholder ?? 'Ask for a molecular view…', rows: '2' });
-  const select = el('select');
-  for (const m of config.models) select.append(el('option', { value: m }, m));
   const send = el('button', { class: 'mcd-send', type: 'submit' }, 'Send');
-  const form = el(
-    'form',
-    { class: 'mcd-form' },
-    textarea,
-    el('div', { class: 'mcd-row' }, select, send),
-  );
+  const row = el('div', { class: 'mcd-row' });
+  let select: HTMLSelectElement | undefined;
+  if (models.length > 1) {
+    select = el('select');
+    for (const m of models) select.append(el('option', { value: m }, m));
+    row.append(select);
+  }
+  row.append(send);
+  const form = el('form', { class: 'mcd-form' }, textarea, row);
   panel.append(form);
 
   root.replaceChildren(panel);
 
-  function addTurn(prompt: string, model: string): { status: HTMLElement; turn: HTMLElement } {
+  function addTurn(prompt: string, model?: string): { status: HTMLElement; turn: HTMLElement } {
     const status = el('div', { class: 'mcd-status' }, 'Thinking…');
-    const turn = el(
-      'div',
-      { class: 'mcd-turn' },
-      el('div', { class: 'mcd-prompt' }, el('div', { class: 'mcd-model' }, model), prompt),
-      status,
-    );
+    const head = el('div', { class: 'mcd-prompt' });
+    if (model) head.append(el('div', { class: 'mcd-model' }, model));
+    head.append(prompt);
+    const turn = el('div', { class: 'mcd-turn' }, head, status);
     transcript.append(turn);
     transcript.scrollTop = transcript.scrollHeight;
     return { status, turn };
-  }
-
-  function addRating(turn: HTMLElement, prompt: string, model: string): void {
-    const row = el('div', { class: 'mcd-rate' });
-    for (const opt of scale) {
-      const btn = el('button', { type: 'button' }, opt.label);
-      btn.addEventListener('click', () => {
-        if (row.classList.contains('done')) return;
-        driver.rate(opt.value, { prompt, model });
-        btn.classList.add('sel');
-        row.classList.add('done');
-      });
-      row.append(btn);
-    }
-    turn.append(row);
-
-    if (config.collectFeedback) {
-      const fbText = el('textarea', { placeholder: 'Anything to add? (optional)' });
-      const fbBtn = el('button', { type: 'button' }, 'Submit feedback');
-      const fb = el('div', { class: 'mcd-fb' }, fbText, fbBtn);
-      fbBtn.addEventListener('click', () => {
-        const value = fbText.value.trim();
-        if (!value) return;
-        driver.feedback(value, { prompt, model });
-        fbBtn.textContent = 'Saved ✓';
-        fbBtn.setAttribute('disabled', 'true');
-        fbText.setAttribute('disabled', 'true');
-      });
-      turn.append(fb);
-    }
   }
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const prompt = textarea.value.trim();
     if (!prompt) return;
-    const model = select.value;
+    const model = select?.value || (models.length === 1 ? models[0] : undefined);
 
     const { status, turn } = addTurn(prompt, model);
     textarea.value = '';
@@ -195,20 +138,21 @@ export function mountChatDriver(
     void driver
       .submit(prompt, model)
       .then((result) => {
-        if (result.tier0 === 'fail') {
-          status.className = 'mcd-status warn';
-          status.textContent = '⚠ No valid scene produced (model output was not parseable MVS).';
-        } else if (result.renderOk) {
+        if (result.rendered) {
           status.className = 'mcd-status ok';
           status.textContent = '✓ Rendered in the viewer.';
-        } else {
+        } else if (result.response.mvsj) {
           status.className = 'mcd-status err';
-          status.textContent = '✗ Valid MVS, but rendering failed.';
+          status.textContent = '✗ Could not render this scene.';
+        } else {
+          status.className = 'mcd-status warn';
+          status.textContent = result.response.error
+            ? `⚠ ${result.response.error}`
+            : '⚠ No scene produced for that prompt.';
         }
-        if (result.tier0 === 'fail' || !result.renderOk) {
-          turn.append(el('pre', { class: 'mcd-raw' }, result.response.rawOutput || '(empty)'));
+        if (result.response.text) {
+          turn.append(el('div', { class: 'mcd-text' }, result.response.text));
         }
-        addRating(turn, prompt, model);
       })
       .catch((err) => {
         status.className = 'mcd-status err';
