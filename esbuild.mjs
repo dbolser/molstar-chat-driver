@@ -25,6 +25,10 @@ if (mode === 'build') {
   });
   console.log('✓ built dist/index.js');
 } else if (mode === 'demo') {
+  // Start the chat backend (keyword mode, or LLM mode if .env has a key).
+  const { startChatServer } = await import('./demo/server.mjs');
+  startChatServer();
+
   const ctx = await esbuild.context({
     ...shared,
     entryPoints: ['demo/demo.ts'],

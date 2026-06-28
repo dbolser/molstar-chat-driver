@@ -17,15 +17,16 @@ box next to the Mol\* viewer.
 The fastest way to see it in action is to simply run the bundled demo (below).
 
 
-### 1. Run the demo (no backend, no API keys)
+### 1. Run the demo (no API key needed)
 
 ```bash
 npm install
 npm run demo # → http://localhost:8765
 ```
 
-The demo ships a *mock* backend that builds real MVS scenes from a few keywords
-using Mol\*'s own builder. Try:
+`npm run demo` starts a small chat backend ([`demo/server.mjs`](./demo/server.mjs)) and serves
+the page. With no API key it runs in *keyword mode*, mapping a few keywords to a hand-authored
+MVS scene. Try:
 
 - `show hemoglobin as cartoon coloured blue, with its ligands`
 - `lysozyme surface in green`
@@ -47,62 +48,21 @@ backend: createHttpBackend('http://localhost:8787/chat')
 ```
 
 That endpoint just has to honour the [backend contract](#the-backend-contract):
-take `{ prompt, model }`, return `{ mvsj, text?, error? }`. Here is a complete,
-runnable reference backend using Claude (Anthropic). Save it as `server.mjs`:
+take `{ prompt, model }`, return `{ mvsj, text?, error? }`.
 
-```js
-// A minimal LLM backend for molstar-chat-driver.
-//   npm install @anthropic-ai/sdk
-//   ANTHROPIC_API_KEY=sk-ant-... node server.mjs   →  http://localhost:8787/chat
-import http from 'node:http';
-import Anthropic from '@anthropic-ai/sdk';
+**The demo already includes one** — [`demo/server.mjs`](./demo/server.mjs) — which `npm run
+demo` starts for you (it's the same server that powers keyword mode above). To switch it to a
+real model, copy the example env file and add your key:
 
-const client = new Anthropic(); // reads ANTHROPIC_API_KEY from the environment
-
-const SYSTEM = `You turn a user's request into a MolViewSpec (MVS) scene tree.
-Reply with ONLY the MVSJ JSON object — no prose, no markdown code fences.
-Shape: { "metadata": { "version": "1" }, "root": { "kind": "root", "children": [ ... ] } },
-nesting download → parse → structure → component → representation → color nodes.`;
-
-const server = http.createServer(async (req, res) => {
-  // Let the browser (a different origin) call this endpoint.
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'content-type');
-  if (req.method === 'OPTIONS') return res.writeHead(204).end();
-  if (req.method !== 'POST') return res.writeHead(405).end();
-
-  let body = '';
-  for await (const chunk of req) body += chunk;
-  const { prompt, model } = JSON.parse(body || '{}');
-
-  try {
-    const message = await client.messages.create({
-      model: model || 'claude-opus-4-8',
-      max_tokens: 16000,
-      system: SYSTEM,
-      messages: [{ role: 'user', content: prompt }],
-    });
-    const text = message.content.find((b) => b.type === 'text')?.text ?? '';
-    // Did the model return parseable MVS JSON?
-    let mvsj = null;
-    try { JSON.parse(text); mvsj = text; } catch { /* not valid JSON */ }
-    res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ mvsj, text: mvsj ? undefined : text }));
-  } catch (err) {
-    res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ mvsj: null, error: String(err) }));
-  }
-});
-
-server.listen(8787, () => console.log('chat backend → http://localhost:8787/chat'));
+```bash
+cp .env.example .env
+# then edit .env:  ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-Run it alongside the demo, then swap the demo's mock backend for the HTTP one — in
-`demo/demo.ts`, replace the `createMockBackend(...)` line with:
-
-```ts
-backend: createHttpBackend('http://localhost:8787/chat'),
-```
+Restart `npm run demo` and the same page now talks to the model — nothing else to change. Set
+`MODEL=` in `.env` to pick a different one (default `claude-opus-4-8`). The bundled server is
+also a minimal template for your own backend: swap the Claude call for any provider, keep the
+contract, and keep the key on the server.
 
 **Picking a model.** Any provider works — the backend is yours; just return MVSJ. The hard part
 is getting the model to emit *valid* MVS reliably, and that varies a lot by model. For a
