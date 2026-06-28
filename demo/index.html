@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>molstar-chat-driver · demo</title>
+    <!-- Mol* UMD viewer bundle (exposes window.molstar). Pinned for reproducibility. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/molstar@5.10.1/build/viewer/molstar.css" />
+    <script src="https://cdn.jsdelivr.net/npm/molstar@5.10.1/build/viewer/molstar.js"></script>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      #app { display: flex; height: 100%; }
+      #viewer { position: relative; flex: 1; min-width: 0; }
+      #chat { flex: 0 0 420px; border-left: 1px solid #e0e0e0; }
+      @media (max-width: 820px) {
+        #app { flex-direction: column; }
+        #viewer { flex: 1 1 55%; }
+        #chat { flex: 1 1 45%; border-left: none; border-top: 1px solid #e0e0e0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="viewer"></div>
+      <div id="chat"></div>
+    </div>
+    <script type="module" src="./dist/demo.js"></script>
+  </body>
+</html>
