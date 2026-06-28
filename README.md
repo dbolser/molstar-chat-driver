@@ -14,6 +14,7 @@ package is a small JavaScript library you add to a web page — it mounts a chat
 Mol\* viewer and turns what you type into a rendered molecular scene. The fastest way to see it
 work is the bundled demo.
 
+
 ### 1. Run the demo (no backend, no API keys)
 
 ```bash
@@ -30,6 +31,7 @@ own builder, so the whole prompt → scene → render loop runs locally. Try:
 
 The mock only understands a handful of patterns — it's there to prove the pipeline, not to chat.
 **To actually talk to a model, connect an LLM backend** (next).
+
 
 ### 2. Connect your LLM backend
 
@@ -104,6 +106,7 @@ is getting the model to emit *valid* MVS reliably, and that varies a lot by mode
 data-driven view of which models are good at natural-language → MVS (and how they compare), see
 **[MolBench](https://github.com/dbolser/MolBench)**, the open benchmark this plugin grew out of.
 
+
 ## Add molstar-chat-driver
 
 For developers embedding the chat driver in their own page.
@@ -121,6 +124,7 @@ mountChatDriver('chat', {
   placeholder: 'Ask for a molecular view…',
 });
 ```
+
 
 ### The backend contract
 
@@ -141,6 +145,7 @@ Your backend receives a `ChatRequest` and returns a `ChatResponse`:
 That's the only thing your service must implement. Keep any API keys on the service — the
 browser only ever sends the prompt.
 
+
 ### Rendering with the Mol\* ES library (instead of the UMD bundle)
 
 If you embed Mol\* as an ES module rather than the UMD bundle, implement `MvsRenderer`
@@ -160,6 +165,7 @@ const renderer: MvsRenderer = {
 
 Make sure your plugin spec registers MVS support via `MolViewSpecBehavior`
 (`molstar/lib/extensions/mvs/behavior`).
+
 
 ## What it does
 
@@ -184,6 +190,7 @@ The unit of exchange is **MVSJ text**, which keeps the pieces independent:
 - **One neutral observer hook** — an optional `onTurn(turn)` callback lets you log or record
   completed turns, without the plugin needing any opinion about it.
 
+
 ## API surface
 
 | Export | What it is |
@@ -194,10 +201,11 @@ The unit of exchange is **MVSJ text**, which keeps the pieces independent:
 | `createUmdRenderer(molstar, viewer)` | `MvsRenderer` over the Mol\* UMD viewer. |
 | `ChatRequest` / `ChatResponse` / `ChatTurn` / `MvsRenderer` | The types. |
 
+
 ## Licence
 
-[PolyForm Noncommercial License 1.0.0](./LICENSE.md). Free for any noncommercial purpose
-(academic, research, education, government, personal). **Commercial use requires a separate
-licence** — contact **dan.bolser@gmail.com**.
+[PolyForm Noncommercial License 1.0.0](./LICENSE.md).
+- Free for any noncommercial purpose(academic, research, education, government, personal).
+- **Commercial use requires a separate licence** — contact **dan.bolser@gmail.com**.
 
-Mol\* itself is MIT-licensed and is used here as a peer dependency.
+Mol\* is MIT-licensed and is used here as a peer dependency.
