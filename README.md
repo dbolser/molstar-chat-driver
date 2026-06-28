@@ -9,10 +9,10 @@ A **chat interface for [Mol\*](https://molstar.org/) powered by
 
 ## Install and test locally
 
-Mol\* runs in the browser, so there's no separate desktop app to install (unlike PyMOL). This
-package is a small JavaScript library you add to a web page — it mounts a chat box next to a
-Mol\* viewer and turns what you type into a rendered molecular scene. The fastest way to see it
-work is the bundled demo.
+Mol\* runs in the browser, so there's no separate desktop app to install. This
+package is a small JavaScript library that mounts a chat box next to a Mol\*
+viewer and turns what you type into a rendered molecular scene. The fastest way
+to see it work is to run the bundled demo (below).
 
 
 ### 1. Run the demo (no backend, no API keys)
@@ -22,30 +22,31 @@ npm install
 npm run demo      # → http://localhost:8765
 ```
 
-The demo ships a *mock* backend that builds real MVS scenes from a few keywords using Mol\*'s
-own builder, so the whole prompt → scene → render loop runs locally. Try:
+The demo ships a *mock* backend that builds real MVS scenes from a few keywords
+using Mol\*'s own builder. Try:
 
 - `show hemoglobin as cartoon coloured blue, with its ligands`
 - `lysozyme surface in green`
 - `4ins as ball and stick`
 
-The mock only understands a handful of patterns — it's there to prove the pipeline, not to chat.
-**To actually talk to a model, connect an LLM backend** (next).
+The mock only understands a handful of patterns for testing layout. **To
+use the plugin, connect an LLM backend** (below).
 
 
 ### 2. Connect your LLM backend
 
-The plugin never calls an LLM directly — your API key stays on a server you control (browsers
-can't keep secrets, and most LLM APIs block direct browser calls anyway). You stand up a small
-HTTP endpoint that turns a prompt into an MVS scene, and point the plugin at it:
+The plugin never calls an LLM directly — your API key stays on a server you
+control (browsers can't keep secrets, and most LLM APIs block direct browser
+calls anyway). You stand up a small HTTP endpoint that turns a prompt into an
+MVS scene, and point the plugin at it:
 
 ```ts
 backend: createHttpBackend('http://localhost:8787/chat')
 ```
 
-That endpoint just has to honour the [backend contract](#the-backend-contract): take
-`{ prompt, model }`, return `{ mvsj, text?, error? }`. Here is a complete, runnable reference
-backend using Claude (Anthropic). Save it as `server.mjs`:
+That endpoint just has to honour the [backend contract](#the-backend-contract):
+take `{ prompt, model }`, return `{ mvsj, text?, error? }`. Here is a complete,
+runnable reference backend using Claude (Anthropic). Save it as `server.mjs`:
 
 ```js
 // A minimal LLM backend for molstar-chat-driver.
