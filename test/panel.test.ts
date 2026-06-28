@@ -65,6 +65,16 @@ test('Shift+Enter does not submit (it leaves a newline to the browser)', async (
   assert.equal(calls.length, 0);
 });
 
+test('Enter while an IME is composing does not submit', async () => {
+  const { backend, calls } = recordingBackend();
+  mountChatDriver('chat', { backend, renderer: okRenderer });
+  const ta = document.querySelector('textarea')!;
+  ta.value = 'にほん';
+  ta.dispatchEvent(key({ key: 'Enter', isComposing: true }));
+  await tick();
+  assert.equal(calls.length, 0);
+});
+
 test('ArrowUp at the start of the box recalls the previous prompt', async () => {
   const { backend } = recordingBackend();
   mountChatDriver('chat', { backend, renderer: okRenderer });

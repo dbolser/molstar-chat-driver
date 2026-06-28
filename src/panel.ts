@@ -198,7 +198,8 @@ export function mountChatDriver(
   // History only fires when the caret is at the very start (↑) or end (↓) so normal
   // line-by-line cursor movement inside a multiline draft is left untouched.
   textarea.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    // `!e.isComposing` so confirming an IME composition (CJK input) with Enter doesn't submit.
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
       e.preventDefault();
       runPrompt();
       return;
