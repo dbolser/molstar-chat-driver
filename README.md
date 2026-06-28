@@ -1,25 +1,27 @@
 # molstar-chat-driver
 
-A **chat interface for [Mol\*](https://molstar.org/) powered by
-[MolViewSpec (MVS)](https://molstar.org/mol-view-spec-docs/)**.
+A **chat interface for [Mol\*](https://molstar.org/)** powered by [MolViewSpec
+(MVS)](https://molstar.org/mol-view-spec-docs/).
 
 > **Licence:** free for academic, research, and other noncommercial use.
 
 ---
 
-## Install and test locally
+## Try `molstar-chat` locally
 
-Mol\* runs in the browser, so there's no separate desktop app to install. This
-package is a small JavaScript library that mounts a chat box next to a Mol\*
-viewer and turns what you type into a rendered molecular scene. The fastest way
-to see it work is to run the bundled demo (below).
+Mol\* is browser native, so there's no separate app to install. For testing,
+this package combines the `molstar-chat-driver` plugin within the Mol\* browser
+application via a small JavaScript library that simply loads the plugin's chat
+box next to the Mol\* viewer.
+
+The fastest way to see it in action is to simply run the bundled demo (below).
 
 
 ### 1. Run the demo (no backend, no API keys)
 
 ```bash
 npm install
-npm run demo      # → http://localhost:8765
+npm run demo # → http://localhost:8765
 ```
 
 The demo ships a *mock* backend that builds real MVS scenes from a few keywords
@@ -29,16 +31,16 @@ using Mol\*'s own builder. Try:
 - `lysozyme surface in green`
 - `4ins as ball and stick`
 
-The mock only understands a handful of patterns for testing layout. **To
-use the plugin, connect an LLM backend** (below).
+This mock backend only understands a handful of patterns for testing layout.
+**To test the plugin properly configure an LLM backend** (below).
 
 
 ### 2. Connect your LLM backend
 
-The plugin never calls an LLM directly — your API key stays on a server you
-control (browsers can't keep secrets, and most LLM APIs block direct browser
-calls anyway). You stand up a small HTTP endpoint that turns a prompt into an
-MVS scene, and point the plugin at it:
+The plugin does not call an LLM directly, this is to protect the underlying API
+key (additionally most LLM APIs block direct browser calls). Instead, we call a
+small HTTP endpoint that relays the prompt to the LLM provider and returns the
+scene tree:
 
 ```ts
 backend: createHttpBackend('http://localhost:8787/chat')
