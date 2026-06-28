@@ -1,19 +1,17 @@
 # molstar-chat-driver
 
-A **chat interface for [Mol\*](https://molstar.org/)**. Type a natural-language prompt, get a
-molecular scene rendered in the viewer — powered by
-[MolViewSpec (MVS)](https://molstar.org/mol-view-spec-docs/).
+A **chat interface for [Mol\*](https://molstar.org/) powered by
+[MolViewSpec (MVS)](https://molstar.org/mol-view-spec-docs/)**.
 
-> **Licence:** free for academic, research, and other noncommercial use. Commercial use needs a
-> separate licence — see [Licence](#licence) below.
+> **Licence:** free for academic, research, and other noncommercial use.
 
 ---
 
 ## What it does
 
 ```
-  prompt ──▶ backend ──▶ MVSJ ──▶ Mol* renders
-            (your model)  (scene tree)  (3D view)
+     prompt   ──▶  backend ──▶ MVSJ ──▶ Mol* renders
+  (your model)  (scene tree)  (3D view)
 ```
 
 You give it a **backend** (anything that turns a prompt into an MVS scene — usually a small
@@ -48,6 +46,7 @@ builder, so the whole loop runs locally. Try:
 - `lysozyme surface in green`
 - `4ins as ball and stick`
 
+
 ## Use it in your app
 
 ```ts
@@ -63,6 +62,7 @@ mountChatDriver('chat', {
   placeholder: 'Ask for a molecular view…',
 });
 ```
+
 
 ### The backend contract
 
@@ -82,6 +82,7 @@ Your backend receives a `ChatRequest` and returns a `ChatResponse`:
 
 That's the only thing your service must implement. Keep any API keys on the service — the
 browser only ever sends the prompt.
+
 
 ### Rendering with the Mol\* ES library (instead of the UMD bundle)
 
@@ -103,6 +104,7 @@ const renderer: MvsRenderer = {
 Make sure your plugin spec registers MVS support via `MolViewSpecBehavior`
 (`molstar/lib/extensions/mvs/behavior`).
 
+
 ## API surface
 
 | Export | What it is |
@@ -113,10 +115,11 @@ Make sure your plugin spec registers MVS support via `MolViewSpecBehavior`
 | `createUmdRenderer(molstar, viewer)` | `MvsRenderer` over the Mol\* UMD viewer. |
 | `ChatRequest` / `ChatResponse` / `ChatTurn` / `MvsRenderer` | The types. |
 
+
 ## Licence
 
 [PolyForm Noncommercial License 1.0.0](./LICENSE.md). Free for any noncommercial purpose
 (academic, research, education, government, personal). **Commercial use requires a separate
-licence** — contact **dan.bolser@outsee.co.uk**.
+licence** — contact **dan.bolser@gmail.com**.
 
 Mol\* itself is MIT-licensed and is used here as a peer dependency.
