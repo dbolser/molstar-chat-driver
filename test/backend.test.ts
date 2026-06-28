@@ -1,6 +1,6 @@
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { createHttpBackend } from '../src/backend';
+import { createHttpBackend, createMockBackend } from '../src/backend';
 
 const realFetch = globalThis.fetch;
 afterEach(() => {
@@ -62,6 +62,22 @@ test('passes a well-formed response through untouched', async () => {
   const res = await createHttpBackend('http://x/chat').run({ prompt: 'hi' });
   assert.equal(res.mvsj, '{}');
   assert.equal(res.text, 'ok');
+});
+
+test('createMockBackend maps a prompt to a scene, with optional text', async () => {
+  const backend = createMockBackend((req) => `mvsj-for:${req.prompt}`, {
+    text: (req) => `built ${req.prompt}`,
+  });
+  const res = await backend.run({ prompt: 'lysozyme' });
+  assert.equal(res.mvsj, 'mvsj-for:lysozyme');
+  assert.equal(res.text, 'built lysozyme');
+});
+
+test('createMockBackend represents "no scene" with a null build result', async () => {
+  const backend = createMockBackend(() => null);
+  const res = await backend.run({ prompt: 'hello' });
+  assert.equal(res.mvsj, null);
+  assert.equal(res.text, undefined);
 });
 
 test('sends the request as JSON with merged headers', async () => {

@@ -15,7 +15,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import dotenv from 'dotenv';
+import { parseEnv } from 'node:util';
 
 const PORT = 8787;
 const DEFAULT_MODEL = 'anthropic:claude-haiku-4-5'; // small + cheap, plenty good for MVS
@@ -41,9 +41,9 @@ const DEFAULT_OPENROUTER_MODELS = [
 function readEnvFile() {
   const p = path.resolve(process.cwd(), '.env');
   if (!fs.existsSync(p)) return {};
-  // dotenv.parse → plain object; it does NOT mutate process.env, so the shell-vars-win
-  // precedence in env() below is preserved (and it handles quotes/escapes/multiline for us).
-  return dotenv.parse(fs.readFileSync(p));
+  // Node's built-in .env parser (>=20.12) → plain object; it does NOT mutate process.env, so the
+  // shell-vars-win precedence in env() below is preserved (and it handles quotes/escapes for us).
+  return parseEnv(fs.readFileSync(p, 'utf8'));
 }
 
 let envFile = readEnvFile();
@@ -109,8 +109,10 @@ export function pickEntry(prompt) {
   for (const [name, id] of Object.entries(NAMED_ENTRIES)) {
     if (p.includes(name)) return id;
   }
-  const m = p.match(/\b([0-9][a-z0-9]{3})\b/); // crude PDB-id detector
-  if (m) return m[1];
+  // Crude PDB-id detector: 4 chars starting 1-9 and containing at least one letter, so plain
+  // numbers ("2024", "1999") aren't mistaken for structure ids and sent to a 404.
+  const m = p.match(/\b([1-9][a-z0-9]{3})\b/);
+  if (m && /[a-z]/.test(m[1])) return m[1];
   if (/\b(show|render|display|view|load|draw)\b/.test(p)) return '1cbs';
   return null;
 }
@@ -123,13 +125,20 @@ function pickRepresentation(prompt) {
   return 'cartoon';
 }
 
+// Named colours for keyword mode. `blue` doubles as the default.
+const COLORS = {
+  red: '#E8000B',
+  green: '#1A9E1A',
+  orange: '#FF7F0E',
+  blue: '#3050F8',
+};
+
 function pickColor(prompt) {
   const p = prompt.toLowerCase();
-  if (p.includes('red')) return '#E8000B';
-  if (p.includes('green')) return '#1A9E1A';
-  if (p.includes('orange')) return '#FF7F0E';
-  if (p.includes('blue')) return '#3050F8';
-  return '#3050F8';
+  for (const [name, hex] of Object.entries(COLORS)) {
+    if (p.includes(name)) return hex;
+  }
+  return COLORS.blue;
 }
 
 function component(selector, type, color) {
@@ -149,7 +158,7 @@ export function buildKeywordMvs(prompt) {
   const url = `https://www.ebi.ac.uk/pdbe/entry-files/download/${entry}_updated.cif`;
   const components = [component('polymer', pickRepresentation(prompt), pickColor(prompt))];
   if (/ligand|drug|heme|haem|bound|cofactor/i.test(prompt)) {
-    components.push(component('ligand', 'ball_and_stick', '#FF7F0E'));
+    components.push(component('ligand', 'ball_and_stick', COLORS.orange));
   }
 
   return JSON.stringify({

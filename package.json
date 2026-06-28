@@ -39,7 +39,6 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
-    "dotenv": "^17.4.2",
     "esbuild": "^0.28.1",
     "jsdom": "^24.1.3",
     "tsx": "^4.22.4",

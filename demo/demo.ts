@@ -50,4 +50,11 @@ async function main(): Promise<void> {
   });
 }
 
-void main();
+main().catch((err) => {
+  // A failure before the panel mounts (e.g. the Mol* CDN is blocked, or Viewer.create rejects)
+  // would otherwise leave a blank page. Surface it instead of failing silently.
+  const msg = `Failed to start the demo: ${String(err)}`;
+  const chat = document.getElementById('chat');
+  if (chat) chat.textContent = msg;
+  console.error(msg, err);
+});

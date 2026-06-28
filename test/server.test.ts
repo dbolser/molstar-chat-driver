@@ -49,6 +49,12 @@ test('pickEntry resolves names, PDB ids, and bare display verbs', () => {
   assert.equal(pickEntry('just chatting, no structure'), null);
 });
 
+test('pickEntry does not mistake a bare number for a PDB id', () => {
+  assert.equal(pickEntry('tell me about the year 2024'), null); // not a structure id
+  assert.equal(pickEntry('what happened in 1999'), null);
+  assert.equal(pickEntry('show me the 2024 cryo-EM model'), '1cbs'); // falls back via "show"
+});
+
 test('availableModels lists one model per configured non-OpenRouter key', () => {
   const models = availableModels(lookupFrom({ ANTHROPIC_API_KEY: 'a', GEMINI_API_KEY: 'g' }));
   assert.deepEqual(models, ['anthropic:claude-haiku-4-5', 'gemini:gemini-2.5-flash']);
