@@ -7,7 +7,7 @@ no need to ask.
 
 **Commercial use requires a separate licence.** If you are a commercial organisation (for
 example a pharmaceutical or biotech company) and want to use this software for a commercial
-purpose, please get in touch to arrange a licence: **dan.bolser@outsee.co.uk**.
+purpose, please get in touch to arrange a licence: **dan.bolser@gmail.com**.
 
 ---
 
