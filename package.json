@@ -14,10 +14,16 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "src", "LICENSE.md", "README.md"],
+  "files": [
+    "dist",
+    "src",
+    "LICENSE.md",
+    "README.md"
+  ],
   "scripts": {
     "build": "node esbuild.mjs build && tsc -p tsconfig.json --emitDeclarationOnly",
     "demo": "node esbuild.mjs demo",
+    "test": "node --import tsx --test test/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
@@ -30,7 +36,9 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
+    "dotenv": "^17.4.2",
     "esbuild": "^0.23.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.5.0"
   },
   "keywords": [

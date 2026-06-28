@@ -15,25 +15,18 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
 
 const PORT = 8787;
 const DEFAULT_MODEL = 'anthropic:claude-haiku-4-5'; // small + cheap, plenty good for MVS
 
 // --- config: .env file, hot-reloaded -------------------------------------------------
 function readEnvFile() {
-  const out = {};
   const p = path.resolve(process.cwd(), '.env');
-  if (!fs.existsSync(p)) return out;
-  for (const raw of fs.readFileSync(p, 'utf8').split('\n')) {
-    const m = raw.match(/^\s*([\w.-]+)\s*=\s*(.*?)\s*$/);
-    if (!m) continue;
-    let [, key, val] = m;
-    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-      val = val.slice(1, -1);
-    }
-    out[key] = val;
-  }
-  return out;
+  if (!fs.existsSync(p)) return {};
+  // dotenv.parse → plain object; it does NOT mutate process.env, so the shell-vars-win
+  // precedence in env() below is preserved (and it handles quotes/escapes/multiline for us).
+  return dotenv.parse(fs.readFileSync(p));
 }
 
 let envFile = readEnvFile();
@@ -77,7 +70,7 @@ const NAMED_ENTRIES = {
   retinol: '1cbs',
 };
 
-function pickEntry(prompt) {
+export function pickEntry(prompt) {
   const p = prompt.toLowerCase();
   for (const [name, id] of Object.entries(NAMED_ENTRIES)) {
     if (p.includes(name)) return id;
@@ -115,7 +108,7 @@ function component(selector, type, color) {
   };
 }
 
-function buildKeywordMvs(prompt) {
+export function buildKeywordMvs(prompt) {
   const entry = pickEntry(prompt);
   if (!entry) return null;
 
@@ -191,15 +184,31 @@ async function callOpenAiCompat(baseUrl, key, id, prompt) {
   }
 }
 
-function toResult(text) {
-  let mvsj = null;
-  try {
-    JSON.parse(text); // Tier 0: parseable JSON?
-    mvsj = text;
-  } catch {
-    /* not valid MVS JSON */
+// Models are asked for bare MVSJ, but routinely wrap it in ```json fences or a line
+// of prose. Peel those off before validating so a correct scene isn't thrown away.
+function unwrapJson(text) {
+  const trimmed = text.trim();
+  const fenced = trimmed.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/i);
+  const inner = (fenced ? fenced[1] : trimmed).trim();
+  // Fallback: grab the outermost {...} if there's leading/trailing prose.
+  const open = inner.indexOf('{');
+  const close = inner.lastIndexOf('}');
+  const sliced = open !== -1 && close > open ? inner.slice(open, close + 1) : '';
+  const candidates = [inner];
+  if (sliced && sliced !== inner) candidates.push(sliced);
+  return candidates;
+}
+
+export function toResult(text) {
+  for (const candidate of unwrapJson(text)) {
+    try {
+      JSON.parse(candidate); // parseable JSON wins; first match is the scene
+      return { mvsj: candidate };
+    } catch {
+      /* try the next candidate */
+    }
   }
-  return { mvsj, text: mvsj ? undefined : text };
+  return { mvsj: null, text }; // nothing parsed — show the raw reply as chat text
 }
 
 // --- server --------------------------------------------------------------------------

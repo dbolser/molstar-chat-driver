@@ -54,18 +54,20 @@ your API key:
 
 ```bash
 cp .env.example .env
-# then edit .env:  ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-Restart `npm run demo` and the same page now talks to the model — nothing else to change. Set
-`MODEL=` in `.env` to pick a different one (default `claude-opus-4-8`). The bundled server is
-also a minimal template for your own backend: swap the Claude call for any provider, keep the
-contract, and keep the key on the server.
+Get an API key, e.g. (in no particular order):
+- https://platform.openai.com/api-keys
+- https://aistudio.google.com/api-keys
+- https://console.anthropic.com/settings/keys
+- https://openrouter.ai/keys
 
-**Picking a model.** Any provider works — the backend is yours; just return MVSJ. The hard part
-is getting the model to emit *valid* MVS reliably, and that varies a lot by model. For a
-data-driven view of which models are good at natural-language → MVS (and how they compare), see
-**[MolBench](https://github.com/dbolser/MolBench)**, the open benchmark this plugin grew out of.
+
+**Picking a model.** Any provider works (the backend is yours); just return
+MVSJ. The hard part is getting the model to emit *valid* MVS reliably, and that
+varies a lot by model. For a data-driven view of which models are good at
+natural-language → MVS (and how they compare), see
+**[MolBench](https://github.com/dbolser/MolBench)**.
 
 
 ## Add molstar-chat-driver

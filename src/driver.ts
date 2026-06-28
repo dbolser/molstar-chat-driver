@@ -24,7 +24,7 @@ export class ChatDriver {
 
     let rendered = false;
     let renderError: unknown;
-    if (response.mvsj) {
+    if (response?.mvsj) {
       try {
         await this.opts.renderer.loadMvsj(response.mvsj);
         rendered = true;
@@ -41,7 +41,13 @@ export class ChatDriver {
       renderError,
       ts: new Date().toISOString(),
     };
-    this.opts.onTurn?.(turn);
+    // The observer is a neutral seam: a throwing observer must not corrupt a turn
+    // that already ran (and rendered). Isolate it.
+    try {
+      this.opts.onTurn?.(turn);
+    } catch {
+      /* observer errors are the observer's problem, not the turn's */
+    }
     return turn;
   }
 }

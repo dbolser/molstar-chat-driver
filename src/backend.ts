@@ -33,7 +33,16 @@ export function createHttpBackend(
         const text = await res.text().catch(() => '');
         return { mvsj: null, error: `HTTP ${res.status}: ${text.slice(0, 200)}` };
       }
-      return (await res.json()) as ChatResponse;
+      let data: unknown;
+      try {
+        data = await res.json();
+      } catch (e) {
+        return { mvsj: null, error: `Invalid JSON from backend: ${String(e)}` };
+      }
+      if (typeof data !== 'object' || data === null || !('mvsj' in data)) {
+        return { mvsj: null, error: 'Malformed backend response: expected { mvsj, text?, error? }' };
+      }
+      return data as ChatResponse;
     },
   };
 }

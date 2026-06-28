@@ -142,13 +142,18 @@ export function mountChatDriver(
           status.className = 'mcd-status ok';
           status.textContent = '✓ Rendered in the viewer.';
         } else if (result.response.mvsj) {
+          // A scene was produced but Mol* rejected it — show why, don't swallow it.
           status.className = 'mcd-status err';
-          status.textContent = '✗ Could not render this scene.';
+          status.textContent = result.renderError
+            ? `✗ Could not render this scene: ${String(result.renderError)}`
+            : '✗ Could not render this scene.';
+        } else if (result.response.error) {
+          // The backend itself failed: that's an error, not a benign "no scene".
+          status.className = 'mcd-status err';
+          status.textContent = `✗ ${result.response.error}`;
         } else {
           status.className = 'mcd-status warn';
-          status.textContent = result.response.error
-            ? `⚠ ${result.response.error}`
-            : '⚠ No scene produced for that prompt.';
+          status.textContent = '⚠ No scene produced for that prompt.';
         }
         if (result.response.text) {
           turn.append(el('div', { class: 'mcd-text' }, result.response.text));
