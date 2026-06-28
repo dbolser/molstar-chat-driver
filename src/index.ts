@@ -8,4 +8,5 @@ export * from './types';
 export * from './backend';
 export * from './renderer';
 export * from './driver';
+export * from './history';
 export * from './panel';

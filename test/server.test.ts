@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { toResult, buildKeywordMvs, pickEntry } from '../demo/server.mjs';
+import { toResult, buildKeywordMvs, pickEntry, availableModels } from '../demo/server.mjs';
+
+/** Build a fake env lookup from a plain object, mirroring server.mjs's env() shape. */
+const lookupFrom = (vars: Record<string, string>) => (name: string) => vars[name];
 
 test('toResult accepts bare MVSJ', () => {
   const r = toResult('{"root":{"kind":"root"}}');
@@ -44,4 +47,26 @@ test('pickEntry resolves names, PDB ids, and bare display verbs', () => {
   assert.equal(pickEntry('show me lysozyme'), '1lyz');
   assert.equal(pickEntry('load 4ins please'), '4ins');
   assert.equal(pickEntry('just chatting, no structure'), null);
+});
+
+test('availableModels lists one model per configured non-OpenRouter key', () => {
+  const models = availableModels(lookupFrom({ ANTHROPIC_API_KEY: 'a', GEMINI_API_KEY: 'g' }));
+  assert.deepEqual(models, ['anthropic:claude-haiku-4-5', 'gemini:gemini-2.5-flash']);
+});
+
+test('availableModels expands an explicit OpenRouter allow-list', () => {
+  const models = availableModels(
+    lookupFrom({ OPENROUTER_API_KEY: 'k', OPENROUTER_ALLOWED_MODELS: 'a/b, c/d' }),
+  );
+  assert.deepEqual(models, ['openrouter:a/b', 'openrouter:c/d']);
+});
+
+test('availableModels falls back to default open models for OpenRouter', () => {
+  const models = availableModels(lookupFrom({ OPENROUTER_API_KEY: 'k' }));
+  assert.ok(models.length >= 2);
+  assert.ok(models.every((m) => m.startsWith('openrouter:')));
+});
+
+test('availableModels is empty when no keys are configured', () => {
+  assert.deepEqual(availableModels(() => undefined), []);
 });

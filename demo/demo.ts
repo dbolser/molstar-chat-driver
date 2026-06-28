@@ -16,6 +16,19 @@ declare global {
   }
 }
 
+const BACKEND = 'http://localhost:8787';
+
+/** Ask the backend which models to offer — it exposes a selector only when 2+ keys are set. */
+async function fetchModels(): Promise<{ models: string[]; default?: string }> {
+  try {
+    const res = await fetch(`${BACKEND}/models`);
+    if (res.ok) return await res.json();
+  } catch {
+    /* backend not up yet — fall back to no picker */
+  }
+  return { models: [] };
+}
+
 async function main(): Promise<void> {
   const viewer = await window.molstar.Viewer.create('viewer', {
     layoutIsExpanded: false,
@@ -25,9 +38,13 @@ async function main(): Promise<void> {
     viewportShowExpand: true,
   });
 
+  const { models, default: defaultModel } = await fetchModels();
+
   mountChatDriver('chat', {
-    backend: createHttpBackend('http://localhost:8787/chat'),
+    backend: createHttpBackend(`${BACKEND}/chat`),
     renderer: createUmdRenderer(window.molstar, viewer),
+    models,
+    defaultModel,
     placeholder: 'e.g. "show hemoglobin as cartoon coloured blue, with its ligands"',
     welcome: 'Type a request to build a molecular scene. Try “lysozyme surface in green” or “4ins as ball and stick”.',
   });

@@ -6,6 +6,7 @@
  * (ratings, recording, …) belongs to the consumer via the `onTurn` hook.
  */
 import { ChatDriver } from './driver';
+import { PromptHistory } from './history';
 import { ChatBackend, ChatTurn, MvsRenderer } from './types';
 
 export interface ChatDriverPanelConfig {
@@ -13,6 +14,8 @@ export interface ChatDriverPanelConfig {
   renderer: MvsRenderer;
   /** Optional models the user can pick from. A selector is shown only when there are 2+. */
   models?: string[];
+  /** Which of `models` is selected initially (and used when no selector is shown). */
+  defaultModel?: string;
   /** Optional observer fired after each completed turn. */
   onTurn?: (turn: ChatTurn) => void;
   /** Placeholder text for the prompt box. */
@@ -72,6 +75,16 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
+const caretAtStart = (t: HTMLTextAreaElement): boolean => t.selectionStart === 0 && t.selectionEnd === 0;
+const caretAtEnd = (t: HTMLTextAreaElement): boolean =>
+  t.selectionStart === t.value.length && t.selectionEnd === t.value.length;
+
+/** Replace the textarea's text and drop the caret at the end (used when recalling history). */
+function setText(t: HTMLTextAreaElement, value: string): void {
+  t.value = value;
+  t.setSelectionRange(value.length, value.length);
+}
+
 /** Resolve the mount target from an element or an element id. */
 function resolveTarget(target: string | HTMLElement): HTMLElement {
   const node = typeof target === 'string' ? document.getElementById(target) : target;
@@ -99,13 +112,18 @@ export function mountChatDriver(
   panel.append(transcript);
 
   // Composer
-  const textarea = el('textarea', { placeholder: config.placeholder ?? 'Ask for a molecular view…', rows: '2' });
+  const textarea = el('textarea', {
+    placeholder: config.placeholder ?? 'Ask for a molecular view…',
+    rows: '2',
+    title: 'Enter to send · Shift+Enter for a newline · ↑/↓ to recall earlier prompts',
+  });
   const send = el('button', { class: 'mcd-send', type: 'submit' }, 'Send');
   const row = el('div', { class: 'mcd-row' });
   let select: HTMLSelectElement | undefined;
   if (models.length > 1) {
     select = el('select');
     for (const m of models) select.append(el('option', { value: m }, m));
+    if (config.defaultModel && models.includes(config.defaultModel)) select.value = config.defaultModel;
     row.append(select);
   }
   row.append(send);
@@ -125,12 +143,14 @@ export function mountChatDriver(
     return { status, turn };
   }
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+  const history = new PromptHistory();
+
+  function runPrompt(): void {
     const prompt = textarea.value.trim();
     if (!prompt) return;
-    const model = select?.value || (models.length === 1 ? models[0] : undefined);
+    const model = select?.value || (models.length === 1 ? models[0] : config.defaultModel);
 
+    history.add(prompt);
     const { status, turn } = addTurn(prompt, model);
     textarea.value = '';
     send.setAttribute('disabled', 'true');
@@ -167,6 +187,38 @@ export function mountChatDriver(
         send.removeAttribute('disabled');
         transcript.scrollTop = transcript.scrollHeight;
       });
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    runPrompt();
+  });
+
+  // Enter sends (Shift+Enter inserts a newline); ↑/↓ recall earlier prompts, shell-style.
+  // History only fires when the caret is at the very start (↑) or end (↓) so normal
+  // line-by-line cursor movement inside a multiline draft is left untouched.
+  textarea.addEventListener('keydown', (e) => {
+    // `!e.isComposing` so confirming an IME composition (CJK input) with Enter doesn't submit.
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      runPrompt();
+      return;
+    }
+    if (e.key === 'ArrowUp' && caretAtStart(textarea)) {
+      const recalled = history.prev(textarea.value);
+      if (recalled !== null) {
+        e.preventDefault();
+        setText(textarea, recalled);
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown' && caretAtEnd(textarea)) {
+      const recalled = history.next();
+      if (recalled !== null) {
+        e.preventDefault();
+        setText(textarea, recalled);
+      }
+    }
   });
 
   return {
