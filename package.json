@@ -23,11 +23,12 @@
   "scripts": {
     "build": "node esbuild.mjs build && tsc -p tsconfig.json --emitDeclarationOnly",
     "demo": "node esbuild.mjs demo",
+    "build:demo": "node esbuild.mjs build-demo",
     "test": "node --import tsx --test test/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "engines": {
-    "node": ">=20.12.0"
+    "node": ">=22"
   },
   "peerDependencies": {
     "molstar": ">=4 <6"
@@ -38,7 +39,6 @@
     }
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.106.0",
     "esbuild": "^0.28.1",
     "jsdom": "^24.1.3",
     "tsx": "^4.22.4",

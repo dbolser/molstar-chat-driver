@@ -1,6 +1,7 @@
 // Build script for molstar-chat-driver.
-//   node esbuild.mjs build   -> bundles the library to dist/index.js (ESM)
-//   node esbuild.mjs demo    -> serves the playable demo at http://localhost:8765
+//   node esbuild.mjs build       -> bundles the library to dist/index.js (ESM)
+//   node esbuild.mjs demo        -> serves the playable demo + keyword backend at :8765/:8787
+//   node esbuild.mjs build-demo  -> bundles the demo page only (serve it yourself, any backend)
 import * as esbuild from 'esbuild';
 
 const mode = process.argv[2] ?? 'build';
@@ -25,7 +26,7 @@ if (mode === 'build') {
   });
   console.log('✓ built dist/index.js');
 } else if (mode === 'demo') {
-  // Start the chat backend (keyword mode, or LLM mode if .env has a key).
+  // Start the keyword-only dev backend, then serve + watch the demo page.
   const { startChatServer } = await import('./demo/server.mjs');
   startChatServer();
 
@@ -37,7 +38,16 @@ if (mode === 'build') {
   await ctx.watch();
   const { port } = await ctx.serve({ servedir: 'demo', port: 8765 });
   console.log(`\n  demo running →  http://localhost:${port}/\n`);
+} else if (mode === 'build-demo') {
+  // Bundle the demo page only (no server, no watch) so it can be served statically against
+  // ANY backend — e.g. the MolBench-powered one. See README → Run a local "production" setup.
+  await esbuild.build({
+    ...shared,
+    entryPoints: ['demo/demo.ts'],
+    outfile: 'demo/dist/demo.js',
+  });
+  console.log('✓ built demo/dist/demo.js');
 } else {
-  console.error(`unknown mode: ${mode} (use "build" or "demo")`);
+  console.error(`unknown mode: ${mode} (use "build", "demo", or "build-demo")`);
   process.exit(1);
 }

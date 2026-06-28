@@ -1,39 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { toResult, buildKeywordMvs, pickEntry, availableModels } from '../demo/server.mjs';
-
-/** Build a fake env lookup from a plain object, mirroring server.mjs's env() shape. */
-const lookupFrom = (vars: Record<string, string>) => (name: string) => vars[name];
-
-test('toResult accepts bare MVSJ', () => {
-  const r = toResult('{"root":{"kind":"root"}}');
-  assert.equal(r.mvsj, '{"root":{"kind":"root"}}');
-  assert.equal(r.text, undefined);
-});
-
-test('toResult unwraps a ```json fenced reply', () => {
-  const r = toResult('```json\n{"root":{"kind":"root"}}\n```');
-  assert.ok(r.mvsj);
-  assert.deepEqual(JSON.parse(r.mvsj as string), { root: { kind: 'root' } });
-});
-
-test('toResult unwraps a bare ``` fenced reply', () => {
-  const r = toResult('```\n{"a":1}\n```');
-  assert.ok(r.mvsj);
-  assert.deepEqual(JSON.parse(r.mvsj as string), { a: 1 });
-});
-
-test('toResult recovers JSON wrapped in prose', () => {
-  const r = toResult('Here is the scene you asked for: {"a":1} — enjoy!');
-  assert.ok(r.mvsj);
-  assert.deepEqual(JSON.parse(r.mvsj as string), { a: 1 });
-});
-
-test('toResult falls back to chat text when there is no JSON', () => {
-  const r = toResult('I could not build a scene for that.');
-  assert.equal(r.mvsj, null);
-  assert.equal(r.text, 'I could not build a scene for that.');
-});
+import { once } from 'node:events';
+import type { AddressInfo } from 'node:net';
+import { buildKeywordMvs, pickEntry, handleChat, startChatServer } from '../demo/server.mjs';
 
 test('keyword mode maps a named structure to a valid MVSJ scene', () => {
   const mvsj = buildKeywordMvs('show hemoglobin as cartoon');
@@ -43,6 +12,14 @@ test('keyword mode maps a named structure to a valid MVSJ scene', () => {
   assert.match(mvsj as string, /1hho_updated\.cif/); // hemoglobin → 1hho
 });
 
+test('keyword mode reflects representation and colour keywords', () => {
+  const scene = JSON.parse(buildKeywordMvs('lysozyme surface in green') as string);
+  const json = JSON.stringify(scene);
+  assert.match(json, /1lyz_updated\.cif/);
+  assert.match(json, /"type":"surface"/);
+  assert.match(json, /#1A9E1A/); // green
+});
+
 test('pickEntry resolves names, PDB ids, and bare display verbs', () => {
   assert.equal(pickEntry('show me lysozyme'), '1lyz');
   assert.equal(pickEntry('load 4ins please'), '4ins');
@@ -50,30 +27,46 @@ test('pickEntry resolves names, PDB ids, and bare display verbs', () => {
 });
 
 test('pickEntry does not mistake a bare number for a PDB id', () => {
-  assert.equal(pickEntry('tell me about the year 2024'), null); // not a structure id
+  assert.equal(pickEntry('tell me about the year 2024'), null);
   assert.equal(pickEntry('what happened in 1999'), null);
   assert.equal(pickEntry('show me the 2024 cryo-EM model'), '1cbs'); // falls back via "show"
 });
 
-test('availableModels lists one model per configured non-OpenRouter key, plus keyword', () => {
-  const models = availableModels(lookupFrom({ ANTHROPIC_API_KEY: 'a', GEMINI_API_KEY: 'g' }));
-  assert.deepEqual(models, ['anthropic:claude-haiku-4-5', 'gemini:gemini-2.5-flash', 'keyword']);
+test('handleChat returns a scene for a structure and guidance otherwise', () => {
+  assert.ok(handleChat('show insulin').mvsj);
+  const miss = handleChat('hello there');
+  assert.equal(miss.mvsj, null);
+  assert.match(miss.text as string, /Keyword mode/);
 });
 
-test('availableModels expands an explicit OpenRouter allow-list', () => {
-  const models = availableModels(
-    lookupFrom({ OPENROUTER_API_KEY: 'k', OPENROUTER_ALLOWED_MODELS: 'a/b, c/d' }),
-  );
-  assert.deepEqual(models, ['openrouter:a/b', 'openrouter:c/d', 'keyword']);
-});
+test('the server speaks the contract over HTTP', async () => {
+  const server = startChatServer({ port: 0 });
+  await once(server, 'listening');
+  const { port } = server.address() as AddressInfo;
+  const base = `http://localhost:${port}`;
+  try {
+    const models = await (await fetch(`${base}/models`)).json();
+    assert.deepEqual(models, { models: ['keyword'], default: 'keyword' });
 
-test('availableModels falls back to default open models for OpenRouter', () => {
-  const models = availableModels(lookupFrom({ OPENROUTER_API_KEY: 'k' }));
-  assert.ok(models.filter((m) => m.startsWith('openrouter:')).length >= 2);
-});
+    const hit = await (
+      await fetch(`${base}/chat`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ prompt: 'lysozyme surface in green' }),
+      })
+    ).json();
+    assert.ok(hit.mvsj);
 
-test('availableModels always offers keyword (and only keyword when no keys are set)', () => {
-  assert.deepEqual(availableModels(() => undefined), ['keyword']);
-  const withKeys = availableModels(lookupFrom({ ANTHROPIC_API_KEY: 'a' }));
-  assert.ok(withKeys.includes('keyword'));
+    const miss = await (
+      await fetch(`${base}/chat`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ prompt: 'hello there' }),
+      })
+    ).json();
+    assert.equal(miss.mvsj, null);
+    assert.ok(miss.text);
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
 });
