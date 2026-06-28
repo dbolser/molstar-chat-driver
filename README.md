@@ -7,8 +7,7 @@ and feedback.
 Built for the [MolBench](https://github.com/dbolser/MolBench) human-evaluation effort — but it
 works standalone wherever you want a "chat → molecular view" loop.
 
-> **Licence:** free for academic, research, and other noncommercial use. Commercial use needs a
-> separate licence — see [Licence](#licence) below.
+> **Licence:** free for academic, research, and other noncommercial use.
 
 ---
 
