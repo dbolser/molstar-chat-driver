@@ -17,20 +17,19 @@ box next to the Mol\* viewer.
 The fastest way to see it in action is to simply run the bundled demo (below).
 
 
-### 1. Run the demo (no API key needed)
+### 1. Run the minimal demo (no API key needed)
 
 ```bash
 npm install
 npm run demo # → http://localhost:8765
 ```
 
-`npm run demo` starts a small chat backend ([`demo/server.mjs`](./demo/server.mjs)) and serves
-the page. With no API key it runs in *keyword mode*, mapping a few keywords to a hand-authored
-MVS scene. Try:
+With no API key, the demo runs in *keyword mode*, mapping a very few keywords to
+a hand-authored MVS scene. Try:
 
 - `show hemoglobin as cartoon coloured blue, with its ligands`
-- `lysozyme surface in green`
-- `4ins as ball and stick`
+- `lysozyme surface green`
+- `please load 4ins as ball and stick`
 
 This mock backend only understands a handful of patterns for testing layout.
 **To test the plugin properly configure an LLM backend** (below).
@@ -38,21 +37,18 @@ This mock backend only understands a handful of patterns for testing layout.
 
 ### 2. Connect your LLM backend
 
-The plugin does not call an LLM directly, this is to protect the underlying API
-key (additionally most LLM APIs block direct browser calls). Instead, we call a
-small HTTP endpoint that relays the prompt to the LLM provider and returns the
-scene tree:
+The plugin does not call an LLM *directly*, this is to protect the underlying
+API key (and additionally, most LLM APIs block direct browser calls anyway).
+Instead, we call an HTTP endpoint (chat backend) that relays the user prompt to
+the configured LLM provider and returns the generated MVS scene tree JSON to
+Mol\*.
 
-```ts
-backend: createHttpBackend('http://localhost:8787/chat')
-```
+The demo automatically starts a chat backend is with `npm run demo` (see
+[`demo/server.mjs`](./demo/server.mjs)), however, any backend that supports the
+backend contract ([defined below](#the-backend-contract)) can be used.
 
-That endpoint just has to honour the [backend contract](#the-backend-contract):
-take `{ prompt, model }`, return `{ mvsj, text?, error? }`.
-
-**The demo already includes one** — [`demo/server.mjs`](./demo/server.mjs) — which `npm run
-demo` starts for you (it's the same server that powers keyword mode above). To switch it to a
-real model, copy the example env file and add your key:
+To switch from keyword mode to a real model, copy the example env file and add
+your API key:
 
 ```bash
 cp .env.example .env
