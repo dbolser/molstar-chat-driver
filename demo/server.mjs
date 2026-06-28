@@ -20,6 +20,10 @@ import { parseEnv } from 'node:util';
 const PORT = 8787;
 const DEFAULT_MODEL = 'anthropic:claude-haiku-4-5'; // small + cheap, plenty good for MVS
 
+// A selectable "model" that forces keyword mode (hand-authored scenes, no key, no LLM call).
+// Always offered in the picker so the offline path is explicit rather than an implicit fallback.
+const KEYWORD_MODEL = 'keyword';
+
 // One representative model per non-OpenRouter provider, offered in the demo's picker when that
 // provider's key is set. (OpenRouter is handled separately — it has hundreds of models, so the
 // operator lists which to offer via OPENROUTER_ALLOWED_MODELS.)
@@ -90,6 +94,7 @@ export function availableModels(lookup = env) {
     const ids = (raw ? raw.split(',') : DEFAULT_OPENROUTER_MODELS).map((s) => s.trim()).filter(Boolean);
     for (const id of ids) models.push(`openrouter:${id}`);
   }
+  models.push(KEYWORD_MODEL); // always available — no key, hand-authored scenes
   return models;
 }
 
@@ -257,6 +262,7 @@ export function toResult(text) {
 // --- server --------------------------------------------------------------------------
 function describeMode() {
   const spec = env('MODEL') || DEFAULT_MODEL;
+  if (spec === KEYWORD_MODEL) return 'keyword mode (forced via MODEL=keyword)';
   const prov = resolveProvider(spec);
   if (prov && env(prov.keyVar)) return `LLM mode → ${spec}`;
   return `keyword mode — no key for ${spec} (set ${prov ? prov.keyVar : 'a key'} in .env)`;
@@ -269,8 +275,12 @@ export function startChatServer({ port = PORT } = {}) {
     if (req.method === 'OPTIONS') return void res.writeHead(204).end();
     // The demo asks which models to offer (it can't see the keys, which stay server-side).
     if (req.method === 'GET' && (req.url === '/models' || req.url.startsWith('/models?'))) {
+      const models = availableModels();
+      const configured = env('MODEL') || DEFAULT_MODEL;
+      // Preselect the configured model only if its key is present; otherwise default to keyword.
+      const fallback = models.includes(configured) ? configured : KEYWORD_MODEL;
       res.writeHead(200, { 'content-type': 'application/json' });
-      return void res.end(JSON.stringify({ models: availableModels(), default: env('MODEL') || DEFAULT_MODEL }));
+      return void res.end(JSON.stringify({ models, default: fallback }));
     }
     if (req.method !== 'POST') return void res.writeHead(405).end();
 
@@ -286,17 +296,20 @@ export function startChatServer({ port = PORT } = {}) {
 
     try {
       const spec = model || env('MODEL') || DEFAULT_MODEL;
-      const prov = resolveProvider(spec);
+      const forceKeyword = spec === KEYWORD_MODEL;
+      const prov = forceKeyword ? null : resolveProvider(spec);
       const key = prov && env(prov.keyVar);
 
       let result;
-      if (!prov || !key) {
-        // Keyword mode — no usable key for the active model.
+      if (forceKeyword || !prov || !key) {
+        // Keyword mode — chosen explicitly, or no usable key for the active model.
         result = { mvsj: buildKeywordMvs(prompt) };
         if (!result.mvsj) {
-          result.text =
-            `Keyword mode (no ${prov ? prov.keyVar : 'API key'} set): name a structure like ` +
-            `“lysozyme”, “hemoglobin”, or a PDB id (e.g. 4ins). Add a key to .env to chat with ${spec}.`;
+          const hint = 'name a structure like “lysozyme”, “hemoglobin”, or a PDB id (e.g. 4ins).';
+          result.text = forceKeyword
+            ? `Keyword mode: ${hint}`
+            : `Keyword mode (no ${prov ? prov.keyVar : 'API key'} set): ${hint} ` +
+              `Add a key to .env to chat with ${spec}.`;
         }
       } else if (prov.kind === 'anthropic') {
         result = toResult(await callAnthropic(key, prov.id, prompt));
