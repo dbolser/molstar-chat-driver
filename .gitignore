@@ -4,3 +4,7 @@ demo/dist/
 .env
 *.log
 .DS_Store
+
+# Python (reference backend)
+__pycache__/
+*.pyc
