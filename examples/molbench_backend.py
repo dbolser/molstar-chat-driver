@@ -71,16 +71,16 @@ def chat(prompt: str, model: str | None) -> dict:
     spec = model or DEFAULT_MODEL
     try:
         raw = build_model(spec).generate(SYSTEM, prompt)
-    except Exception as e:  # noqa: BLE001 - surface any provider/setup error to the UI
+        tree, err = extract_json_object(raw)  # strips ``` fences / prose, parses JSON
+        root = None if (err or tree is None) else extract_root(tree)
+        if root is None:
+            return {"mvsj": None, "text": raw}  # no scene — show the raw reply so failures are visible
+        # MolBench's prompt yields a bare {root} tree (its grader needs no envelope), but Mol*
+        # requires a full MVS state with metadata.version — wrap it so the scene actually renders.
+        mvsj = {"metadata": {"version": "1", "timestamp": datetime.now(timezone.utc).isoformat()}, "root": root}
+        return {"mvsj": json.dumps(mvsj)}
+    except Exception as e:  # noqa: BLE001 - surface any provider/setup or parse error to the UI
         return {"mvsj": None, "error": f"{type(e).__name__}: {e}"}
-    tree, err = extract_json_object(raw)  # strips ``` fences / prose, parses JSON
-    root = None if (err or tree is None) else extract_root(tree)
-    if root is None:
-        return {"mvsj": None, "text": raw}  # no scene — show the raw reply so failures are visible
-    # MolBench's prompt yields a bare {root} tree (its grader needs no envelope), but Mol*
-    # requires a full MVS state with metadata.version — wrap it so the scene actually renders.
-    mvsj = {"metadata": {"version": "1", "timestamp": datetime.now(timezone.utc).isoformat()}, "root": root}
-    return {"mvsj": json.dumps(mvsj)}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -112,6 +112,8 @@ class Handler(BaseHTTPRequestHandler):
         raw = self.rfile.read(length).decode("utf-8") if length else "{}"
         try:
             data = json.loads(raw or "{}")
+            if not isinstance(data, dict):
+                data = {}
         except json.JSONDecodeError:
             data = {}
         self._send(chat(data.get("prompt", ""), data.get("model")))
@@ -128,7 +130,9 @@ def main() -> None:
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        server.shutdown()
+        pass
+    finally:
+        server.server_close()
 
 
 if __name__ == "__main__":
