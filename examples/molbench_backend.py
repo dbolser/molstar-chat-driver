@@ -26,9 +26,11 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from molbench.models import build_model
+from molbench.mvs import extract_root
 from molbench.runner import build_system_prompts, extract_json_object
 
 PORT = int(os.environ.get("PORT", "8787"))
@@ -72,9 +74,13 @@ def chat(prompt: str, model: str | None) -> dict:
     except Exception as e:  # noqa: BLE001 - surface any provider/setup error to the UI
         return {"mvsj": None, "error": f"{type(e).__name__}: {e}"}
     tree, err = extract_json_object(raw)  # strips ``` fences / prose, parses JSON
-    if err or tree is None:
-        return {"mvsj": None, "text": raw}  # show the raw reply so failures are visible
-    return {"mvsj": json.dumps(tree)}
+    root = None if (err or tree is None) else extract_root(tree)
+    if root is None:
+        return {"mvsj": None, "text": raw}  # no scene — show the raw reply so failures are visible
+    # MolBench's prompt yields a bare {root} tree (its grader needs no envelope), but Mol*
+    # requires a full MVS state with metadata.version — wrap it so the scene actually renders.
+    mvsj = {"metadata": {"version": "1", "timestamp": datetime.now(timezone.utc).isoformat()}, "root": root}
+    return {"mvsj": json.dumps(mvsj)}
 
 
 class Handler(BaseHTTPRequestHandler):
