@@ -4,7 +4,7 @@
 // Fill in your Supabase project's values, then deploy.
 window.MCD_CONFIG = {
   // Supabase Functions base URL: https://<project-ref>.supabase.co/functions/v1
-  functionsUrl: 'https://YOUR-PROJECT-REF.supabase.co/functions/v1',
-  // Supabase anon / publishable key (Project Settings → API). Sent as the `apikey` header.
-  anonKey: 'YOUR-SUPABASE-ANON-KEY',
+  functionsUrl: 'https://dfdybtixipdgovagihfn.supabase.co/functions/v1',
+  // Supabase publishable key (Project Settings → API). Sent as the `apikey` header.
+  anonKey: 'sb_publishable_WUFy9pUIQ7ZZ_WkGrlDoKQ_T9mbHVE2',
 };
