@@ -17,28 +17,18 @@ const ALLOWED_MODELS = new Set(
 );
 
 // Abuse / cost guards. A leaked invite token is a bearer credential, so cap how much any single
-// token (and, optionally, the whole preview) can spend per rolling 24h. Prompts are length-capped
-// so a single request can't balloon model input + the stored turn.
-const MAX_PROMPT_CHARS = Number(Deno.env.get('MCD_MAX_PROMPT_CHARS') || '8000');
-const TOKEN_DAILY_CAP = Number(Deno.env.get('MCD_TOKEN_DAILY_CAP') || '50'); // per-token calls / 24h
-const GLOBAL_DAILY_CAP = Number(Deno.env.get('MCD_DAILY_CALL_CAP') || '0'); // 0 = no global cap
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-/** Count `turns` rows newer than `since`, optionally for one token. Returns null on error. */
-async function callsSince(
-  supabase: ReturnType<typeof createClient>,
-  since: string,
-  token?: string,
-): Promise<number | null> {
-  let q = supabase.from('turns').select('*', { count: 'exact', head: true }).gte('created_at', since);
-  if (token) q = q.eq('evaluator_token', token);
-  const { count, error } = await q;
-  if (error) {
-    console.error('rate-limit count failed', error);
-    return null;
-  }
-  return count ?? 0;
+// token (and, optionally, the whole preview) can spend per day. Prompts are length-capped so a
+// single request can't balloon model input + the stored turn. Caps come from env; a malformed
+// value falls back to the safe default rather than silently disabling the limit.
+function intEnv(name: string, def: number): number {
+  const raw = Deno.env.get(name);
+  if (raw == null || raw.trim() === '') return def; // unset/blank → default (not 0)
+  const v = Number(raw);
+  return Number.isFinite(v) && v >= 0 ? Math.floor(v) : def;
 }
+const MAX_PROMPT_CHARS = intEnv('MCD_MAX_PROMPT_CHARS', 8000);
+const TOKEN_DAILY_CAP = intEnv('MCD_TOKEN_DAILY_CAP', 50); // per-token model calls / UTC day
+const GLOBAL_DAILY_CAP = intEnv('MCD_DAILY_CALL_CAP', 0); // 0 = no global cap
 
 function resolveModel(requested: unknown): string {
   if (typeof requested === 'string' && requested.trim()) {
@@ -76,18 +66,18 @@ Deno.serve(async (req) => {
     return json({ error: 'invalid or missing evaluator token' }, 403);
   }
 
-  // Daily abuse/cost caps (best-effort; a count error fails OPEN so a transient DB blip doesn't
-  // lock out a legitimate evaluator — the token gate above is the real security boundary).
-  const since = new Date(Date.now() - DAY_MS).toISOString();
-  const tokenCalls = await callsSince(supabase, since, evaluator as string);
-  if (tokenCalls !== null && tokenCalls >= TOKEN_DAILY_CAP) {
-    return json({ error: 'daily limit reached for this invite — please try again tomorrow' }, 429);
-  }
-  if (GLOBAL_DAILY_CAP > 0) {
-    const globalCalls = await callsSince(supabase, since);
-    if (globalCalls !== null && globalCalls >= GLOBAL_DAILY_CAP) {
-      return json({ error: 'the preview is at capacity right now — please try again later' }, 429);
-    }
+  // Daily abuse/cost caps via an ATOMIC reservation (rate_take RPC) so concurrent requests can't
+  // overshoot the cap. Reserve a slot BEFORE spending model tokens. A DB error fails OPEN — a
+  // transient blip shouldn't lock out a legit evaluator; the token gate above is the real boundary.
+  const { data: allowed, error: rateErr } = await supabase.rpc('rate_take', {
+    p_token: evaluator,
+    p_token_cap: TOKEN_DAILY_CAP,
+    p_global_cap: GLOBAL_DAILY_CAP,
+  });
+  if (rateErr) {
+    console.error('rate_take failed (allowing)', rateErr);
+  } else if (allowed === false) {
+    return json({ error: 'daily limit reached — please try again tomorrow' }, 429);
   }
 
   const result = await generateScene(model, prompt);
