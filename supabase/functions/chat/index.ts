@@ -16,6 +16,30 @@ const ALLOWED_MODELS = new Set(
   (Deno.env.get('MCD_ALLOWED_MODELS') || '').split(',').map((s) => s.trim()).filter(Boolean),
 );
 
+// Abuse / cost guards. A leaked invite token is a bearer credential, so cap how much any single
+// token (and, optionally, the whole preview) can spend per rolling 24h. Prompts are length-capped
+// so a single request can't balloon model input + the stored turn.
+const MAX_PROMPT_CHARS = Number(Deno.env.get('MCD_MAX_PROMPT_CHARS') || '8000');
+const TOKEN_DAILY_CAP = Number(Deno.env.get('MCD_TOKEN_DAILY_CAP') || '50'); // per-token calls / 24h
+const GLOBAL_DAILY_CAP = Number(Deno.env.get('MCD_DAILY_CALL_CAP') || '0'); // 0 = no global cap
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Count `turns` rows newer than `since`, optionally for one token. Returns null on error. */
+async function callsSince(
+  supabase: ReturnType<typeof createClient>,
+  since: string,
+  token?: string,
+): Promise<number | null> {
+  let q = supabase.from('turns').select('*', { count: 'exact', head: true }).gte('created_at', since);
+  if (token) q = q.eq('evaluator_token', token);
+  const { count, error } = await q;
+  if (error) {
+    console.error('rate-limit count failed', error);
+    return null;
+  }
+  return count ?? 0;
+}
+
 function resolveModel(requested: unknown): string {
   if (typeof requested === 'string' && requested.trim()) {
     const spec = requested.trim();
@@ -36,6 +60,9 @@ Deno.serve(async (req) => {
   }
   const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : '';
   if (!prompt) return json({ error: 'prompt is required' }, 400);
+  if (prompt.length > MAX_PROMPT_CHARS) {
+    return json({ error: `prompt too long (max ${MAX_PROMPT_CHARS} characters)` }, 400);
+  }
   const model = resolveModel(body.model);
 
   const supabase = createClient(
@@ -47,6 +74,20 @@ Deno.serve(async (req) => {
   const evaluator = req.headers.get('x-evaluator-token');
   if (!(await isInvited(supabase, evaluator))) {
     return json({ error: 'invalid or missing evaluator token' }, 403);
+  }
+
+  // Daily abuse/cost caps (best-effort; a count error fails OPEN so a transient DB blip doesn't
+  // lock out a legitimate evaluator — the token gate above is the real security boundary).
+  const since = new Date(Date.now() - DAY_MS).toISOString();
+  const tokenCalls = await callsSince(supabase, since, evaluator as string);
+  if (tokenCalls !== null && tokenCalls >= TOKEN_DAILY_CAP) {
+    return json({ error: 'daily limit reached for this invite — please try again tomorrow' }, 429);
+  }
+  if (GLOBAL_DAILY_CAP > 0) {
+    const globalCalls = await callsSince(supabase, since);
+    if (globalCalls !== null && globalCalls >= GLOBAL_DAILY_CAP) {
+      return json({ error: 'the preview is at capacity right now — please try again later' }, 429);
+    }
   }
 
   const result = await generateScene(model, prompt);

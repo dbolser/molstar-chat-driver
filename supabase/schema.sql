@@ -13,8 +13,11 @@
 create table if not exists evaluators (
   token       text primary key,
   name        text,
+  revoked     boolean not null default false,  -- set true to instantly cut off a leaked link
   first_seen  timestamptz not null default now()
 );
+-- (idempotent for projects created before `revoked` existed)
+alter table evaluators add column if not exists revoked boolean not null default false;
 
 create table if not exists turns (
   id              uuid primary key default gen_random_uuid(),

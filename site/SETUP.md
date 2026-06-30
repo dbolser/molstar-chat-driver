@@ -29,7 +29,13 @@ supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
 # supabase secrets set OPENAI_API_KEY=...  GEMINI_API_KEY=...  OPENROUTER_API_KEY=...
 # optional, change the default model (default anthropic:claude-haiku-4-5):
 # supabase secrets set MCD_MODEL=anthropic:claude-haiku-4-5
+# optional abuse/cost caps (defaults shown): per-invite calls / 24h, max prompt chars,
+# and an optional whole-preview ceiling (0 = off):
+# supabase secrets set MCD_TOKEN_DAILY_CAP=50 MCD_MAX_PROMPT_CHARS=8000 MCD_DAILY_CALL_CAP=0
 ```
+A leaked invite link is a bearer credential, so `chat` caps calls per token per 24h and rejects
+over-long prompts; revoke a link instantly with `update evaluators set revoked = true where
+token = '…';`.
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are injected into functions automatically — don't set them.
 
 ## 3. Deploy the functions

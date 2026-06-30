@@ -4,8 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mol* chat — preview</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/molstar@5.10.1/build/viewer/molstar.css" />
-    <script src="https://cdn.jsdelivr.net/npm/molstar@5.10.1/build/viewer/molstar.js"></script>
+    <!-- Mol* from jsDelivr, pinned + Subresource Integrity so a CDN compromise can't inject JS
+         that reads the evaluator token. Hashes are for molstar@5.10.1 (bump both on version change). -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/molstar@5.10.1/build/viewer/molstar.css"
+      integrity="sha384-RIontCdJN53gEl2fmiHN+4bscIBvaUaOiCeeGktXqmFqdEBF+COnSdt9O4IKFSvq" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/molstar@5.10.1/build/viewer/molstar.js"
+      integrity="sha384-A7AzJS3wWUGFfOgUxj+NMW6sOujbL01gqs/4l1zlprZM0csgVHBGWFMh4CZBqFv+" crossorigin="anonymous"></script>
     <!-- Public Supabase config (project URL + anon key). Edit config.js with your values. -->
     <script src="./config.js"></script>
     <style>
