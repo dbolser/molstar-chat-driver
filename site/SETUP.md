@@ -4,13 +4,17 @@ A private free-play site: evaluators chat to a real model, scenes render in Mol\
 prompt + feedback is captured. Static frontend on **GitHub Pages**, key-holding backend +
 capture on **Supabase** (Edge Functions + Postgres).
 
-```
+```text
 browser (Pages)  ──POST /chat──▶  Supabase Edge Function ──▶ model (key as secret)
    plugin + UI                         │ inserts turn (service role)
    ──POST /capture──▶  Edge Function ──┘ inserts evaluator / feedback
                                         ▼
                                    Postgres (you inspect via the dashboard)
 ```
+
+Every request carries a per-evaluator **invite token** (`?e=<token>`). The Edge Functions reject
+any token that isn't in the `evaluators` allowlist, so even though the Pages URL is public it
+can't be used to burn model quota or pollute the capture tables.
 
 ## 1. Database
 In the Supabase **SQL editor**, run [`../supabase/schema.sql`](../supabase/schema.sql). It
@@ -56,13 +60,21 @@ deploys it. Your site lands at `https://<user>.github.io/molstar-chat-driver/`.
 
 > To build locally: `npm run build:site` → open `site/index.html` (it needs `config.js` filled in).
 
-## 6. Invite evaluators
-Give each person a link with a unique, unguessable token so their captures are tagged to them:
+## 6. Mint invite links
+Each evaluator gets a unique, unguessable token. `scripts/mint-invites.mjs` generates UUIDv4
+tokens (122 bits of entropy — not guessable), seeds them into the `evaluators` allowlist, and
+prints the secret links. Only seeded tokens work, so this is a real lock, not just discretion.
+```bash
+export SUPABASE_URL=https://<project-ref>.supabase.co
+export SUPABASE_SERVICE_ROLE_KEY=<service-role key>   # Project Settings → API (keep secret!)
+export SITE_URL=https://<user>.github.io/molstar-chat-driver
+
+npm run mint:invites -- "Ada Lovelace" "Rosalind Franklin"   # one link per name
+# or anonymous: npm run mint:invites -- --count 5
+# preview without writing:  npm run mint:invites -- --dry-run --count 3
 ```
-https://<user>.github.io/molstar-chat-driver/?e=$(uuidgen)
-```
-Generate one per evaluator (any random string works). Ask them to keep it private — Pages is
-public, so the token + discretion are the "soft lock".
+Email each person their `?e=<token>` line and ask them to keep it private. To revoke someone,
+delete their row from the `evaluators` table.
 
 ## 7. See the data
 Supabase dashboard → **Table editor** → `turns` (every prompt + scene + tier0) and `feedback`

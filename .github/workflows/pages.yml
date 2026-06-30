@@ -8,6 +8,9 @@ on:
     paths:
       - 'site/**'
       - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'esbuild.mjs'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 

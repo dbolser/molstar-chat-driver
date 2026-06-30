@@ -33,8 +33,27 @@ export function resolveProvider(spec: string): Provider | null {
   }
 }
 
+// Outbound model calls get a hard timeout so a stalled upstream fails fast instead of hanging
+// the Edge Function (and the evaluator's turn) indefinitely.
+const REQUEST_TIMEOUT_MS = 60_000;
+
+async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: ctrl.signal });
+  } catch (e) {
+    if ((e as Error).name === 'AbortError') {
+      throw new Error(`upstream timed out after ${REQUEST_TIMEOUT_MS / 1000}s`);
+    }
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function callAnthropic(key: string, id: string, prompt: string): Promise<string> {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({ model: id, max_tokens: 16000, system: SYSTEM, messages: [{ role: 'user', content: prompt }] }),
@@ -48,7 +67,7 @@ async function callOpenAiCompat(baseUrl: string, key: string, id: string, prompt
   const url = `${baseUrl.replace(/\/$/, '')}/chat/completions`;
   const messages = [{ role: 'system', content: SYSTEM }, { role: 'user', content: prompt }];
   const send = async (tokenField: string) => {
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       method: 'POST',
       headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
       body: JSON.stringify({ model: id, messages, [tokenField]: 16000 }),
@@ -71,7 +90,10 @@ function extractRoot(obj: unknown): Record<string, unknown> | null {
   if (!obj || typeof obj !== 'object') return null;
   const o = obj as Record<string, unknown>;
   if (o.kind === 'root') return o;
-  if (o.root && typeof o.root === 'object') return o.root as Record<string, unknown>;
+  if (o.root && typeof o.root === 'object') {
+    const root = o.root as Record<string, unknown>;
+    if (root.kind === 'root') return root; // only a real root node is a renderable scene
+  }
   return null;
 }
 
