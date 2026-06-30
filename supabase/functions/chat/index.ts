@@ -20,11 +20,13 @@ const ALLOWED_MODELS = new Set(
 // token (and, optionally, the whole preview) can spend per day. Prompts are length-capped so a
 // single request can't balloon model input + the stored turn. Caps come from env; a malformed
 // value falls back to the safe default rather than silently disabling the limit.
+const INT4_MAX = 2147483647; // caps are passed to int4 RPC params — clamp so they can't overflow
 function intEnv(name: string, def: number): number {
   const raw = Deno.env.get(name);
   if (raw == null || raw.trim() === '') return def; // unset/blank → default (not 0)
   const v = Number(raw);
-  return Number.isFinite(v) && v >= 0 ? Math.floor(v) : def;
+  if (!Number.isFinite(v) || v < 0) return def;
+  return Math.min(Math.floor(v), INT4_MAX);
 }
 const MAX_PROMPT_CHARS = intEnv('MCD_MAX_PROMPT_CHARS', 8000);
 const TOKEN_DAILY_CAP = intEnv('MCD_TOKEN_DAILY_CAP', 50); // per-token model calls / UTC day
