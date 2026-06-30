@@ -21,16 +21,19 @@ const ALLOWED_MODELS = new Set(
 // single request can't balloon model input + the stored turn. Caps come from env; a malformed
 // value falls back to the safe default rather than silently disabling the limit.
 const INT4_MAX = 2147483647; // caps are passed to int4 RPC params — clamp so they can't overflow
-function intEnv(name: string, def: number): number {
+// Read a non-negative int from env, clamped to [min, INT4_MAX]; unset/blank/invalid → default.
+// `min` differs per setting: prompt length and per-token cap must be ≥1 (0 would block everyone),
+// while the global cap keeps 0 as its documented "disabled" value.
+function intEnv(name: string, def: number, min: number): number {
   const raw = Deno.env.get(name);
-  if (raw == null || raw.trim() === '') return def; // unset/blank → default (not 0)
+  if (raw == null || raw.trim() === '') return def;
   const v = Number(raw);
   if (!Number.isFinite(v) || v < 0) return def;
-  return Math.min(Math.floor(v), INT4_MAX);
+  return Math.min(Math.max(Math.floor(v), min), INT4_MAX);
 }
-const MAX_PROMPT_CHARS = intEnv('MCD_MAX_PROMPT_CHARS', 8000);
-const TOKEN_DAILY_CAP = intEnv('MCD_TOKEN_DAILY_CAP', 50); // per-token model calls / UTC day
-const GLOBAL_DAILY_CAP = intEnv('MCD_DAILY_CALL_CAP', 0); // 0 = no global cap
+const MAX_PROMPT_CHARS = intEnv('MCD_MAX_PROMPT_CHARS', 8000, 1);
+const TOKEN_DAILY_CAP = intEnv('MCD_TOKEN_DAILY_CAP', 50, 1); // per-token model calls / UTC day
+const GLOBAL_DAILY_CAP = intEnv('MCD_DAILY_CALL_CAP', 0, 0); // 0 = no global cap
 
 function resolveModel(requested: unknown): string {
   if (typeof requested === 'string' && requested.trim()) {
