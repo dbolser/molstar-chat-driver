@@ -16,6 +16,25 @@ const ALLOWED_MODELS = new Set(
   (Deno.env.get('MCD_ALLOWED_MODELS') || '').split(',').map((s) => s.trim()).filter(Boolean),
 );
 
+// Abuse / cost guards. A leaked invite token is a bearer credential, so cap how much any single
+// token (and, optionally, the whole preview) can spend per day. Prompts are length-capped so a
+// single request can't balloon model input + the stored turn. Caps come from env; a malformed
+// value falls back to the safe default rather than silently disabling the limit.
+const INT4_MAX = 2147483647; // caps are passed to int4 RPC params — clamp so they can't overflow
+// Read a non-negative int from env, clamped to [min, INT4_MAX]; unset/blank/invalid → default.
+// `min` differs per setting: prompt length and per-token cap must be ≥1 (0 would block everyone),
+// while the global cap keeps 0 as its documented "disabled" value.
+function intEnv(name: string, def: number, min: number): number {
+  const raw = Deno.env.get(name);
+  if (raw == null || raw.trim() === '') return def;
+  const v = Number(raw);
+  if (!Number.isFinite(v) || v < 0) return def;
+  return Math.min(Math.max(Math.floor(v), min), INT4_MAX);
+}
+const MAX_PROMPT_CHARS = intEnv('MCD_MAX_PROMPT_CHARS', 8000, 1);
+const TOKEN_DAILY_CAP = intEnv('MCD_TOKEN_DAILY_CAP', 50, 1); // per-token model calls / UTC day
+const GLOBAL_DAILY_CAP = intEnv('MCD_DAILY_CALL_CAP', 0, 0); // 0 = no global cap
+
 function resolveModel(requested: unknown): string {
   if (typeof requested === 'string' && requested.trim()) {
     const spec = requested.trim();
@@ -36,6 +55,9 @@ Deno.serve(async (req) => {
   }
   const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : '';
   if (!prompt) return json({ error: 'prompt is required' }, 400);
+  if (prompt.length > MAX_PROMPT_CHARS) {
+    return json({ error: `prompt too long (max ${MAX_PROMPT_CHARS} characters)` }, 400);
+  }
   const model = resolveModel(body.model);
 
   const supabase = createClient(
@@ -47,6 +69,20 @@ Deno.serve(async (req) => {
   const evaluator = req.headers.get('x-evaluator-token');
   if (!(await isInvited(supabase, evaluator))) {
     return json({ error: 'invalid or missing evaluator token' }, 403);
+  }
+
+  // Daily abuse/cost caps via an ATOMIC reservation (rate_take RPC) so concurrent requests can't
+  // overshoot the cap. Reserve a slot BEFORE spending model tokens. A DB error fails OPEN — a
+  // transient blip shouldn't lock out a legit evaluator; the token gate above is the real boundary.
+  const { data: allowed, error: rateErr } = await supabase.rpc('rate_take', {
+    p_token: evaluator,
+    p_token_cap: TOKEN_DAILY_CAP,
+    p_global_cap: GLOBAL_DAILY_CAP,
+  });
+  if (rateErr) {
+    console.error('rate_take failed (allowing)', rateErr);
+  } else if (allowed === false) {
+    return json({ error: 'daily limit reached — please try again tomorrow' }, 429);
   }
 
   const result = await generateScene(model, prompt);
