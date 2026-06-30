@@ -24,6 +24,8 @@
     "build": "node esbuild.mjs build && tsc -p tsconfig.json --emitDeclarationOnly",
     "demo": "node esbuild.mjs demo",
     "build:demo": "node esbuild.mjs build-demo",
+    "build:site": "node esbuild.mjs build-site",
+    "mint:invites": "node scripts/mint-invites.mjs",
     "test": "node --import tsx --test test/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

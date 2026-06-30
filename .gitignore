@@ -1,6 +1,7 @@
 node_modules/
 dist/
 demo/dist/
+site/dist/
 .env
 *.log
 .DS_Store

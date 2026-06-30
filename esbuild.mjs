@@ -47,7 +47,16 @@ if (mode === 'build') {
     outfile: 'demo/dist/demo.js',
   });
   console.log('✓ built demo/dist/demo.js');
+} else if (mode === 'build-site') {
+  // Bundle the evaluator preview site (site/ → site/dist/site.js). Deployed to GitHub Pages;
+  // talks to the Supabase Edge Functions. See site/ and SETUP.md.
+  await esbuild.build({
+    ...shared,
+    entryPoints: ['site/main.ts'],
+    outfile: 'site/dist/site.js',
+  });
+  console.log('✓ built site/dist/site.js');
 } else {
-  console.error(`unknown mode: ${mode} (use "build", "demo", or "build-demo")`);
+  console.error(`unknown mode: ${mode} (use "build", "demo", "build-demo", or "build-site")`);
   process.exit(1);
 }
