@@ -39,6 +39,10 @@ const CSS = `
 .mcd-transcript::-webkit-scrollbar-thumb { background:#bcbcbc; border-radius:5px; border:2px solid #fafafa; }
 .mcd-transcript::-webkit-scrollbar-thumb:hover { background:#9a9a9a; }
 .mcd-transcript::-webkit-scrollbar-track { background:transparent; }
+/* Critical: keep messages at natural height. Without this, the flex column SHRINKS each child to
+   fit the container (and .mcd-turn has overflow:hidden, so text gets clipped) instead of
+   overflowing — which both squashed the boxes AND defeated scrolling. */
+.mcd-transcript > * { flex-shrink:0; }
 .mcd-welcome { color:#666; font-size:13px; padding:4px 2px; }
 .mcd-turn { border:1px solid #e6e6e6; border-radius:8px; background:#fff; overflow:hidden; }
 .mcd-prompt { padding:8px 12px; background:#f0f4ff; border-bottom:1px solid #e1e8ff; }
