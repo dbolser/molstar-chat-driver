@@ -59,6 +59,22 @@ function buildFeedback(getTurnId: () => string | null): void {
   const buttons = new Map<string, HTMLButtonElement>();
   const sent = document.createElement('span');
   sent.className = 'sent';
+  sent.setAttribute('role', 'status'); // announce success/failure to screen readers
+  sent.setAttribute('aria-live', 'polite');
+
+  // One shared status line; clear any pending auto-hide first so rapid taps don't race
+  // (an earlier timeout blanking a later message).
+  let statusTimer: ReturnType<typeof setTimeout> | undefined;
+  function status(msg: string, autoHideMs?: number): void {
+    if (statusTimer !== undefined) clearTimeout(statusTimer);
+    sent.textContent = msg;
+    statusTimer = autoHideMs
+      ? setTimeout(() => {
+          sent.textContent = '';
+          statusTimer = undefined;
+        }, autoHideMs)
+      : undefined;
+  }
 
   for (const r of REACTIONS) {
     const b = document.createElement('button');
@@ -72,8 +88,7 @@ function buildFeedback(getTurnId: () => string | null): void {
       for (const [rt, btn] of buttons) btn.classList.toggle('on', rt === rating);
       // One tap is itself a (lightweight) rating — record it right away.
       const res = await capture({ kind: 'feedback', rating, turnId: getTurnId() });
-      sent.textContent = res?.ok ? 'Thanks ✓' : 'Could not send — retry?';
-      setTimeout(() => (sent.textContent = ''), 2500);
+      status(res?.ok ? 'Thanks ✓' : 'Could not send — retry?', 2500);
     });
     buttons.set(r.rating, b);
     emojiRow.append(b);
@@ -93,16 +108,15 @@ function buildFeedback(getTurnId: () => string | null): void {
     const comment = ta.value.trim();
     if (!comment) return;
     send.disabled = true;
-    sent.textContent = 'Sending…';
+    status('Sending…');
     const res = await capture({ kind: 'feedback', comment, rating, turnId: getTurnId() });
     send.disabled = false;
     if (!res || !res.ok) {
-      sent.textContent = 'Could not send — please retry.';
+      status('Could not send — please retry.', 4000);
       return;
     }
     ta.value = '';
-    sent.textContent = 'Thanks — saved ✓';
-    setTimeout(() => (sent.textContent = ''), 3000);
+    status('Thanks — saved ✓', 3000);
   });
 }
 
