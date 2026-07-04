@@ -139,7 +139,7 @@ async function start(name: string): Promise<void> {
       latestTurnId = ((t.response as Record<string, unknown>)?.turnId as string) ?? null;
     },
     placeholder: 'Ask for any molecular view…',
-    welcome: `Hi ${name} — type anything to build a molecular scene, then refine it: follow-ups build on what's on screen (e.g. "now colour it by chain", "hide the water"). Hit ↺ New scene to start fresh. Your prompts and feedback are being recorded.`,
+    welcome: `Hi ${name} — type anything to build a molecular scene, then refine it. Hit ↺ New scene to start fresh. Your prompts and feedback are being recorded.`,
   });
 
   buildFeedback(() => latestTurnId);
