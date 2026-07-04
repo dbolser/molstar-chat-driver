@@ -1,10 +1,12 @@
 name: Deploy preview site
 
-# Builds site/ and publishes it to GitHub Pages. Enable Pages with source "GitHub Actions"
-# in repo Settings → Pages. The site talks to your Supabase Edge Functions (see SETUP.md).
+# Publishes the site to GitHub Pages. Root (/) is PRODUCTION, always built from `main`. A
+# secondary /staging/ copy is built from the `staging` branch (best-effort) so UI changes can be
+# previewed at https://<user>.github.io/molstar-chat-driver/staging/ before they reach reviewers.
+# Enable Pages with source "GitHub Actions" in repo Settings → Pages. See site/SETUP.md.
 on:
   push:
-    branches: [main]
+    branches: [main, staging]
     paths:
       - 'site/**'
       - 'src/**'
@@ -30,15 +32,35 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
+      # Root always comes from main, regardless of which branch triggered the run.
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm ci
       - run: npm run build:site
+      - name: Assemble production at site root
+        run: |
+          mkdir -p _site
+          cp -r site/. _site/
+      # Preview: build the staging branch into /staging. Best-effort — a broken staging branch
+      # (or none) must never block the production deploy.
+      - name: Build staging into /staging
+        continue-on-error: true
+        run: |
+          if ! git fetch origin staging; then
+            echo "no staging branch — skipping /staging"; exit 0
+          fi
+          git worktree add ../staging-src FETCH_HEAD
+          ln -s "$GITHUB_WORKSPACE/node_modules" ../staging-src/node_modules
+          ( cd ../staging-src && npm run build:site )
+          mkdir -p _site/staging
+          cp -r ../staging-src/site/. _site/staging/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: _site
       - id: deploy
         uses: actions/deploy-pages@v4
