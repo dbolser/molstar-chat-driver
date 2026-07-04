@@ -18,8 +18,16 @@
       #banner { padding: 6px 12px; background: #fff7e6; border-bottom: 1px solid #ffe2a8; color: #7a5b00; font-size: 13px; }
       #app { display: flex; flex: 1; min-height: 0; }
       #viewer { position: relative; flex: 1; min-width: 0; }
-      #side { flex: 0 0 420px; display: flex; flex-direction: column; border-left: 1px solid #e0e0e0; }
-      #chat { flex: 1; min-height: 0; }
+      #divider { flex: 0 0 6px; cursor: col-resize; background: #e6e6e6; position: relative; }
+      #divider::before { content: ''; position: absolute; inset: 0 -5px; } /* wider invisible grab target */
+      #divider:hover, #divider.dragging { background: #1a66ff; }
+      #divider:focus-visible { outline: 2px solid #1a66ff; outline-offset: -1px; }
+      /* width driven by --side-w (set by the drag handle); the mobile query below overrides flex entirely */
+      #side { flex: 0 0 var(--side-w, 420px); display: flex; flex-direction: column; border-left: 1px solid #e0e0e0; min-width: 0; }
+      /* Make #chat a flex column so the panel fills it via flex (not a percentage height that
+         won't resolve against a flex item) — this is what lets the transcript actually scroll. */
+      #chat { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+      #chat > .mcd-panel { flex: 1; min-height: 0; }
       #feedback { border-top: 1px solid #e0e0e0; padding: 10px 12px; background: #fafafa; }
       #feedback .emoji { display: flex; gap: 4px; margin-bottom: 8px; }
       #feedback .emoji button { cursor: pointer; border: 1px solid transparent; background: none; border-radius: 8px; padding: 3px 6px; font-size: 20px; line-height: 1; filter: grayscale(.55); opacity: .75; transition: transform .08s; }
@@ -39,6 +47,7 @@
       @media (max-width: 820px) {
         #app { flex-direction: column; }
         #viewer { flex: 1 1 50%; }
+        #divider { display: none; }
         #side { flex: 1 1 50%; border-left: none; border-top: 1px solid #e0e0e0; }
       }
     </style>
@@ -47,6 +56,7 @@
     <div id="banner">● Preview — your prompts and feedback are being recorded to help build an open benchmark. Please keep this link private.</div>
     <div id="app">
       <div id="viewer"></div>
+      <div id="divider" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Resize chat panel — drag or use arrow keys" title="Drag to resize"></div>
       <div id="side">
         <div id="chat"></div>
         <div id="feedback"></div>
