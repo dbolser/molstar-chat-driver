@@ -32,7 +32,7 @@ export interface ChatDriverPanelHandle {
 const STYLE_ID = 'mcd-styles';
 const CSS = `
 .mcd-panel { display:flex; flex-direction:column; height:100%; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; font-size:14px; color:#1a1a1a; background:#fafafa; }
-.mcd-transcript { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
+.mcd-transcript { flex:1; min-height:0; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:12px; }
 .mcd-welcome { color:#666; font-size:13px; padding:4px 2px; }
 .mcd-turn { border:1px solid #e6e6e6; border-radius:8px; background:#fff; overflow:hidden; }
 .mcd-prompt { padding:8px 12px; background:#f0f4ff; border-bottom:1px solid #e1e8ff; }

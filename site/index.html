@@ -21,6 +21,10 @@
       #side { flex: 0 0 420px; display: flex; flex-direction: column; border-left: 1px solid #e0e0e0; }
       #chat { flex: 1; min-height: 0; }
       #feedback { border-top: 1px solid #e0e0e0; padding: 10px 12px; background: #fafafa; }
+      #feedback .emoji { display: flex; gap: 4px; margin-bottom: 8px; }
+      #feedback .emoji button { cursor: pointer; border: 1px solid transparent; background: none; border-radius: 8px; padding: 3px 6px; font-size: 20px; line-height: 1; filter: grayscale(.55); opacity: .75; transition: transform .08s; }
+      #feedback .emoji button:hover { transform: scale(1.15); filter: none; opacity: 1; }
+      #feedback .emoji button.on { border-color: #1a66ff; background: #eef3ff; filter: none; opacity: 1; }
       #feedback textarea { width: 100%; box-sizing: border-box; min-height: 52px; resize: vertical; border: 1px solid #d0d0d0; border-radius: 6px; padding: 8px; font: inherit; }
       #feedback .row { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
       #feedback button { cursor: pointer; border: 1px solid #d0d0d0; background: #fff; border-radius: 6px; padding: 6px 14px; font: inherit; }
