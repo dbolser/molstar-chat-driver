@@ -40,25 +40,61 @@ function capture(body: Record<string, unknown>): Promise<Response | null> {
   }).catch(() => null);
 }
 
+// Quick reactions: one tap = lightweight rating (sent immediately). The same selection also
+// tags any longer written feedback. 'neutral' is the default highlight but is never auto-sent.
+const REACTIONS: { rating: string; emoji: string; title: string }[] = [
+  { rating: 'love', emoji: '🤯', title: 'I love it' },
+  { rating: 'happy', emoji: '🙂', title: 'Happy' },
+  { rating: 'neutral', emoji: '😐', title: 'Neutral' },
+  { rating: 'sad', emoji: '☹️', title: 'Not great' },
+  { rating: 'hate', emoji: '💩', title: 'I hate it' },
+];
+
 function buildFeedback(getTurnId: () => string | null): void {
   const root = document.getElementById('feedback')!;
-  const ta = document.createElement('textarea');
-  ta.placeholder = 'Feedback on the last result, or any thoughts… (recorded)';
-  const send = document.createElement('button');
-  send.textContent = 'Send feedback';
+  let rating = 'neutral';
+
+  const emojiRow = document.createElement('div');
+  emojiRow.className = 'emoji';
+  const buttons = new Map<string, HTMLButtonElement>();
   const sent = document.createElement('span');
   sent.className = 'sent';
+
+  for (const r of REACTIONS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = r.emoji;
+    b.title = r.title;
+    b.setAttribute('aria-label', r.title);
+    if (r.rating === rating) b.classList.add('on');
+    b.addEventListener('click', async () => {
+      rating = r.rating;
+      for (const [rt, btn] of buttons) btn.classList.toggle('on', rt === rating);
+      // One tap is itself a (lightweight) rating — record it right away.
+      const res = await capture({ kind: 'feedback', rating, turnId: getTurnId() });
+      sent.textContent = res?.ok ? 'Thanks ✓' : 'Could not send — retry?';
+      setTimeout(() => (sent.textContent = ''), 2500);
+    });
+    buttons.set(r.rating, b);
+    emojiRow.append(b);
+  }
+
+  const ta = document.createElement('textarea');
+  ta.placeholder = 'Anything more? What worked, what didn’t… (recorded)';
+  const send = document.createElement('button');
+  send.className = 'thoughts';
+  send.textContent = 'Thoughts?';
   const row = document.createElement('div');
   row.className = 'row';
   row.append(send, sent);
-  root.append(ta, row);
+  root.append(emojiRow, ta, row);
 
   send.addEventListener('click', async () => {
     const comment = ta.value.trim();
     if (!comment) return;
     send.disabled = true;
     sent.textContent = 'Sending…';
-    const res = await capture({ kind: 'feedback', comment, turnId: getTurnId() });
+    const res = await capture({ kind: 'feedback', comment, rating, turnId: getTurnId() });
     send.disabled = false;
     if (!res || !res.ok) {
       sent.textContent = 'Could not send — please retry.';
