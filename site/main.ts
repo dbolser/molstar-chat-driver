@@ -145,15 +145,22 @@ async function start(name: string): Promise<void> {
   buildFeedback(() => latestTurnId);
 }
 
-const esc = (s: string): string =>
-  s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
-
-/** Drag the divider to resize the side (chat) pane horizontally. */
+/** Drag or arrow-key the divider to resize the side (chat) pane. Width lives in a CSS custom
+ *  property so it never leaks into (and break) the mobile stacked layout, which overrides flex. */
 function setupResize(): void {
   const app = document.getElementById('app');
   const side = document.getElementById('side');
   const divider = document.getElementById('divider');
   if (!app || !side || !divider) return;
+  const MIN = 260;
+  const apply = (w: number) => {
+    const max = app.getBoundingClientRect().width - 200;
+    const c = Math.min(Math.max(w, MIN), Math.max(MIN, max));
+    side.style.setProperty('--side-w', `${Math.round(c)}px`);
+    divider.setAttribute('aria-valuemin', String(MIN));
+    divider.setAttribute('aria-valuemax', String(Math.round(Math.max(MIN, max))));
+    divider.setAttribute('aria-valuenow', String(Math.round(c)));
+  };
   let dragging = false;
   divider.addEventListener('pointerdown', (e) => {
     dragging = true;
@@ -162,10 +169,7 @@ function setupResize(): void {
     document.body.style.userSelect = 'none';
   });
   divider.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    const rect = app.getBoundingClientRect();
-    const w = Math.min(Math.max(rect.right - e.clientX, 260), rect.width - 200);
-    side.style.flex = `0 0 ${w}px`;
+    if (dragging) apply(app.getBoundingClientRect().right - e.clientX);
   });
   const stop = (e: PointerEvent) => {
     if (!dragging) return;
@@ -180,6 +184,13 @@ function setupResize(): void {
   };
   divider.addEventListener('pointerup', stop);
   divider.addEventListener('pointercancel', stop);
+  divider.addEventListener('keydown', (e) => {
+    const cur = side.getBoundingClientRect().width;
+    if (e.key === 'ArrowLeft') apply(cur + 24); // divider left → wider chat
+    else if (e.key === 'ArrowRight') apply(cur - 24);
+    else return;
+    e.preventDefault();
+  });
 }
 
 function main(): void {
@@ -195,45 +206,67 @@ function main(): void {
 
   setupResize();
 
-  // Returning evaluator (name remembered on this browser) → skip the name prompt, go straight in.
+  // Build (or rebuild) the name-entry gate. Used first-time AND as the fallback if an auto-start
+  // for a returning evaluator fails — so a bad startup can't trap them in a reload loop.
+  const showNameGate = (prefill: string, errorMsg = ''): void => {
+    const h = document.createElement('h2');
+    h.textContent = 'Mol* chat — preview';
+    const p = document.createElement('p');
+    p.textContent = 'Pop your name in so we can credit your feedback.';
+    const input = document.createElement('input');
+    input.placeholder = 'Your name';
+    input.autocomplete = 'name';
+    input.value = prefill;
+    const go = document.createElement('button');
+    go.textContent = 'Start';
+    const errorEl = document.createElement('div');
+    errorEl.id = 'gate-error';
+    errorEl.textContent = errorMsg;
+    const wrap = document.createElement('div');
+    wrap.append(input, go);
+    card.replaceChildren(h, p, wrap, errorEl);
+
+    const begin = async () => {
+      const name = input.value.trim() || 'anonymous';
+      errorEl.textContent = '';
+      go.setAttribute('disabled', 'true');
+      try {
+        localStorage.setItem(nameKey, name);
+        void capture({ kind: 'register', name });
+        await start(name); // only dismiss the gate once the viewer + chat are actually up
+        gate.style.display = 'none';
+      } catch (e) {
+        console.error('startup failed', e);
+        errorEl.textContent = 'Something went wrong starting up. Please try again.';
+        go.removeAttribute('disabled');
+      }
+    };
+    go.addEventListener('click', begin);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') begin();
+    });
+    input.focus();
+  };
+
+  // Returning evaluator (name remembered on this browser) → skip the prompt, go straight in;
+  // fall back to the name gate (pre-filled) if startup fails.
   const existing = localStorage.getItem(nameKey);
   if (existing) {
-    card.innerHTML = `<h2>Welcome back, ${esc(existing)}</h2><p id="wb">Starting your session…</p>`;
+    const h = document.createElement('h2');
+    h.textContent = `Welcome back, ${existing}`;
+    const p = document.createElement('p');
+    p.textContent = 'Starting your session…';
+    card.replaceChildren(h, p);
     start(existing)
       .then(() => (gate.style.display = 'none'))
       .catch((e) => {
         console.error('startup failed', e);
-        const wb = document.getElementById('wb');
-        if (wb) wb.textContent = 'Something went wrong. Please reload and try again.';
+        showNameGate(existing, 'Could not start automatically — please try again.');
       });
     return;
   }
 
-  const input = document.getElementById('gate-name') as HTMLInputElement;
-  const go = document.getElementById('gate-go')!;
-  const error = document.getElementById('gate-error')!;
-
-  const begin = async () => {
-    const name = input.value.trim() || 'anonymous';
-    error.textContent = '';
-    go.setAttribute('disabled', 'true');
-    try {
-      localStorage.setItem(nameKey, name);
-      void capture({ kind: 'register', name });
-      await start(name); // only dismiss the gate once the viewer + chat are actually up
-      gate.style.display = 'none';
-    } catch (e) {
-      console.error('startup failed', e);
-      error.textContent = 'Something went wrong starting up. Please reload and try again.';
-      go.removeAttribute('disabled');
-    }
-  };
-
-  go.addEventListener('click', begin);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') begin();
-  });
-  input.focus();
+  showNameGate('');
 }
 
 main();
