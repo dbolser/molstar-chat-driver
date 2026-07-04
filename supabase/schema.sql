@@ -54,6 +54,7 @@ alter table feedback   enable row level security;
 grant select, insert, update, delete on evaluators, turns, feedback to service_role;
 
 create index if not exists turns_evaluator_idx    on turns (evaluator_token, created_at);
+create index if not exists turns_session_idx      on turns (session_id, created_at);
 create index if not exists feedback_evaluator_idx on feedback (evaluator_token, created_at);
 
 -- Atomic daily usage counters for the chat abuse/cost caps (per-token + optional global), keyed

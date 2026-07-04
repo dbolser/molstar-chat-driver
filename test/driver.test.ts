@@ -119,6 +119,28 @@ test('slides the context window to maxContextTurns', async () => {
   assert.deepEqual(reqs[3].history?.map((h) => h.prompt), ['two', 'three']); // oldest dropped
 });
 
+test('a turn completing after reset() does not leak into the new scene', async () => {
+  let release!: () => void;
+  const gate = new Promise<void>((r) => (release = r));
+  const reqs: ChatRequest[] = [];
+  const backend: ChatBackend = {
+    async run(req) {
+      reqs.push(req);
+      if (reqs.length === 1) await gate; // hold the first turn open
+      return { mvsj: `scene-${reqs.length}` };
+    },
+  };
+  const seen: ChatTurn[] = [];
+  const driver = new ChatDriver({ backend, renderer: okRenderer(), onTurn: (t) => seen.push(t) });
+  const pending = driver.submit('first'); // hangs on the gate
+  driver.reset(); // new scene starts before 'first' resolves
+  release();
+  await pending; // 'first' now completes, but post-reset
+  await driver.submit('second');
+  assert.equal(reqs[1].history, undefined); // 'first' did not fold into the new scene's context
+  assert.equal(seen.length, 2); // onTurn still fired for both turns (nothing swallowed)
+});
+
 test('maxContextTurns:0 disables context entirely', async () => {
   const { reqs, backend } = spyBackend();
   const driver = new ChatDriver({ backend, renderer: okRenderer(), maxContextTurns: 0 });

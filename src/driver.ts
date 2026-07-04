@@ -37,8 +37,10 @@ function newSessionId(): string {
 }
 
 export class ChatDriver {
-  /** Completed turns in the current scene (cleared by {@link reset}). */
+  /** Recent turns in the current scene, trimmed to the context window (cleared by {@link reset}). */
   private turns: ChatTurn[] = [];
+  /** Total turns since the last reset (for the UI counter; `turns` itself is trimmed). */
+  private turnCount = 0;
   private sessionId = newSessionId();
 
   constructor(private readonly opts: ChatDriverOptions) {}
@@ -57,11 +59,12 @@ export class ChatDriver {
 
   /** Run a prompt (with scene context), render the resulting scene, and return the completed turn. */
   async submit(prompt: string, model?: string): Promise<ChatTurn> {
+    const session = this.sessionId; // snapshot: reset() may run before this call resolves
     const response = await this.opts.backend.run({
       prompt,
       model,
       history: this.buildHistory(),
-      sessionId: this.sessionId,
+      sessionId: session,
     });
 
     let rendered = false;
@@ -83,8 +86,15 @@ export class ChatDriver {
       renderError,
       ts: new Date().toISOString(),
     };
-    this.turns.push(turn);
-    this.notifyContext();
+    // Only fold this into the scene context if we're still in the same scene — a reset() while the
+    // backend call was in flight starts a fresh conversation this late turn must not leak into.
+    if (this.sessionId === session) {
+      this.turns.push(turn);
+      const keep = this.maxContext > 0 ? this.maxContext : 0;
+      if (this.turns.length > keep) this.turns.splice(0, this.turns.length - keep);
+      this.turnCount += 1;
+      this.notifyContext();
+    }
     // The observer is a neutral seam: a throwing observer must not corrupt a turn
     // that already ran (and rendered). Isolate it.
     try {
@@ -98,13 +108,14 @@ export class ChatDriver {
   /** Clear the scene context and start a fresh conversation ("New scene"). */
   reset(): void {
     this.turns = [];
+    this.turnCount = 0;
     this.sessionId = newSessionId();
     this.notifyContext();
   }
 
   private notifyContext(): void {
     try {
-      this.opts.onContextChange?.({ size: this.turns.length, max: this.maxContext });
+      this.opts.onContextChange?.({ size: this.turnCount, max: this.maxContext });
     } catch {
       /* observer errors are the observer's problem */
     }

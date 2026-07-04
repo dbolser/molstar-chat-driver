@@ -44,8 +44,9 @@ function resolveModel(requested: unknown): string {
 }
 
 const MAX_HISTORY_TURNS = intEnv('MCD_MAX_HISTORY_TURNS', 12, 0); // server cap on replayed context
+const MAX_MVSJ_CHARS = intEnv('MCD_MAX_MVSJ_CHARS', 40000, 1); // cap each replayed scene's size
 
-/** Validate + cap the client-supplied scene history (defensive: untrusted, and bounds token cost). */
+/** Validate + cap the client-supplied scene history (untrusted; both fields bound token cost). */
 function sanitizeHistory(raw: unknown): { prompt: string; mvsj: string | null }[] {
   if (!Array.isArray(raw)) return [];
   const out: { prompt: string; mvsj: string | null }[] = [];
@@ -54,7 +55,7 @@ function sanitizeHistory(raw: unknown): { prompt: string; mvsj: string | null }[
     const o = item as Record<string, unknown>;
     const p = typeof o.prompt === 'string' ? o.prompt.slice(0, MAX_PROMPT_CHARS) : '';
     if (!p) continue;
-    out.push({ prompt: p, mvsj: typeof o.mvsj === 'string' ? o.mvsj : null });
+    out.push({ prompt: p, mvsj: typeof o.mvsj === 'string' ? o.mvsj.slice(0, MAX_MVSJ_CHARS) : null });
   }
   return out.slice(-MAX_HISTORY_TURNS);
 }
