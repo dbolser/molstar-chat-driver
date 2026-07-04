@@ -182,6 +182,7 @@ function setupResize(): void {
     }
     document.body.style.userSelect = '';
   };
+  apply(side.getBoundingClientRect().width || 420); // seed aria-value* on load
   divider.addEventListener('pointerup', stop);
   divider.addEventListener('pointercancel', stop);
   divider.addEventListener('keydown', (e) => {
@@ -226,7 +227,10 @@ function main(): void {
     wrap.append(input, go);
     card.replaceChildren(h, p, wrap, errorEl);
 
+    let starting = false;
     const begin = async () => {
+      if (starting) return; // guard: Enter can re-fire while start() is still pending
+      starting = true;
       const name = input.value.trim() || 'anonymous';
       errorEl.textContent = '';
       go.setAttribute('disabled', 'true');
@@ -239,6 +243,7 @@ function main(): void {
         console.error('startup failed', e);
         errorEl.textContent = 'Something went wrong starting up. Please try again.';
         go.removeAttribute('disabled');
+        starting = false; // allow a retry
       }
     };
     go.addEventListener('click', begin);
