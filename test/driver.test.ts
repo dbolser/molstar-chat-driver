@@ -97,6 +97,22 @@ test('replays scene context (history) on follow-up prompts, in one session', asy
   assert.ok(reqs[0].sessionId && reqs[0].sessionId === reqs[1].sessionId); // same scene session
 });
 
+test('a turn Mol* could not render contributes no scene to history', async () => {
+  const reqs: ChatRequest[] = [];
+  const backend: ChatBackend = {
+    async run(req) {
+      reqs.push(req);
+      return { mvsj: '{"scene":true}' };
+    },
+  };
+  // renderer always throws → turns produce an mvsj but never actually render
+  const driver = new ChatDriver({ backend, renderer: failingRenderer(new Error('rejected')) });
+  await driver.submit('build something');
+  await driver.submit('now tweak it');
+  // the prior prompt is replayed for continuity, but its unrendered scene is NOT (mvsj: null)
+  assert.deepEqual(reqs[1].history, [{ prompt: 'build something', mvsj: null }]);
+});
+
 test('reset() clears the context and starts a new session', async () => {
   const { reqs, backend } = spyBackend();
   const driver = new ChatDriver({ backend, renderer: okRenderer() });

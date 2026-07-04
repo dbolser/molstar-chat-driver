@@ -49,12 +49,14 @@ export class ChatDriver {
     return this.opts.maxContextTurns ?? 10;
   }
 
-  /** The recent turns replayed as history for the next prompt (sliding window), or undefined. */
+  /** The recent turns replayed as history for the next prompt (sliding window), or undefined.
+   *  Only turns that actually rendered contribute a scene — a scene Mol* rejected never reached
+   *  the viewer, so replaying it would ask the model to edit something that isn't on screen. */
   private buildHistory(): ChatHistoryTurn[] | undefined {
     if (this.maxContext <= 0 || this.turns.length === 0) return undefined;
     return this.turns
       .slice(-this.maxContext)
-      .map((t) => ({ prompt: t.prompt, mvsj: t.response?.mvsj ?? null }));
+      .map((t) => ({ prompt: t.prompt, mvsj: t.rendered ? t.response?.mvsj ?? null : null }));
   }
 
   /** Run a prompt (with scene context), render the resulting scene, and return the completed turn. */

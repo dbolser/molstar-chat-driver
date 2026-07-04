@@ -57,7 +57,8 @@ function sanitizeHistory(raw: unknown): { prompt: string; mvsj: string | null }[
     if (!p) continue;
     out.push({ prompt: p, mvsj: typeof o.mvsj === 'string' ? o.mvsj.slice(0, MAX_MVSJ_CHARS) : null });
   }
-  return out.slice(-MAX_HISTORY_TURNS);
+  // NB: slice(-0) === slice(0) (returns everything), so a 0 cap must short-circuit to "no history".
+  return MAX_HISTORY_TURNS > 0 ? out.slice(-MAX_HISTORY_TURNS) : [];
 }
 
 Deno.serve(async (req) => {
