@@ -145,6 +145,43 @@ async function start(name: string): Promise<void> {
   buildFeedback(() => latestTurnId);
 }
 
+const esc = (s: string): string =>
+  s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
+
+/** Drag the divider to resize the side (chat) pane horizontally. */
+function setupResize(): void {
+  const app = document.getElementById('app');
+  const side = document.getElementById('side');
+  const divider = document.getElementById('divider');
+  if (!app || !side || !divider) return;
+  let dragging = false;
+  divider.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    divider.classList.add('dragging');
+    divider.setPointerCapture(e.pointerId);
+    document.body.style.userSelect = 'none';
+  });
+  divider.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const rect = app.getBoundingClientRect();
+    const w = Math.min(Math.max(rect.right - e.clientX, 260), rect.width - 200);
+    side.style.flex = `0 0 ${w}px`;
+  });
+  const stop = (e: PointerEvent) => {
+    if (!dragging) return;
+    dragging = false;
+    divider.classList.remove('dragging');
+    try {
+      divider.releasePointerCapture(e.pointerId);
+    } catch {
+      /* pointer already released */
+    }
+    document.body.style.userSelect = '';
+  };
+  divider.addEventListener('pointerup', stop);
+  divider.addEventListener('pointercancel', stop);
+}
+
 function main(): void {
   const gate = document.getElementById('gate')!;
   const card = gate.querySelector('.card')!;
@@ -156,12 +193,25 @@ function main(): void {
     return;
   }
 
+  setupResize();
+
+  // Returning evaluator (name remembered on this browser) → skip the name prompt, go straight in.
+  const existing = localStorage.getItem(nameKey);
+  if (existing) {
+    card.innerHTML = `<h2>Welcome back, ${esc(existing)}</h2><p id="wb">Starting your session…</p>`;
+    start(existing)
+      .then(() => (gate.style.display = 'none'))
+      .catch((e) => {
+        console.error('startup failed', e);
+        const wb = document.getElementById('wb');
+        if (wb) wb.textContent = 'Something went wrong. Please reload and try again.';
+      });
+    return;
+  }
+
   const input = document.getElementById('gate-name') as HTMLInputElement;
   const go = document.getElementById('gate-go')!;
   const error = document.getElementById('gate-error')!;
-
-  const existing = localStorage.getItem(nameKey);
-  if (existing) input.value = existing;
 
   const begin = async () => {
     const name = input.value.trim() || 'anonymous';
@@ -169,7 +219,7 @@ function main(): void {
     go.setAttribute('disabled', 'true');
     try {
       localStorage.setItem(nameKey, name);
-      if (name !== existing) void capture({ kind: 'register', name });
+      void capture({ kind: 'register', name });
       await start(name); // only dismiss the gate once the viewer + chat are actually up
       gate.style.display = 'none';
     } catch (e) {
