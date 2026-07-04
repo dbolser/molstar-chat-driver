@@ -6,12 +6,27 @@
  * what lets the backend, the renderer, and the UI stay independent.
  */
 
+/** One earlier exchange, replayed to the backend so a follow-up prompt can build on it. */
+export interface ChatHistoryTurn {
+  /** What the user asked. */
+  prompt: string;
+  /** The MVSJ scene the backend returned (or `null` if that turn produced none). */
+  mvsj: string | null;
+}
+
 /** A request to turn a prompt into a molecular scene. */
 export interface ChatRequest {
   /** The natural-language instruction, e.g. "show hemoglobin as cartoon coloured blue". */
   prompt: string;
   /** Optional model id, for backends that can route to more than one model. */
   model?: string;
+  /**
+   * Recent prior turns (oldest→newest), so the backend can treat the prompt as a follow-up that
+   * edits the current scene. Omitted/empty means "fresh scene". Callers cap the length.
+   */
+  history?: ChatHistoryTurn[];
+  /** Opaque id grouping the turns of one scene conversation; changes when the scene is reset. */
+  sessionId?: string;
 }
 
 /** The result of a chat turn. */

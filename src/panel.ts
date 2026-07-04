@@ -22,6 +22,8 @@ export interface ChatDriverPanelConfig {
   placeholder?: string;
   /** Optional intro line shown above the first turn. */
   welcome?: string;
+  /** Turns of scene context to keep (sliding window). Default 10; 0 hides the context UI. */
+  maxContextTurns?: number;
 }
 
 export interface ChatDriverPanelHandle {
@@ -52,6 +54,12 @@ const CSS = `
 .mcd-form textarea { flex:1; resize:vertical; min-height:44px; border:1px solid #d0d0d0; border-radius:6px; padding:8px; font:inherit; }
 .mcd-form button.mcd-send { cursor:pointer; border:none; background:#1a66ff; color:#fff; border-radius:6px; padding:8px 16px; font:inherit; }
 .mcd-form button.mcd-send:disabled { opacity:.5; cursor:default; }
+.mcd-divider { text-align:center; font-size:11px; color:#999; text-transform:uppercase; letter-spacing:.05em; }
+.mcd-context { display:flex; align-items:center; gap:8px; padding:6px 12px; border-top:1px solid #e6e6e6; background:#fff; font-size:12px; color:#666; }
+.mcd-context .mcd-ctx-label { flex:1; }
+.mcd-context .mcd-ctx-label.full { color:#9a6700; }
+.mcd-context button.mcd-newscene { cursor:pointer; border:1px solid #d0d0d0; background:#fff; border-radius:6px; padding:3px 10px; font:inherit; font-size:12px; color:#333; }
+.mcd-context button.mcd-newscene:hover { background:#f4f4f4; }
 `;
 
 function ensureStyles(): void {
@@ -104,16 +112,48 @@ export function mountChatDriver(
   const root = resolveTarget(target);
   const models = config.models ?? [];
 
-  const driver = new ChatDriver({
-    backend: config.backend,
-    renderer: config.renderer,
-    onTurn: config.onTurn,
-  });
+  const maxContextTurns = config.maxContextTurns ?? 10;
 
   const panel = el('div', { class: 'mcd-panel' });
   const transcript = el('div', { class: 'mcd-transcript' });
   if (config.welcome) transcript.append(el('div', { class: 'mcd-welcome' }, config.welcome));
   panel.append(transcript);
+
+  // Scene-context bar: shows how much history is carried into follow-up prompts, and a button to
+  // start a fresh scene (clears the context the model sees). Hidden when context is disabled.
+  let ctxLabel: HTMLElement | undefined;
+  if (maxContextTurns > 0) {
+    ctxLabel = el('span', { class: 'mcd-ctx-label' }, '🧵 New scene — prompts will build on each other');
+    const newScene = el('button', { class: 'mcd-newscene', type: 'button', title: 'Forget the current scene and start fresh' }, '↺ New scene');
+    newScene.addEventListener('click', () => {
+      driver.reset();
+      transcript.append(el('div', { class: 'mcd-divider' }, '— new scene —'));
+      transcript.scrollTop = transcript.scrollHeight;
+    });
+    panel.append(el('div', { class: 'mcd-context' }, ctxLabel, newScene));
+  }
+
+  function updateContext(info: { size: number; max: number }): void {
+    if (!ctxLabel) return;
+    if (info.size === 0) {
+      ctxLabel.textContent = '🧵 New scene — prompts will build on each other';
+      ctxLabel.classList.remove('full');
+    } else if (info.size < info.max) {
+      ctxLabel.textContent = `🧵 Context: ${info.size} prompt${info.size === 1 ? '' : 's'} (${info.max - info.size} before it starts trimming)`;
+      ctxLabel.classList.remove('full');
+    } else {
+      ctxLabel.textContent = `🧵 Context: last ${info.max} prompts (older ones dropped) — ↺ for a fresh scene`;
+      ctxLabel.classList.add('full');
+    }
+  }
+
+  const driver = new ChatDriver({
+    backend: config.backend,
+    renderer: config.renderer,
+    onTurn: config.onTurn,
+    maxContextTurns,
+    onContextChange: updateContext,
+  });
 
   // Composer
   const textarea = el('textarea', {
