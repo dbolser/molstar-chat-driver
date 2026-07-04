@@ -22,6 +22,7 @@ alter table evaluators add column if not exists revoked boolean not null default
 create table if not exists turns (
   id              uuid primary key default gen_random_uuid(),
   evaluator_token text not null,
+  session_id      text,        -- groups the turns of one scene conversation (multi-turn refinement)
   prompt          text not null,
   model           text,
   mvsj            text,        -- the MVS scene (null if none was produced)
@@ -29,6 +30,8 @@ create table if not exists turns (
   tier0           boolean,     -- did it produce a parseable scene?
   created_at      timestamptz not null default now()
 );
+-- (idempotent for projects created before session_id existed)
+alter table turns add column if not exists session_id text;
 
 create table if not exists feedback (
   id              uuid primary key default gen_random_uuid(),
@@ -51,6 +54,7 @@ alter table feedback   enable row level security;
 grant select, insert, update, delete on evaluators, turns, feedback to service_role;
 
 create index if not exists turns_evaluator_idx    on turns (evaluator_token, created_at);
+create index if not exists turns_session_idx      on turns (session_id, created_at);
 create index if not exists feedback_evaluator_idx on feedback (evaluator_token, created_at);
 
 -- Atomic daily usage counters for the chat abuse/cost caps (per-token + optional global), keyed

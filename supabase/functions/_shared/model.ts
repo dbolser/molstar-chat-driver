@@ -52,20 +52,41 @@ async function fetchWithTimeout(url: string, init: RequestInit): Promise<Respons
   }
 }
 
-async function callAnthropic(key: string, id: string, prompt: string): Promise<string> {
+export interface HistoryTurn {
+  prompt: string;
+  mvsj: string | null;
+}
+interface Msg {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+// Replay prior turns as an alternating user/assistant conversation so a follow-up prompt edits
+// the current scene. The assistant's earlier reply is the MVSJ it produced (what it should edit).
+function buildMessages(prompt: string, history?: HistoryTurn[]): Msg[] {
+  const msgs: Msg[] = [];
+  for (const h of history ?? []) {
+    msgs.push({ role: 'user', content: h.prompt });
+    msgs.push({ role: 'assistant', content: h.mvsj ?? '(no scene produced for that prompt)' });
+  }
+  msgs.push({ role: 'user', content: prompt });
+  return msgs;
+}
+
+async function callAnthropic(key: string, id: string, messages: Msg[]): Promise<string> {
   const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-    body: JSON.stringify({ model: id, max_tokens: 16000, system: SYSTEM, messages: [{ role: 'user', content: prompt }] }),
+    body: JSON.stringify({ model: id, max_tokens: 16000, system: SYSTEM, messages }),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data?.error?.message || `HTTP ${res.status}`);
   return (data.content ?? []).filter((b: { type: string }) => b.type === 'text').map((b: { text: string }) => b.text).join('');
 }
 
-async function callOpenAiCompat(baseUrl: string, key: string, id: string, prompt: string): Promise<string> {
+async function callOpenAiCompat(baseUrl: string, key: string, id: string, convo: Msg[]): Promise<string> {
   const url = `${baseUrl.replace(/\/$/, '')}/chat/completions`;
-  const messages = [{ role: 'system', content: SYSTEM }, { role: 'user', content: prompt }];
+  const messages = [{ role: 'system', content: SYSTEM }, ...convo];
   const send = async (tokenField: string) => {
     const res = await fetchWithTimeout(url, {
       method: 'POST',
@@ -119,17 +140,22 @@ export interface SceneResult {
   tier0: boolean;
 }
 
-export async function generateScene(spec: string, prompt: string): Promise<SceneResult> {
+export async function generateScene(
+  spec: string,
+  prompt: string,
+  history?: HistoryTurn[],
+): Promise<SceneResult> {
   const prov = resolveProvider(spec);
   if (!prov) return { mvsj: null, error: `unknown model spec: ${spec}`, raw: '', tier0: false };
   const key = Deno.env.get(prov.keyVar);
   if (!key) return { mvsj: null, error: `server is missing ${prov.keyVar}`, raw: '', tier0: false };
 
+  const messages = buildMessages(prompt, history);
   let raw: string;
   try {
     raw = prov.kind === 'anthropic'
-      ? await callAnthropic(key, prov.id, prompt)
-      : await callOpenAiCompat(prov.baseUrl as string, key, prov.id, prompt);
+      ? await callAnthropic(key, prov.id, messages)
+      : await callOpenAiCompat(prov.baseUrl as string, key, prov.id, messages);
   } catch (e) {
     return { mvsj: null, error: `${(e as Error).name}: ${(e as Error).message}`, raw: '', tier0: false };
   }

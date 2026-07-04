@@ -43,11 +43,29 @@ function resolveModel(requested: unknown): string {
   return DEFAULT_MODEL;
 }
 
+const MAX_HISTORY_TURNS = intEnv('MCD_MAX_HISTORY_TURNS', 12, 0); // server cap on replayed context
+const MAX_MVSJ_CHARS = intEnv('MCD_MAX_MVSJ_CHARS', 40000, 1); // cap each replayed scene's size
+
+/** Validate + cap the client-supplied scene history (untrusted; both fields bound token cost). */
+function sanitizeHistory(raw: unknown): { prompt: string; mvsj: string | null }[] {
+  if (!Array.isArray(raw)) return [];
+  const out: { prompt: string; mvsj: string | null }[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue;
+    const o = item as Record<string, unknown>;
+    const p = typeof o.prompt === 'string' ? o.prompt.slice(0, MAX_PROMPT_CHARS) : '';
+    if (!p) continue;
+    out.push({ prompt: p, mvsj: typeof o.mvsj === 'string' ? o.mvsj.slice(0, MAX_MVSJ_CHARS) : null });
+  }
+  // NB: slice(-0) === slice(0) (returns everything), so a 0 cap must short-circuit to "no history".
+  return MAX_HISTORY_TURNS > 0 ? out.slice(-MAX_HISTORY_TURNS) : [];
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ error: 'POST only' }, 405);
 
-  let body: { prompt?: unknown; model?: unknown };
+  let body: { prompt?: unknown; model?: unknown; history?: unknown; sessionId?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -59,6 +77,8 @@ Deno.serve(async (req) => {
     return json({ error: `prompt too long (max ${MAX_PROMPT_CHARS} characters)` }, 400);
   }
   const model = resolveModel(body.model);
+  const history = sanitizeHistory(body.history);
+  const sessionId = typeof body.sessionId === 'string' ? body.sessionId.slice(0, 64) : null;
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') as string,
@@ -85,7 +105,7 @@ Deno.serve(async (req) => {
     return json({ error: 'daily limit reached — please try again tomorrow' }, 429);
   }
 
-  const result = await generateScene(model, prompt);
+  const result = await generateScene(model, prompt, history);
 
   // Reliable, server-side capture of the prompt + outcome. Must never break the user's turn.
   let turnId: string | null = null;
@@ -94,6 +114,7 @@ Deno.serve(async (req) => {
       .from('turns')
       .insert({
         evaluator_token: evaluator,
+        session_id: sessionId,
         prompt,
         model,
         mvsj: result.mvsj,
