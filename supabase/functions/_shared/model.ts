@@ -7,7 +7,7 @@
 import { SYSTEM } from './prompt.ts';
 // Maintained JSON-repair library (fixes the missing-bracket / trailing-comma output Haiku produces
 // on complex multi-component scenes, e.g. "colour by chain"). Not hand-rolled.
-import { jsonrepair } from 'https://esm.sh/jsonrepair@3.13.0';
+import { jsonrepair } from 'https://esm.sh/jsonrepair@3.15.0';
 
 type Kind = 'anthropic' | 'openai';
 interface Provider {
@@ -128,9 +128,11 @@ export function extractJsonObject(raw: string): { obj: unknown; repaired: boolea
   const fence = s.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/i);
   if (fence) s = fence[1].trim();
   const a = s.indexOf('{');
+  if (a === -1) return { obj: null, repaired: false };
   const b = s.lastIndexOf('}');
-  if (a === -1 || b <= a) return { obj: null, repaired: false };
-  const candidate = s.slice(a, b + 1);
+  // If the reply was truncated (no closing brace after the first `{`, e.g. a max_tokens cutoff),
+  // keep everything from `{` onward and let jsonrepair close it, rather than bailing out.
+  const candidate = b > a ? s.slice(a, b + 1) : s.slice(a);
   try {
     return { obj: JSON.parse(candidate), repaired: false };
   } catch {

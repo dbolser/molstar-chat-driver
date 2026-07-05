@@ -205,9 +205,12 @@ export function mountChatDriver(
 
     // Reassure during longer model calls: escalate the status text over time so a slow response
     // still feels alive rather than stuck.
+    const setStatusIfLive = (text: string) => {
+      if (status.isConnected) status.textContent = text; // no-op if the panel was unmounted mid-wait
+    };
     const waitTimers = [
-      setTimeout(() => (status.textContent = 'Thinking again…'), 7000),
-      setTimeout(() => (status.textContent = 'Still working on it…'), 16000),
+      setTimeout(() => setStatusIfLive('Thinking again…'), 7000),
+      setTimeout(() => setStatusIfLive('Still working on it…'), 16000),
     ];
 
     void driver
