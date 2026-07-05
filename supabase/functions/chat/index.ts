@@ -120,6 +120,7 @@ Deno.serve(async (req) => {
         mvsj: result.mvsj,
         raw: result.raw,
         tier0: result.tier0,
+        repaired: result.repaired ?? false,
       })
       .select('id')
       .single();

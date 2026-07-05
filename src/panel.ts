@@ -203,6 +203,13 @@ export function mountChatDriver(
     textarea.value = '';
     send.setAttribute('disabled', 'true');
 
+    // Reassure during longer model calls: escalate the status text over time so a slow response
+    // still feels alive rather than stuck.
+    const waitTimers = [
+      setTimeout(() => (status.textContent = 'Thinking again…'), 7000),
+      setTimeout(() => (status.textContent = 'Still working on it…'), 16000),
+    ];
+
     void driver
       .submit(prompt, model)
       .then((result) => {
@@ -232,6 +239,7 @@ export function mountChatDriver(
         status.textContent = `✗ Error: ${String(err)}`;
       })
       .finally(() => {
+        waitTimers.forEach(clearTimeout);
         send.removeAttribute('disabled');
         transcript.scrollTop = transcript.scrollHeight;
       });
