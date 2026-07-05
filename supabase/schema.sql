@@ -28,10 +28,12 @@ create table if not exists turns (
   mvsj            text,        -- the MVS scene (null if none was produced)
   raw             text,        -- the model's raw reply / error text
   tier0           boolean,     -- did it produce a parseable scene?
+  repaired        boolean,     -- did the scene only parse after a JSON self-repair retry?
   created_at      timestamptz not null default now()
 );
--- (idempotent for projects created before session_id existed)
+-- (idempotent for projects created before these columns existed)
 alter table turns add column if not exists session_id text;
+alter table turns add column if not exists repaired boolean;
 
 create table if not exists feedback (
   id              uuid primary key default gen_random_uuid(),

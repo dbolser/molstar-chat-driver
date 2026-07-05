@@ -5,6 +5,9 @@
 // Keys come from Edge Function secrets (Deno.env): ANTHROPIC_API_KEY / OPENAI_API_KEY /
 // GEMINI_API_KEY / OPENROUTER_API_KEY (+ optional OPENAI_BASE_URL).
 import { SYSTEM } from './prompt.ts';
+// Maintained JSON-repair library (fixes the missing-bracket / trailing-comma output Haiku produces
+// on complex multi-component scenes, e.g. "colour by chain"). Not hand-rolled.
+import { jsonrepair } from 'https://esm.sh/jsonrepair@3.15.0';
 
 type Kind = 'anthropic' | 'openai';
 interface Provider {
@@ -118,17 +121,26 @@ function extractRoot(obj: unknown): Record<string, unknown> | null {
   return null;
 }
 
-function extractJsonObject(raw: string): unknown {
+/** Parse the model's reply into an object. If strict JSON fails, fall back to jsonrepair (which
+ *  closes missing brackets etc.). `repaired` reports whether that fallback was needed. */
+export function extractJsonObject(raw: string): { obj: unknown; repaired: boolean } {
   let s = raw.trim();
   const fence = s.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/i);
   if (fence) s = fence[1].trim();
   const a = s.indexOf('{');
+  if (a === -1) return { obj: null, repaired: false };
   const b = s.lastIndexOf('}');
-  if (a === -1 || b <= a) return null;
+  // If the reply was truncated (no closing brace after the first `{`, e.g. a max_tokens cutoff),
+  // keep everything from `{` onward and let jsonrepair close it, rather than bailing out.
+  const candidate = b > a ? s.slice(a, b + 1) : s.slice(a);
   try {
-    return JSON.parse(s.slice(a, b + 1));
+    return { obj: JSON.parse(candidate), repaired: false };
   } catch {
-    return null;
+    try {
+      return { obj: JSON.parse(jsonrepair(candidate)), repaired: true };
+    } catch {
+      return { obj: null, repaired: false };
+    }
   }
 }
 
@@ -138,6 +150,8 @@ export interface SceneResult {
   error?: string;
   raw: string;
   tier0: boolean;
+  /** True if the scene only parsed after a JSON self-repair retry (for capture/metrics). */
+  repaired?: boolean;
 }
 
 export async function generateScene(
@@ -160,9 +174,10 @@ export async function generateScene(
     return { mvsj: null, error: `${(e as Error).name}: ${(e as Error).message}`, raw: '', tier0: false };
   }
 
-  const root = extractRoot(extractJsonObject(raw));
-  if (!root) return { mvsj: null, text: raw, raw, tier0: false }; // no scene — show the raw reply
+  const { obj, repaired } = extractJsonObject(raw); // jsonrepair fallback for near-valid JSON
+  const root = extractRoot(obj);
+  if (!root) return { mvsj: null, text: raw, raw, tier0: false, repaired }; // no scene — show the raw reply
   // MolBench's prompt yields a bare {root} tree; Mol* needs a full state with metadata.version.
   const mvsj = JSON.stringify({ metadata: { version: '1', timestamp: new Date().toISOString() }, root });
-  return { mvsj, raw, tier0: true };
+  return { mvsj, raw, tier0: true, repaired };
 }
