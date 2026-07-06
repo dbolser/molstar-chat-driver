@@ -27,7 +27,11 @@ Deno.serve(async (req) => {
 
   let body: { recent?: unknown };
   try {
-    body = await req.json();
+    // A literal `null` (or an array/primitive) is valid JSON but not a usable body — reject it
+    // here so the later `body.recent` access can't throw outside the guarantee below.
+    const parsed = await req.json();
+    if (parsed === null || typeof parsed !== 'object') throw new Error('not an object');
+    body = parsed as { recent?: unknown };
   } catch {
     return json({ error: 'invalid JSON body' }, 400);
   }

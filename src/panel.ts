@@ -285,7 +285,13 @@ export function mountChatDriver(
   function renderChips(items: string[]): void {
     if (!suggestBar) return;
     suggestBar.replaceChildren();
-    const prompts = items.map((s) => s.trim()).filter(Boolean).slice(0, maxSuggestions);
+    // Defensive: the provider is typed string[], but its data may be untrusted (e.g. a backend
+    // response) — drop non-strings so a stray null/number can't throw in `.trim()`.
+    const prompts = items
+      .filter((s): s is string => typeof s === 'string')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(0, maxSuggestions);
     if (prompts.length === 0) return; // nothing to offer → keep the row empty (collapses to nil)
     const dice = el('button', { class: 'mcd-dice', type: 'button', title: 'Show me other ideas', 'aria-label': 'Show other suggestions' }, '🎲');
     dice.addEventListener('click', () => void refreshSuggestions());

@@ -148,6 +148,19 @@ test('maxSuggestions caps how many chips are shown', async () => {
   assert.equal(document.querySelectorAll('.mcd-suggest .mcd-chip').length, 2);
 });
 
+test('non-string suggestions are dropped rather than crashing the row', async () => {
+  const { backend } = recordingBackend();
+  mountChatDriver('chat', {
+    backend,
+    renderer: okRenderer,
+    // Untrusted providers (e.g. a backend response) may include junk; it must not throw.
+    suggestions: () => ['Show me lysozyme', null, 42, '  ', 'Load hemoglobin'] as unknown as string[],
+  });
+  await tick();
+  const chips = [...document.querySelectorAll('.mcd-suggest .mcd-chip')].map((c) => c.textContent);
+  assert.deepEqual(chips, ['Show me lysozyme', 'Load hemoglobin']);
+});
+
 test('clicking a suggestion chip submits that prompt', async () => {
   const { backend, calls } = recordingBackend();
   mountChatDriver('chat', {

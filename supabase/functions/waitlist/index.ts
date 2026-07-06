@@ -17,7 +17,11 @@ Deno.serve(async (req) => {
 
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
+    // A literal `null` (or an array/primitive) is valid JSON but not a usable body — reject it
+    // here so the later `body.email` access can't throw with a TypeError.
+    const parsed = await req.json();
+    if (parsed === null || typeof parsed !== 'object') throw new Error('not an object');
+    body = parsed as Record<string, unknown>;
   } catch {
     return json({ error: 'invalid JSON body' }, 400);
   }
@@ -38,7 +42,8 @@ Deno.serve(async (req) => {
     .from('waitlist')
     .upsert({ email, name, note, source }, { onConflict: 'email', ignoreDuplicates: true });
   if (error) {
-    console.error('waitlist insert failed', error);
+    // Log only non-PII fields: a raw Postgrest error can echo the offending row (the email).
+    console.error('waitlist insert failed', { code: error.code, hint: error.hint });
     return json({ error: 'could not save — please try again' }, 500);
   }
   return json({ ok: true });

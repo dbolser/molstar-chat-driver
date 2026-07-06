@@ -251,11 +251,16 @@ function showWaitlist(card: Element): void {
     sending = true;
     errorEl.textContent = 'Sending…';
     go.setAttribute('disabled', 'true');
+    // Time the request out so a stalled network can't leave the form stuck on "Sending…"
+    // forever with no way to retry (abort surfaces as a throw → the catch re-enables the button).
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10_000);
     try {
       const res = await fetch(`${cfg.functionsUrl}/waitlist`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', apikey: cfg.anonKey },
         body: JSON.stringify({ email: addr, name: name.value.trim() || null }),
+        signal: ctrl.signal,
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const done = document.createElement('h2');
@@ -268,6 +273,8 @@ function showWaitlist(card: Element): void {
       errorEl.textContent = 'Could not save that — please try again in a moment.';
       go.removeAttribute('disabled');
       sending = false;
+    } finally {
+      clearTimeout(timer);
     }
   };
   go.addEventListener('click', submit);

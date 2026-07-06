@@ -131,7 +131,7 @@ export async function nextSuggestions(recent: string[], n: number, allowModel = 
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data?.error?.message || `HTTP ${res.status}`);
-    const text = (data.content ?? [])
+    const text = (data?.content ?? [])
       .filter((b: { type: string }) => b.type === 'text')
       .map((b: { text: string }) => b.text)
       .join('');
