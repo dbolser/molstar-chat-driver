@@ -62,20 +62,28 @@ function dedupe(items: string[]): string[] {
 export async function starterSuggestions(supabase: SupabaseClient, n: number): Promise<string[]> {
   let corpus: string[] = [];
   try {
-    // Real prompts other evaluators used (that produced a scene). Recent-first, then filtered to
-    // things that read like self-contained openers rather than mid-scene refinements.
+    // Only the FIRST prompt of a session is a real opener. Later tier0 turns (e.g. "Colour it by
+    // chain") are mid-scene refinements that assume a molecule already on screen — served as a
+    // blank-session starter they'd reference nothing and fail. So pull tier0 turns oldest-first
+    // and keep just the earliest prompt per session.
     const { data, error } = await supabase
       .from('turns')
-      .select('prompt')
+      .select('session_id, prompt')
       .eq('tier0', true)
-      .order('created_at', { ascending: false })
-      .limit(200);
+      .order('created_at', { ascending: true })
+      .limit(1000);
     if (!error && Array.isArray(data)) {
-      corpus = data
-        .map((r) => (r as { prompt?: unknown }).prompt)
-        .filter((p): p is string => typeof p === 'string')
-        .map((p) => p.trim())
-        .filter((p) => p.length >= 10 && p.length <= 120 && /\b(show|load|display|render|view|colou?r)\b/i.test(p));
+      const openerBySession = new Map<string, string>();
+      const standalone: string[] = []; // legacy rows without a session_id: each is its own opener
+      for (const row of data as { session_id?: string | null; prompt?: unknown }[]) {
+        const p = typeof row.prompt === 'string' ? row.prompt.trim() : '';
+        if (!p) continue;
+        if (row.session_id == null) standalone.push(p);
+        else if (!openerBySession.has(row.session_id)) openerBySession.set(row.session_id, p);
+      }
+      corpus = [...openerBySession.values(), ...standalone].filter(
+        (p) => p.length >= 10 && p.length <= 120 && /\b(show|load|display|render|view|colou?r)\b/i.test(p),
+      );
     }
   } catch (e) {
     console.error('starter corpus fetch failed (using seed only)', e);

@@ -230,7 +230,11 @@ export function mountChatDriver(
     const { status, turn } = addTurn(prompt, model);
     textarea.value = '';
     send.setAttribute('disabled', 'true');
-    suggestBar?.replaceChildren(); // drop stale chips while this turn is in flight
+    // Drop stale chips AND invalidate any in-flight refresh (e.g. the starter fetch from mount):
+    // bumping the request id makes a late response fail its `reqId !== suggestReq` check, so it
+    // can't render chips computed for the pre-submit context (which could fire a second submit).
+    suggestReq++;
+    suggestBar?.replaceChildren();
 
     // Reassure during longer model calls: escalate the status text over time so a slow response
     // still feels alive rather than stuck.

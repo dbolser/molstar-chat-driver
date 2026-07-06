@@ -161,6 +161,36 @@ test('non-string suggestions are dropped rather than crashing the row', async ()
   assert.deepEqual(chips, ['Show me lysozyme', 'Load hemoglobin']);
 });
 
+test('a suggestion refresh resolving mid-turn does not render stale chips', async () => {
+  // Backend stays pending so the turn is still "in flight" when the mount's starter fetch resolves.
+  let releaseBackend: () => void = () => {};
+  const backend: ChatBackend = {
+    run: () => new Promise((res) => (releaseBackend = () => res({ mvsj: null }))),
+  };
+  // The mount (first) suggestion call stays pending until we resolve it with a stale starter.
+  let resolveStarters: (v: string[]) => void = () => {};
+  let calls = 0;
+  const suggestions = () => {
+    calls += 1;
+    return calls === 1 ? new Promise<string[]>((res) => (resolveStarters = res)) : [];
+  };
+  mountChatDriver('chat', { backend, renderer: okRenderer, suggestions });
+  await tick(); // mount's starter fetch is now in flight (pending)
+
+  const ta = document.querySelector('textarea')!;
+  ta.value = 'show lysozyme';
+  ta.dispatchEvent(key({ key: 'Enter' })); // submit — backend pending, turn in flight
+  await tick();
+
+  resolveStarters(['STALE STARTER']); // the pre-submit fetch resolves mid-turn
+  await tick();
+
+  const chips = [...document.querySelectorAll('.mcd-suggest .mcd-chip')].map((c) => c.textContent);
+  assert.ok(!chips.includes('STALE STARTER'), 'a superseded refresh must not render its chips');
+  releaseBackend(); // let the turn finish cleanly
+  await tick();
+});
+
 test('clicking a suggestion chip submits that prompt', async () => {
   const { backend, calls } = recordingBackend();
   mountChatDriver('chat', {
