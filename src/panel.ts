@@ -7,7 +7,7 @@
  */
 import { ChatDriver } from './driver';
 import { PromptHistory } from './history';
-import { ChatBackend, ChatTurn, MvsRenderer } from './types';
+import { ChatBackend, ChatTurn, MvsRenderer, SuggestionProvider } from './types';
 
 export interface ChatDriverPanelConfig {
   backend: ChatBackend;
@@ -24,6 +24,15 @@ export interface ChatDriverPanelConfig {
   welcome?: string;
   /** Turns of scene context to keep (sliding window). Default 10; 0 hides the context UI. */
   maxContextTurns?: number;
+  /**
+   * Optional provider of clickable prompt suggestions, shown as chips just above the composer with
+   * a 🎲 button to reshuffle. Called on mount (starter prompts), after each turn and reset
+   * (follow-up predictions), and on reshuffle. Omit it and no suggestion row is shown — the plugin
+   * stays prompt-agnostic; the content is the caller's (e.g. the site's `suggest` backend).
+   */
+  suggestions?: SuggestionProvider;
+  /** How many suggestion chips to show at once. Default 3. */
+  maxSuggestions?: number;
 }
 
 export interface ChatDriverPanelHandle {
@@ -64,6 +73,15 @@ const CSS = `
 .mcd-context .mcd-ctx-label.full { color:#9a6700; }
 .mcd-context button.mcd-newscene { cursor:pointer; border:1px solid #d0d0d0; background:#fff; border-radius:6px; padding:3px 10px; font:inherit; font-size:12px; color:#333; }
 .mcd-context button.mcd-newscene:hover { background:#f4f4f4; }
+/* Suggestion chips: one-tap prompts shown just above the composer. The dice reshuffles them so a
+   user who doesn't know what to ask can start (or continue) without typing. */
+.mcd-suggest { display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px 12px 0; }
+.mcd-suggest.loading { opacity:.55; }
+.mcd-suggest button.mcd-chip { cursor:pointer; border:1px solid #d0d7e6; background:#f2f6ff; color:#1a3a7a; border-radius:14px; padding:4px 12px; font:inherit; font-size:12px; line-height:1.3; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mcd-suggest button.mcd-chip:hover { background:#e2ecff; border-color:#a9c0f0; }
+.mcd-suggest button.mcd-dice { cursor:pointer; border:1px solid #d0d0d0; background:#fff; border-radius:14px; padding:4px 9px; font:inherit; font-size:13px; line-height:1.3; }
+.mcd-suggest button.mcd-dice:hover { background:#f4f4f4; }
+.mcd-suggest button:disabled { opacity:.5; cursor:default; }
 `;
 
 function ensureStyles(): void {
@@ -133,6 +151,7 @@ export function mountChatDriver(
       driver.reset();
       transcript.append(el('div', { class: 'mcd-divider' }, '— new scene —'));
       transcript.scrollTop = transcript.scrollHeight;
+      void refreshSuggestions(); // back to starter prompts for the fresh scene
     });
     panel.append(el('div', { class: 'mcd-context' }, ctxLabel, newScene));
   }
@@ -158,6 +177,15 @@ export function mountChatDriver(
     maxContextTurns,
     onContextChange: updateContext,
   });
+
+  // Suggestion chips (optional): sits between the context bar and the composer, so tappable
+  // prompts land right above the send button. Only created when a provider is configured.
+  const suggestionProvider = config.suggestions;
+  const maxSuggestions = Math.max(1, config.maxSuggestions ?? 3);
+  const suggestBar = suggestionProvider
+    ? el('div', { class: 'mcd-suggest', role: 'group', 'aria-label': 'Prompt suggestions' })
+    : undefined;
+  if (suggestBar) panel.append(suggestBar);
 
   // Composer
   const textarea = el('textarea', {
@@ -202,6 +230,7 @@ export function mountChatDriver(
     const { status, turn } = addTurn(prompt, model);
     textarea.value = '';
     send.setAttribute('disabled', 'true');
+    suggestBar?.replaceChildren(); // drop stale chips while this turn is in flight
 
     // Reassure during longer model calls: escalate the status text over time so a slow response
     // still feels alive rather than stuck.
@@ -245,7 +274,45 @@ export function mountChatDriver(
         waitTimers.forEach(clearTimeout);
         send.removeAttribute('disabled');
         transcript.scrollTop = transcript.scrollHeight;
+        void refreshSuggestions(); // now predict what to ask next, from the updated context
       });
+  }
+
+  // Suggestion chips. `refreshSuggestions` asks the provider for prompts for the CURRENT context
+  // (empty → starters, otherwise follow-ups) and renders them; the request counter drops any
+  // response that a newer refresh has already superseded. A tap on a chip fills the box and sends.
+  let suggestReq = 0;
+  function renderChips(items: string[]): void {
+    if (!suggestBar) return;
+    suggestBar.replaceChildren();
+    const prompts = items.map((s) => s.trim()).filter(Boolean).slice(0, maxSuggestions);
+    if (prompts.length === 0) return; // nothing to offer → keep the row empty (collapses to nil)
+    const dice = el('button', { class: 'mcd-dice', type: 'button', title: 'Show me other ideas', 'aria-label': 'Show other suggestions' }, '🎲');
+    dice.addEventListener('click', () => void refreshSuggestions());
+    suggestBar.append(dice);
+    for (const p of prompts) {
+      const chip = el('button', { class: 'mcd-chip', type: 'button', title: p }, p);
+      chip.addEventListener('click', () => {
+        setText(textarea, p);
+        runPrompt();
+      });
+      suggestBar.append(chip);
+    }
+  }
+  async function refreshSuggestions(): Promise<void> {
+    if (!suggestionProvider || !suggestBar) return;
+    const reqId = ++suggestReq;
+    const turns = driver.recentTurns();
+    suggestBar.classList.add('loading');
+    let items: string[] = [];
+    try {
+      items = await suggestionProvider({ turns, isFirstPrompt: turns.length === 0 });
+    } catch {
+      items = []; // a failing provider just yields no chips — never breaks the composer
+    }
+    if (reqId !== suggestReq) return; // superseded by a newer refresh
+    suggestBar.classList.remove('loading');
+    renderChips(Array.isArray(items) ? items : []);
   }
 
   form.addEventListener('submit', (e) => {
@@ -279,6 +346,8 @@ export function mountChatDriver(
       }
     }
   });
+
+  void refreshSuggestions(); // seed the starter prompts for a first-time / fresh session
 
   return {
     driver,

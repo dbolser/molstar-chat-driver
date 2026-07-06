@@ -49,6 +49,12 @@ export class ChatDriver {
     return this.opts.maxContextTurns ?? 10;
   }
 
+  /** Snapshot of the current scene's turns (oldest→newest), for suggestion providers and the like.
+   *  A copy, so callers can't mutate the driver's internal context window. */
+  recentTurns(): ReadonlyArray<ChatTurn> {
+    return this.turns.slice();
+  }
+
   /** The recent turns replayed as history for the next prompt (sliding window), or undefined.
    *  Only turns that actually rendered contribute a scene — a scene Mol* rejected never reached
    *  the viewer, so replaying it would ask the model to edit something that isn't on screen. */
