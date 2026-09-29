@@ -50,6 +50,22 @@ export interface MvsRenderer {
   loadMvsj(mvsj: string): Promise<void>;
 }
 
+/** Context handed to a {@link SuggestionProvider} so it can propose relevant prompts. */
+export interface SuggestionContext {
+  /** Recent turns in the current scene, oldest→newest (empty for a fresh/first-time session). */
+  turns: ReadonlyArray<ChatTurn>;
+  /** Convenience flag: `true` when there is no scene context yet (nothing has rendered). */
+  isFirstPrompt: boolean;
+}
+
+/**
+ * Supplies the clickable prompt suggestions shown above the composer. The plugin stays
+ * prompt-agnostic — it just renders whatever short prompts you return and submits the one the
+ * user taps. Return `[]` to hide the row. Called on mount, after each turn, on reset, and when the
+ * user asks to reshuffle. May be async (e.g. a network call); a throw/reject just hides the row.
+ */
+export type SuggestionProvider = (ctx: SuggestionContext) => string[] | Promise<string[]>;
+
 /** A completed exchange: what was asked, what came back, and whether it rendered. */
 export interface ChatTurn {
   prompt: string;

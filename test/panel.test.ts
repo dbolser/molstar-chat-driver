@@ -1,7 +1,7 @@
 import { test, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
-import type { ChatBackend, ChatRequest, MvsRenderer } from '../src/types';
+import type { ChatBackend, ChatRequest, MvsRenderer, SuggestionContext } from '../src/types';
 
 let mountChatDriver: typeof import('../src/panel').mountChatDriver;
 let win: Window & typeof globalThis;
@@ -106,4 +106,102 @@ test('no selector is shown for a single configured model', () => {
   const { backend } = recordingBackend();
   mountChatDriver('chat', { backend, renderer: okRenderer, models: ['anthropic:claude-haiku-4-5'] });
   assert.equal(document.querySelector('select'), null);
+});
+
+test('no suggestion row is rendered without a provider', () => {
+  const { backend } = recordingBackend();
+  mountChatDriver('chat', { backend, renderer: okRenderer });
+  assert.equal(document.querySelector('.mcd-suggest'), null);
+});
+
+test('the suggestion provider is called on mount with an empty first-prompt context', async () => {
+  const { backend } = recordingBackend();
+  const seen: SuggestionContext[] = [];
+  mountChatDriver('chat', {
+    backend,
+    renderer: okRenderer,
+    suggestions: (ctx) => {
+      seen.push(ctx);
+      return ['Show me lysozyme', 'Load hemoglobin'];
+    },
+  });
+  await tick();
+  assert.equal(seen.length, 1);
+  assert.equal(seen[0].isFirstPrompt, true);
+  assert.equal(seen[0].turns.length, 0);
+  const chips = document.querySelectorAll('.mcd-suggest .mcd-chip');
+  assert.equal(chips.length, 2);
+  assert.equal(chips[0].textContent, 'Show me lysozyme');
+  // A 🎲 reshuffle button accompanies the chips.
+  assert.ok(document.querySelector('.mcd-suggest .mcd-dice'));
+});
+
+test('maxSuggestions caps how many chips are shown', async () => {
+  const { backend } = recordingBackend();
+  mountChatDriver('chat', {
+    backend,
+    renderer: okRenderer,
+    maxSuggestions: 2,
+    suggestions: () => ['a', 'b', 'c', 'd'],
+  });
+  await tick();
+  assert.equal(document.querySelectorAll('.mcd-suggest .mcd-chip').length, 2);
+});
+
+test('non-string suggestions are dropped rather than crashing the row', async () => {
+  const { backend } = recordingBackend();
+  mountChatDriver('chat', {
+    backend,
+    renderer: okRenderer,
+    // Untrusted providers (e.g. a backend response) may include junk; it must not throw.
+    suggestions: () => ['Show me lysozyme', null, 42, '  ', 'Load hemoglobin'] as unknown as string[],
+  });
+  await tick();
+  const chips = [...document.querySelectorAll('.mcd-suggest .mcd-chip')].map((c) => c.textContent);
+  assert.deepEqual(chips, ['Show me lysozyme', 'Load hemoglobin']);
+});
+
+test('a suggestion refresh resolving mid-turn does not render stale chips', async () => {
+  // Backend stays pending so the turn is still "in flight" when the mount's starter fetch resolves.
+  let releaseBackend: () => void = () => {};
+  const backend: ChatBackend = {
+    run: () => new Promise((res) => (releaseBackend = () => res({ mvsj: null }))),
+  };
+  // The mount (first) suggestion call stays pending until we resolve it with a stale starter.
+  let resolveStarters: (v: string[]) => void = () => {};
+  let calls = 0;
+  const suggestions = () => {
+    calls += 1;
+    return calls === 1 ? new Promise<string[]>((res) => (resolveStarters = res)) : [];
+  };
+  mountChatDriver('chat', { backend, renderer: okRenderer, suggestions });
+  await tick(); // mount's starter fetch is now in flight (pending)
+
+  const ta = document.querySelector('textarea')!;
+  ta.value = 'show lysozyme';
+  ta.dispatchEvent(key({ key: 'Enter' })); // submit — backend pending, turn in flight
+  await tick();
+
+  resolveStarters(['STALE STARTER']); // the pre-submit fetch resolves mid-turn
+  await tick();
+
+  const chips = [...document.querySelectorAll('.mcd-suggest .mcd-chip')].map((c) => c.textContent);
+  assert.ok(!chips.includes('STALE STARTER'), 'a superseded refresh must not render its chips');
+  releaseBackend(); // let the turn finish cleanly
+  await tick();
+});
+
+test('clicking a suggestion chip submits that prompt', async () => {
+  const { backend, calls } = recordingBackend();
+  mountChatDriver('chat', {
+    backend,
+    renderer: okRenderer,
+    suggestions: (ctx) => (ctx.isFirstPrompt ? ['Show me lysozyme'] : []),
+  });
+  await tick();
+  const chip = document.querySelector('.mcd-suggest .mcd-chip') as HTMLButtonElement;
+  chip.click();
+  await tick();
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].prompt, 'Show me lysozyme');
 });

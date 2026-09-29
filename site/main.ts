@@ -138,8 +138,25 @@ async function start(name: string): Promise<void> {
     onTurn: (t) => {
       latestTurnId = ((t.response as Record<string, unknown>)?.turnId as string) ?? null;
     },
+    // Chip row above the composer: starter ideas for a blank session (the 🎲 reshuffles them),
+    // and predicted next steps once a scene is going. The content comes from the `suggest` Edge
+    // Function; the plugin just renders + submits what we return.
+    suggestions: async ({ turns }) => {
+      try {
+        const res = await fetch(`${cfg.functionsUrl}/suggest`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', apikey: cfg.anonKey, 'x-evaluator-token': token! },
+          body: JSON.stringify({ recent: turns.map((t) => t.prompt) }),
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data?.suggestions) ? (data.suggestions as string[]) : [];
+      } catch {
+        return []; // a network hiccup just means no chips this round
+      }
+    },
     placeholder: 'Ask for any molecular view…',
-    welcome: `Hi ${name} — type anything to build a molecular scene, then refine it. Hit ↺ New scene to start fresh. Your prompts and feedback are being recorded.`,
+    welcome: `Hi ${name} — type anything to build a molecular scene, then refine it. Tap a suggestion or 🎲 for ideas, and hit ↺ New scene to start fresh. Your prompts and feedback are being recorded.`,
   });
 
   buildFeedback(() => latestTurnId);
@@ -194,14 +211,88 @@ function setupResize(): void {
   });
 }
 
+/** Waitlist form shown to visitors WITHOUT an invite token: collect an email so we can send a
+ *  link, instead of a dead-end "invite only" message. Posts to the token-free `waitlist` function. */
+function showWaitlist(card: Element): void {
+  const h = document.createElement('h2');
+  h.textContent = 'Mol* chat — preview';
+  const p = document.createElement('p');
+  p.textContent =
+    "This preview is invite-only for now — but we're opening it up. Leave your email and we'll send you a link.";
+  const email = document.createElement('input');
+  email.type = 'email';
+  email.placeholder = 'you@example.com';
+  email.autocomplete = 'email';
+  const name = document.createElement('input');
+  name.placeholder = 'Your name (optional)';
+  name.autocomplete = 'name';
+  const go = document.createElement('button');
+  go.textContent = 'Request access';
+  const errorEl = document.createElement('div');
+  errorEl.id = 'gate-error';
+  errorEl.setAttribute('role', 'status');
+  errorEl.setAttribute('aria-live', 'polite');
+  // Stack the two inputs; keep the button on its own line so the form reads top-to-bottom.
+  const wrap = document.createElement('div');
+  wrap.className = 'gate-form';
+  wrap.append(email, name, go);
+  card.replaceChildren(h, p, wrap, errorEl);
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let sending = false;
+  const submit = async () => {
+    if (sending) return;
+    const addr = email.value.trim();
+    if (!EMAIL_RE.test(addr)) {
+      errorEl.textContent = 'Please enter a valid email address.';
+      email.focus();
+      return;
+    }
+    sending = true;
+    errorEl.textContent = 'Sending…';
+    go.setAttribute('disabled', 'true');
+    // Time the request out so a stalled network can't leave the form stuck on "Sending…"
+    // forever with no way to retry (abort surfaces as a throw → the catch re-enables the button).
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10_000);
+    try {
+      const res = await fetch(`${cfg.functionsUrl}/waitlist`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', apikey: cfg.anonKey },
+        body: JSON.stringify({ email: addr, name: name.value.trim() || null }),
+        signal: ctrl.signal,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const done = document.createElement('h2');
+      done.textContent = "You're on the list 🎉";
+      const msg = document.createElement('p');
+      msg.textContent = "Thanks! We'll email you a link as soon as a spot opens up.";
+      card.replaceChildren(done, msg);
+    } catch (e) {
+      console.error('waitlist signup failed', e);
+      errorEl.textContent = 'Could not save that — please try again in a moment.';
+      go.removeAttribute('disabled');
+      sending = false;
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+  go.addEventListener('click', submit);
+  for (const input of [email, name]) {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submit();
+    });
+  }
+  email.focus();
+}
+
 function main(): void {
   const gate = document.getElementById('gate')!;
   const card = gate.querySelector('.card')!;
 
-  // No invite token → don't mount; explain how to get in.
+  // No invite token → collect an email for the waitlist instead of a dead end.
   if (!token) {
-    card.innerHTML =
-      '<h2>Invite only</h2><p>This preview is invite-only. Please open it using the personal link you were sent (it ends with <code>?e=…</code>).</p>';
+    showWaitlist(card);
     return;
   }
 

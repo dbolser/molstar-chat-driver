@@ -380,6 +380,15 @@ verify_jwt = false
 [functions.capture]
 verify_jwt = false
 
+# Public front door (no invite token) — the site posts with only the publishable `apikey`, so the
+# JWT gate must be off (the function validates the email itself).
+[functions.waitlist]
+verify_jwt = false
+
+# Prompt-suggestion chips — same publishable-key-only call shape as chat/capture.
+[functions.suggest]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

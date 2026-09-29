@@ -18,8 +18,9 @@ can't be used to burn model quota or pollute the capture tables.
 
 ## 1. Database
 In the Supabase **SQL editor**, run [`../supabase/schema.sql`](../supabase/schema.sql). It
-creates `evaluators`, `turns`, `feedback` with RLS on and **no public policies** — only the
-Edge Functions (service role) can touch the data; you read it via the dashboard.
+creates `evaluators`, `turns`, `feedback`, and `waitlist` with RLS on and **no public policies** —
+only the Edge Functions (service role) can touch the data; you read it via the dashboard.
+(`waitlist` collects emails from visitors who arrive without an invite token — see §8.)
 
 ## 2. Edge Function secrets
 Set at least one model key (Project Settings → Edge Functions → Secrets, or the CLI):
@@ -32,6 +33,9 @@ supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
 # optional abuse/cost caps (defaults shown): per-invite calls / 24h, max prompt chars,
 # and an optional whole-preview ceiling (0 = off):
 # supabase secrets set MCD_TOKEN_DAILY_CAP=50 MCD_MAX_PROMPT_CHARS=8000 MCD_DAILY_CALL_CAP=0
+# optional: the chip-row "next step" suggestions (see §9) — model + its own daily per-invite cap
+# (0 disables the model path, leaving deterministic fallbacks); default claude-haiku-4-5 / 300:
+# supabase secrets set MCD_SUGGEST_MODEL=claude-haiku-4-5 MCD_SUGGEST_DAILY_CAP=300
 ```
 A leaked invite link is a bearer credential, so `chat` caps calls per token per 24h and rejects
 over-long prompts; revoke a link instantly with `update evaluators set revoked = true where
@@ -45,6 +49,8 @@ supabase login
 supabase link --project-ref <your-project-ref>
 supabase functions deploy chat
 supabase functions deploy capture
+supabase functions deploy waitlist   # public email signup for §8
+supabase functions deploy suggest    # prompt-suggestion chips for §9
 ```
 (The shared code in `supabase/functions/_shared/` — including the vendored MolBench prompt — is
 bundled automatically.)
@@ -83,6 +89,24 @@ Email each person their `?e=<token>` line and ask them to keep it private. To re
 delete their row from the `evaluators` table.
 
 ## 7. See the data
-Supabase dashboard → **Table editor** → `turns` (every prompt + scene + tier0) and `feedback`
-(their comments). These are the harvested prompts that will seed the standardised eval and the
-MolBench corpus.
+Supabase dashboard → **Table editor** → `turns` (every prompt + scene + tier0), `feedback`
+(their comments), and `waitlist` (emails from would-be evaluators). The `turns` prompts are the
+harvested corpus that will seed the standardised eval and MolBench — and also fuel the starter
+suggestions in §9.
+
+## 8. Waitlist (open the front door)
+A visitor who opens the bare site **without** an `?e=` token no longer hits a dead end — they get
+a small form to leave their email, which the token-free `waitlist` Edge Function stores (validated,
+deduped on email). Review `waitlist` in the dashboard, then mint invites (§6) for the people you
+want and email them their link. This endpoint is intentionally un-gated (it's the sign-up door),
+so it only accepts a well-formed email + optional name and does nothing else.
+
+## 9. Prompt suggestions (the chip row)
+Above the composer the site shows tappable prompt chips with a 🎲 to reshuffle, served by the
+`suggest` Edge Function:
+- **Fresh session** → *starter* ideas: a curated seed list mixed with real openers harvested from
+  the `turns` corpus (so a first-time evaluator can start with one tap, no typing).
+- **In-progress scene** → *next-step* predictions: a small Haiku call proposes what to ask next,
+  grounded in the evaluator's recent prompts. It's gated by its own per-invite daily cap
+  (`MCD_SUGGEST_DAILY_CAP`); over the cap — or with no model key — it degrades to a deterministic
+  fallback list, so the row is never empty.

@@ -44,6 +44,21 @@ create table if not exists feedback (
   created_at      timestamptz not null default now()
 );
 
+-- Waitlist: people who reach the public URL WITHOUT an invite token and ask for access. Unlike
+-- everything above this is NOT gated on an invite (it's the front door), so the `waitlist` Edge
+-- Function is the only writer and it validates + length-caps input. `email` is unique so a repeat
+-- submit is an idempotent no-op (ON CONFLICT DO NOTHING) rather than a duplicate row.
+create table if not exists waitlist (
+  id          uuid primary key default gen_random_uuid(),
+  email       text not null unique,
+  name        text,
+  note        text,        -- optional free text ("what are you hoping to do?")
+  source      text,        -- coarse provenance (e.g. the page referrer) for triage
+  created_at  timestamptz not null default now()
+);
+alter table waitlist enable row level security;  -- no policies → anon has no direct access
+grant select, insert, update, delete on waitlist to service_role;
+
 alter table evaluators enable row level security;
 alter table turns      enable row level security;
 alter table feedback   enable row level security;
