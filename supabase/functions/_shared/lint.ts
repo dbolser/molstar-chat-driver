@@ -8,8 +8,9 @@
 type Node = { kind?: unknown; params?: Record<string, unknown>; children?: unknown; custom?: Record<string, unknown> };
 
 // Colour *schemes* a model writes where a colour belongs ("spectrum", "secondaryStructure"…).
-// MVS has no scheme colours, but Mol* honours `custom.molstar_color_theme_name` on the
-// representation, so the intent survives instead of the whole scene failing.
+// MVS has no scheme colours, but Mol* honours `custom.molstar_color_theme_name` on a `color`
+// node (its `load-helpers` reads it from the representation's single colour child), so the
+// intent survives instead of the whole scene failing.
 const THEMES: Record<string, string> = {
   spectrum: 'sequence-id', rainbow: 'sequence-id', sequence: 'sequence-id', sequenceid: 'sequence-id',
   residueindex: 'sequence-id', chainbow: 'sequence-id',
@@ -40,7 +41,10 @@ const COLOR_NAMES = new Set(
 const HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 
 // Where a node may sit, for the misplacements we have actually seen.
-const FOCUS_PARENTS = new Set(['root', 'component', 'component_from_uri', 'component_from_source', 'primitives']);
+const FOCUS_PARENTS = new Set([
+  'root', 'component', 'component_from_uri', 'component_from_source',
+  'primitives', 'primitives_from_uri', 'volume', 'volume_representation',
+]);
 
 const isNode = (v: unknown): v is Node => !!v && typeof v === 'object' && !Array.isArray(v);
 const kids = (n: Node): Node[] => (Array.isArray(n.children) ? n.children.filter(isNode) : []);
@@ -57,15 +61,17 @@ function fixColor(color: Node, parent: Node): string | null {
   if (typeof raw !== 'string') return null;
   if (HEX.test(raw) || COLOR_NAMES.has(raw)) return null;
   const squashed = raw.toLowerCase().replace(/[^a-z0-9#]/g, ''); // "Light Blue" → "lightblue"
-  if (HEX.test(squashed) || COLOR_NAMES.has(squashed)) {
-    color.params!.color = squashed;
-    return `color "${raw}" → "${squashed}"`;
+  const fixed = /^[0-9a-f]{3}$|^[0-9a-f]{6}$/.test(squashed) ? `#${squashed}` : squashed; // "ff0000"
+  if (HEX.test(fixed) || COLOR_NAMES.has(fixed)) {
+    color.params!.color = fixed;
+    return `color "${raw}" → "${fixed}"`;
   }
   const theme = THEMES[squashed.replace(/^(by|colou?r)/, '')];
-  if (theme && parent.kind === 'representation') {
-    parent.custom = { ...(parent.custom ?? {}), molstar_color_theme_name: theme };
-    parent.children = kids(parent).filter((c) => c !== color);
-    return `color "${raw}" → representation theme "${theme}"`;
+  if (theme) {
+    // Keep the node (Mol* needs a valid `color` param); the theme overrides it.
+    color.params!.color = 'gray';
+    color.custom = { ...(color.custom ?? {}), molstar_color_theme_name: theme };
+    return `color "${raw}" → theme "${theme}"`;
   }
   // Unknown colour: better a default-coloured scene than no scene.
   parent.children = kids(parent).filter((c) => c !== color);
@@ -93,27 +99,30 @@ export function lintScene(root: Node): string[] {
   walk(root);
 
   // Nodes hung off the wrong parent. `component` belongs under `structure`; `focus` under a
-  // component (or root). Only re-parent when the target is unambiguous.
-  const reparent = (parent: Node) => {
+  // component (the enclosing one, else the parent's only one) or root. Only re-parent when the
+  // target is unambiguous. A moved subtree is visited right after the move (it may hold further
+  // misplacements) and never twice.
+  const visited = new Set<Node>();
+  const reparent = (parent: Node, ancestors: Node[]) => {
+    if (visited.has(parent)) return;
+    visited.add(parent);
     for (const c of kids(parent)) {
       if (c.kind === 'component' && parent.kind !== 'structure' && structures.length === 1) {
         parent.children = kids(parent).filter((x) => x !== c);
         structures[0].children = [...kids(structures[0]), c];
         notes.push(`moved component from "${parent.kind}" to structure`);
-        continue;
-      }
-      if (c.kind === 'focus' && !FOCUS_PARENTS.has(String(parent.kind))) {
+      } else if (c.kind === 'focus' && !FOCUS_PARENTS.has(String(parent.kind))) {
+        const enclosing = [...ancestors].reverse().find((n) => n.kind === 'component');
         const comps = kids(parent).filter((x) => x.kind === 'component');
-        const target = comps.length === 1 ? comps[0] : root;
+        const target = enclosing ?? (comps.length === 1 ? comps[0] : root);
         parent.children = kids(parent).filter((x) => x !== c);
         target.children = [...kids(target), c];
         notes.push(`moved focus from "${parent.kind}" to ${target === root ? 'root' : 'component'}`);
-        continue;
       }
-      reparent(c);
+      reparent(c, [...ancestors, parent]);
     }
   };
-  reparent(root);
+  reparent(root, []);
 
   return notes;
 }

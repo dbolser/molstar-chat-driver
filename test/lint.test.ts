@@ -31,27 +31,33 @@ test('a valid scene is left untouched', () => {
   assert.equal(JSON.stringify(root), before);
 });
 
-test('"spectrum" becomes the sequence-id theme on the representation', () => {
+// Mol* reads `molstar_color_theme_name` from the representation's single colour child (its
+// `load-helpers`), so the colour node must survive with a valid placeholder colour.
+test('"spectrum" becomes the sequence-id theme on the colour node', () => {
   const root = scene([{ kind: 'component', params: { selector: 'polymer' }, children: [rep([color('spectrum')])] }]);
   const notes = lintScene(root);
   assert.equal(notes.length, 1);
   const r = firstRep(root);
-  assert.equal(r.custom.molstar_color_theme_name, 'sequence-id');
-  assert.deepEqual(r.children, []);
+  assert.equal(r.custom, undefined);
+  assert.equal(r.children.length, 1);
+  assert.equal(r.children[0].custom.molstar_color_theme_name, 'sequence-id');
+  assert.equal(r.children[0].params.color, 'gray');
 });
 
 test('camelCase scheme names map to their Mol* themes', () => {
   for (const [name, theme] of [['secondaryStructure', 'secondary-structure'], ['elementSymbol', 'element-symbol'], ['byChain', 'chain-id']]) {
     const root = scene([{ kind: 'component', params: { selector: 'polymer' }, children: [rep([color(name)])] }]);
     lintScene(root);
-    assert.equal(firstRep(root).custom.molstar_color_theme_name, theme, name);
+    assert.equal(firstRep(root).children[0].custom.molstar_color_theme_name, theme, name);
   }
 });
 
 test('colour names are normalised to what Mol* accepts', () => {
-  const root = scene([{ kind: 'component', params: { selector: 'polymer' }, children: [rep([color('Light Blue')])] }]);
-  lintScene(root);
-  assert.equal(firstRep(root).children[0].params.color, 'lightblue');
+  for (const [given, want] of [['Light Blue', 'lightblue'], ['ff0000', '#ff0000'], ['#ABC', '#ABC']]) {
+    const root = scene([{ kind: 'component', params: { selector: 'polymer' }, children: [rep([color(given)])] }]);
+    lintScene(root);
+    assert.equal(firstRep(root).children[0].params.color, want, given);
+  }
 });
 
 test('an unknown colour is dropped rather than failing the scene', () => {
@@ -76,6 +82,27 @@ test('focus under structure with several components moves to root', () => {
   const root = scene([c(), c(), { kind: 'focus' }]);
   lintScene(root);
   assert.equal(root.children.at(-1)?.kind, 'focus');
+});
+
+test('focus under a valid non-component parent is left alone', () => {
+  for (const kind of ['root', 'primitives', 'volume', 'volume_representation', 'primitives_from_uri']) {
+    const root = { kind: 'root', children: [kind === 'root' ? { kind: 'focus' } : { kind, children: [{ kind: 'focus' }] }] };
+    const before = JSON.stringify(root);
+    assert.deepEqual(lintScene(root), [], kind);
+    assert.equal(JSON.stringify(root), before, kind);
+  }
+});
+
+test('a moved component is itself linted (structure listed before the stray component)', () => {
+  const stray = { kind: 'component', params: { selector: 'ligand' }, children: [rep([color('spectrum'), { kind: 'focus' }])] };
+  const root = scene([], [stray]);
+  const notes = lintScene(root);
+  assert.equal(notes.length, 3, notes.join('; '));
+  const structure = root.children[0].children[0].children[0];
+  assert.equal(structure.children[0], stray);
+  const r = stray.children[0] as any;
+  assert.deepEqual(r.children.map((c: any) => c.kind), ['color']); // focus moved off the representation…
+  assert.equal(stray.children.at(-1)?.kind, 'focus'); // …onto its component
 });
 
 test('a component under parse or root moves under the single structure', () => {

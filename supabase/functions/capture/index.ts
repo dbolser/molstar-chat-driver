@@ -8,6 +8,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { cors, json } from '../_shared/cors.ts';
 import { isInvited } from '../_shared/auth.ts';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ error: 'POST only' }, 405);
@@ -57,8 +59,8 @@ Deno.serve(async (req) => {
     if (body.kind === 'render') {
       // The server sees whether a scene parsed; only the browser knows whether Mol* drew it.
       // Scoped to the evaluator's own turn so a token can't rewrite someone else's row.
-      if (typeof body.turnId !== 'string' || typeof body.rendered !== 'boolean') {
-        return json({ error: 'render needs turnId + rendered' }, 400);
+      if (typeof body.turnId !== 'string' || !UUID_RE.test(body.turnId) || typeof body.rendered !== 'boolean') {
+        return json({ error: 'render needs a turnId (uuid) + rendered (boolean)' }, 400);
       }
       const { error } = await supabase
         .from('turns')
