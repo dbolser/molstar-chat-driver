@@ -1,11 +1,14 @@
 // Edge Function `capture` — records evaluator identity and free-text feedback.
 // POST { token, kind: 'register', name } -> set the invited evaluator's name.
 // POST { token, kind: 'feedback', comment, rating?, turnId? } -> store feedback.
+// POST { token, kind: 'render', turnId, rendered, error? } -> record whether Mol* rendered a turn.
 // Writes use the service role (bypasses RLS), so the browser never touches the DB directly.
 // The token must match a pre-issued invite (the `evaluators` allowlist) or the call is rejected.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { cors, json } from '../_shared/cors.ts';
 import { isInvited } from '../_shared/auth.ts';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -50,6 +53,26 @@ Deno.serve(async (req) => {
       if (error) {
         console.error('feedback insert failed', error);
         return json({ error: 'feedback failed' }, 500);
+      }
+      return json({ ok: true });
+    }
+    if (body.kind === 'render') {
+      // The server sees whether a scene parsed; only the browser knows whether Mol* drew it.
+      // Scoped to the evaluator's own turn so a token can't rewrite someone else's row.
+      if (typeof body.turnId !== 'string' || !UUID_RE.test(body.turnId) || typeof body.rendered !== 'boolean') {
+        return json({ error: 'render needs a turnId (uuid) + rendered (boolean)' }, 400);
+      }
+      const { error } = await supabase
+        .from('turns')
+        .update({
+          rendered: body.rendered,
+          render_error: typeof body.error === 'string' ? body.error.slice(0, 2000) : null,
+        })
+        .eq('id', body.turnId)
+        .eq('evaluator_token', token);
+      if (error) {
+        console.error('render capture failed', error);
+        return json({ error: 'render capture failed' }, 500);
       }
       return json({ ok: true });
     }

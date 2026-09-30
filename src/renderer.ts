@@ -18,7 +18,11 @@ import { MvsRenderer } from './types';
 export interface MolstarUmd {
   PluginExtensions: {
     mvs: {
-      MVSData: { fromMVSJ(text: string): unknown };
+      MVSData: {
+        fromMVSJ(text: string): unknown;
+        /** Human-readable validation problems, or undefined when the tree is valid. */
+        validationIssues?(data: unknown): string[] | undefined;
+      };
       loadMVS(plugin: unknown, data: unknown, options?: Record<string, unknown>): Promise<void>;
     };
   };
@@ -38,8 +42,13 @@ export interface MolstarViewerLike {
 export function createUmdRenderer(molstar: MolstarUmd, viewer: MolstarViewerLike): MvsRenderer {
   return {
     async loadMvsj(mvsj: string): Promise<void> {
-      const data = molstar.PluginExtensions.mvs.MVSData.fromMVSJ(mvsj);
-      await molstar.PluginExtensions.mvs.loadMVS(viewer.plugin, data, { sanityChecks: true });
+      const { MVSData, loadMVS } = molstar.PluginExtensions.mvs;
+      const data = MVSData.fromMVSJ(mvsj);
+      // Mol* logs *why* a tree is invalid to the console but throws a bare "FormatError". Ask it
+      // first, so the user (and the capture) sees e.g. `"spectrum" is not a valid color name`.
+      const issues = MVSData.validationIssues?.(data);
+      if (issues?.length) throw new Error(`Invalid scene: ${issues.map((s) => s.replace(/\s+/g, ' ').trim()).join(' ')}`);
+      await loadMVS(viewer.plugin, data, { sanityChecks: true });
     },
   };
 }

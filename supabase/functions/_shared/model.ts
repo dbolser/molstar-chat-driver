@@ -8,6 +8,7 @@ import { SYSTEM } from './prompt.ts';
 // Maintained JSON-repair library (fixes the missing-bracket / trailing-comma output Haiku produces
 // on complex multi-component scenes, e.g. "colour by chain"). Not hand-rolled.
 import { jsonrepair } from 'https://esm.sh/jsonrepair@3.15.0';
+import { lintScene } from './lint.ts';
 
 type Kind = 'anthropic' | 'openai';
 interface Provider {
@@ -68,9 +69,13 @@ interface Msg {
 // the current scene. The assistant's earlier reply is the MVSJ it produced (what it should edit).
 function buildMessages(prompt: string, history?: HistoryTurn[]): Msg[] {
   const msgs: Msg[] = [];
+  // Only turns that put a scene on screen are replayed. A failed turn used to be replayed as
+  // "(no scene produced for that prompt)", and the model learned to answer with exactly that —
+  // one failure cascaded into a run of them (seen in the captured turns, 2026-07-08).
   for (const h of history ?? []) {
+    if (!h.mvsj) continue;
     msgs.push({ role: 'user', content: h.prompt });
-    msgs.push({ role: 'assistant', content: h.mvsj ?? '(no scene produced for that prompt)' });
+    msgs.push({ role: 'assistant', content: h.mvsj });
   }
   msgs.push({ role: 'user', content: prompt });
   return msgs;
@@ -152,6 +157,8 @@ export interface SceneResult {
   tier0: boolean;
   /** True if the scene only parsed after a JSON self-repair retry (for capture/metrics). */
   repaired?: boolean;
+  /** What `lintScene` changed to make the tree valid (empty = untouched). */
+  lint?: string[];
 }
 
 export async function generateScene(
@@ -177,7 +184,8 @@ export async function generateScene(
   const { obj, repaired } = extractJsonObject(raw); // jsonrepair fallback for near-valid JSON
   const root = extractRoot(obj);
   if (!root) return { mvsj: null, text: raw, raw, tier0: false, repaired }; // no scene — show the raw reply
+  const lint = lintScene(root); // fix the recurring validation failures (recorded on the turn)
   // MolBench's prompt yields a bare {root} tree; Mol* needs a full state with metadata.version.
   const mvsj = JSON.stringify({ metadata: { version: '1', timestamp: new Date().toISOString() }, root });
-  return { mvsj, raw, tier0: true, repaired };
+  return { mvsj, raw, tier0: true, repaired, lint };
 }
