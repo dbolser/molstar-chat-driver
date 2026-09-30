@@ -6,7 +6,7 @@
 // The service-role key can't run DDL, and `supabase db push` wants Docker + a linked repo; the
 // Management API just wants the access token `npx supabase login` already stored. schema.sql is
 // idempotent (create/alter … if not exists), so this is safe to run after every upgrade.
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
@@ -16,8 +16,14 @@ if (!ref || ref.startsWith('--')) {
   console.error('usage: node scripts/apply-schema.mjs --project-ref <ref>');
   process.exit(2);
 }
-const token = process.env.SUPABASE_ACCESS_TOKEN
-  ?? readFileSync(join(homedir(), '.supabase', 'access-token'), 'utf8').trim();
+// `supabase login` keeps the token in the OS keychain when it can and falls back to this file;
+// on a headless box it's the file. Otherwise pass SUPABASE_ACCESS_TOKEN (an `sbp_…` token).
+const tokenFile = join(homedir(), '.supabase', 'access-token');
+const token = process.env.SUPABASE_ACCESS_TOKEN ?? (existsSync(tokenFile) ? readFileSync(tokenFile, 'utf8').trim() : '');
+if (!token) {
+  console.error(`no access token: set SUPABASE_ACCESS_TOKEN, or run \`npx supabase login\` so ${tokenFile} exists`);
+  process.exit(2);
+}
 const sql = readFileSync(new URL('../supabase/schema.sql', import.meta.url), 'utf8');
 
 const res = await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {

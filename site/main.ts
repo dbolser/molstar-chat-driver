@@ -117,10 +117,11 @@ function buildFeedback(getTurnId: () => string | null, shoot: () => string | nul
       for (const [rt, btn] of buttons) btn.classList.toggle('on', rt === rating);
       // One tap is itself a (lightweight) rating — but people browse the faces while deciding,
       // and every tap used to land as its own row. Send the choice they settle on.
+      const turnId = getTurnId(); // the turn they were looking at when they tapped, not 1.2 s later
       if (ratingTimer !== undefined) clearTimeout(ratingTimer);
       ratingTimer = setTimeout(async () => {
         ratingTimer = undefined;
-        const res = await capture({ kind: 'feedback', rating, turnId: getTurnId(), screenshot: shoot() });
+        const res = await capture({ kind: 'feedback', rating, turnId, screenshot: shoot() });
         status(res?.ok ? 'Thanks ✓' : 'Could not send — retry?', 2500);
       }, RATING_SETTLE_MS);
     });
