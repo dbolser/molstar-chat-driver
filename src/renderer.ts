@@ -71,7 +71,7 @@ function failedCells(plugin: unknown): string[] {
   if (!cells || typeof cells.values !== 'function') return []; // Mol* internals may change shape
   const out: string[] = [];
   for (const cell of cells.values()) {
-    if (cell.status !== 'error') continue;
+    if (!cell || cell.status !== 'error') continue;
     const step = cell.transform?.transformer?.id?.split('.').pop() ?? 'step';
     out.push(`${step}: ${String(cell.errorText ?? 'failed')}`);
   }
