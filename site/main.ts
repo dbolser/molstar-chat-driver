@@ -57,30 +57,28 @@ const REACTIONS: { rating: string; emoji: string; title: string }[] = [
   { rating: 'hate', emoji: '💩', title: 'I hate it' },
 ];
 
-/** What the evaluator is looking at, as a small JPEG data URL — or null if Mol* can't say. */
-async function screenshot(viewer: { plugin: any }): Promise<string | null> {
+/** What the evaluator is looking at, as a small JPEG data URL — or null if there's no canvas.
+ *  Reads the live WebGL canvas directly (Mol* keeps its drawing buffer by default). NOT Mol*'s
+ *  `viewportScreenshot.getImageDataUri()`: that runs as a plugin task that stops the animation
+ *  loop and re-renders through a high-quality image pass, freezing the page for seconds. */
+function screenshot(viewer: { plugin: any }): string | null {
   try {
-    const uri: string = await viewer.plugin.helpers.viewportScreenshot.getImageDataUri();
-    // Shrink to ≤ 800px wide JPEG: plenty to see what went wrong, ~50 KB instead of a full PNG.
-    const img = new Image();
-    await new Promise<void>((ok, fail) => {
-      const timer = setTimeout(() => fail(new Error('decode timeout')), 3000); // never hold up the feedback
-      img.onload = () => { clearTimeout(timer); ok(); };
-      img.onerror = () => { clearTimeout(timer); fail(new Error('decode')); };
-      img.src = uri;
-    });
-    const scale = Math.min(1, 800 / img.width);
+    const src: HTMLCanvasElement | null | undefined =
+      viewer.plugin.canvas3dContext?.canvas ?? document.querySelector<HTMLCanvasElement>('#viewer canvas');
+    if (!src || !src.width || !src.height) return null;
+    // Shrink to ≤ 800px wide: plenty to see what went wrong, ~50 KB.
+    const scale = Math.min(1, 800 / src.width);
     const c = document.createElement('canvas');
-    c.width = Math.round(img.width * scale);
-    c.height = Math.round(img.height * scale);
-    c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+    c.width = Math.round(src.width * scale);
+    c.height = Math.round(src.height * scale);
+    c.getContext('2d')!.drawImage(src, 0, 0, c.width, c.height);
     return c.toDataURL('image/jpeg', 0.8);
   } catch {
     return null; // a missing picture must never block the feedback itself
   }
 }
 
-function buildFeedback(getTurnId: () => string | null, shoot: () => Promise<string | null>): void {
+function buildFeedback(getTurnId: () => string | null, shoot: () => string | null): void {
   const root = document.getElementById('feedback')!;
   let rating = 'neutral';
 
@@ -122,7 +120,7 @@ function buildFeedback(getTurnId: () => string | null, shoot: () => Promise<stri
       if (ratingTimer !== undefined) clearTimeout(ratingTimer);
       ratingTimer = setTimeout(async () => {
         ratingTimer = undefined;
-        const res = await capture({ kind: 'feedback', rating, turnId: getTurnId(), screenshot: await shoot() });
+        const res = await capture({ kind: 'feedback', rating, turnId: getTurnId(), screenshot: shoot() });
         status(res?.ok ? 'Thanks ✓' : 'Could not send — retry?', 2500);
       }, RATING_SETTLE_MS);
     });
@@ -147,7 +145,7 @@ function buildFeedback(getTurnId: () => string | null, shoot: () => Promise<stri
     status('Sending…');
     if (ratingTimer !== undefined) clearTimeout(ratingTimer); // this row carries the rating already
     ratingTimer = undefined;
-    const res = await capture({ kind: 'feedback', comment, rating, turnId: getTurnId(), screenshot: await shoot() });
+    const res = await capture({ kind: 'feedback', comment, rating, turnId: getTurnId(), screenshot: shoot() });
     send.disabled = false;
     if (!res || !res.ok) {
       status('Could not send — please retry.', 4000);
