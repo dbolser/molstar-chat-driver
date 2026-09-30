@@ -59,6 +59,7 @@ const CSS = `
 .mcd-status { padding:8px 12px; font-size:13px; }
 .mcd-status.ok { color:#1a7f37; }
 .mcd-status.warn { color:#9a6700; }
+.mcd-status.msg { color:#555; }
 .mcd-status.err { color:#cf222e; }
 .mcd-text { padding:0 12px 10px; font-size:13px; color:#333; white-space:pre-wrap; }
 .mcd-form { display:flex; flex-direction:column; gap:8px; padding:12px; border-top:1px solid #e6e6e6; background:#fff; }
@@ -262,6 +263,11 @@ export function mountChatDriver(
           // The backend itself failed: that's an error, not a benign "no scene".
           status.className = 'mcd-status err';
           status.textContent = `✗ ${result.response.error}`;
+        } else if (result.response.text) {
+          // No scene, but the model answered in words (a question, or something MVS can't do).
+          // That's a reply, not a failure — don't dress it as a warning.
+          status.className = 'mcd-status msg';
+          status.textContent = '💬 Reply:';
         } else {
           status.className = 'mcd-status warn';
           status.textContent = '⚠ No scene produced for that prompt.';

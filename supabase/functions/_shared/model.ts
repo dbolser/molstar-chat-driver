@@ -9,6 +9,7 @@ import { SYSTEM } from './prompt.ts';
 // on complex multi-component scenes, e.g. "colour by chain"). Not hand-rolled.
 import { jsonrepair } from 'https://esm.sh/jsonrepair@3.15.0';
 import { lintScene } from './lint.ts';
+import { candidatesMessage, checkMessage, loadedText, lookup, pdbIds, search, searchPhrase } from './ground.ts';
 
 type Kind = 'anthropic' | 'openai';
 interface Provider {
@@ -157,8 +158,31 @@ export interface SceneResult {
   tier0: boolean;
   /** True if the scene only parsed after a JSON self-repair retry (for capture/metrics). */
   repaired?: boolean;
-  /** What `lintScene` changed to make the tree valid (empty = untouched). */
+  /** What the server changed or checked to get here — lint fixes and grounding steps. */
   lint?: string[];
+}
+
+function callModel(prov: Provider, key: string, messages: Msg[]): Promise<string> {
+  return prov.kind === 'anthropic'
+    ? callAnthropic(key, prov.id, messages)
+    : callOpenAiCompat(prov.baseUrl as string, key, prov.id, messages);
+}
+
+interface Scene {
+  mvsj: string;
+  repaired: boolean;
+  lint: string[];
+}
+
+/** Raw model text → a linted, envelope-wrapped scene, or null when there is no scene in it. */
+function toScene(raw: string): Scene | null {
+  const { obj, repaired } = extractJsonObject(raw); // jsonrepair fallback for near-valid JSON
+  const root = extractRoot(obj);
+  if (!root) return null;
+  const lint = lintScene(root); // fix the recurring validation failures (recorded on the turn)
+  // MolBench's prompt yields a bare {root} tree; Mol* needs a full state with metadata.version.
+  const mvsj = JSON.stringify({ metadata: { version: '1', timestamp: new Date().toISOString() }, root });
+  return { mvsj, repaired, lint };
 }
 
 export async function generateScene(
@@ -174,18 +198,56 @@ export async function generateScene(
   const messages = buildMessages(prompt, history);
   let raw: string;
   try {
-    raw = prov.kind === 'anthropic'
-      ? await callAnthropic(key, prov.id, messages)
-      : await callOpenAiCompat(prov.baseUrl as string, key, prov.id, messages);
+    raw = await callModel(prov, key, messages);
   } catch (e) {
     return { mvsj: null, error: `${(e as Error).name}: ${(e as Error).message}`, raw: '', tier0: false };
   }
 
-  const { obj, repaired } = extractJsonObject(raw); // jsonrepair fallback for near-valid JSON
-  const root = extractRoot(obj);
-  if (!root) return { mvsj: null, text: raw, raw, tier0: false, repaired }; // no scene — show the raw reply
-  const lint = lintScene(root); // fix the recurring validation failures (recorded on the turn)
-  // MolBench's prompt yields a bare {root} tree; Mol* needs a full state with metadata.version.
-  const mvsj = JSON.stringify({ metadata: { version: '1', timestamp: new Date().toISOString() }, root });
-  return { mvsj, raw, tier0: true, repaired, lint };
+  let scene = toScene(raw);
+  if (!scene) return { mvsj: null, text: raw, raw, tier0: false }; // no scene — show the raw reply
+  const notes = [...scene.lint];
+  let text: string | undefined;
+
+  // Grounding (see ground.ts): only for entries this turn introduces — a follow-up that keeps
+  // editing the structure already on screen has nothing new to check.
+  const known = new Set((history ?? []).flatMap((h) => (h.mvsj ? pdbIds(h.mvsj) : [])));
+  const fresh = pdbIds(scene.mvsj).filter((id) => !known.has(id));
+  if (fresh.length) {
+    try {
+      let entries = await lookup(fresh);
+      const convo: Msg[] = [...messages, { role: 'assistant', content: raw }, { role: 'user', content: checkMessage(entries) }];
+      const verdict = await callModel(prov, key, convo);
+      const phrase = searchPhrase(verdict);
+      if (phrase) {
+        const hits = await search(phrase);
+        if (hits.length === 0) {
+          notes.push(`grounding: no RCSB hits for "${phrase}"`);
+        } else {
+          convo.push({ role: 'assistant', content: verdict }, { role: 'user', content: candidatesMessage(phrase, hits) });
+          const raw2 = await callModel(prov, key, convo);
+          const scene2 = toScene(raw2);
+          if (scene2) {
+            const ids2 = pdbIds(scene2.mvsj);
+            notes.push(`grounding: ${fresh.join(',')} → ${ids2.join(',')} via "${phrase}"`, ...scene2.lint);
+            entries = await lookup(ids2.filter((id) => !known.has(id)));
+            scene = scene2;
+            raw = raw2;
+          }
+        }
+      }
+      const missing = entries.filter((e) => !e.title);
+      if (missing.length) {
+        // Still pointing at a non-existent entry: say so plainly rather than render an empty viewer.
+        return {
+          mvsj: null, raw, tier0: true, repaired: scene.repaired, lint: notes,
+          error: `PDB entry ${missing.map((e) => e.id).join(', ')} does not exist — the model made it up. Try naming a real PDB id.`,
+        };
+      }
+      text = loadedText(entries) || undefined;
+    } catch (e) {
+      console.error('grounding skipped', e); // RCSB hiccup: the ungrounded scene is still worth showing
+    }
+  }
+
+  return { mvsj: scene.mvsj, text, raw, tier0: true, repaired: scene.repaired, lint: notes };
 }

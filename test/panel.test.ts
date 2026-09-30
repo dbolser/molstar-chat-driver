@@ -205,3 +205,34 @@ test('clicking a suggestion chip submits that prompt', async () => {
   assert.equal(calls.length, 1);
   assert.equal(calls[0].prompt, 'Show me lysozyme');
 });
+
+// How a turn's outcome is labelled. A text-only reply is a message, not a warning.
+async function outcome(response: { mvsj: string | null; text?: string; error?: string }) {
+  const backend: ChatBackend = { async run() { return response; } };
+  mountChatDriver('chat', { backend, renderer: okRenderer });
+  const ta = document.querySelector('textarea')!;
+  ta.value = 'what is loaded?';
+  ta.dispatchEvent(key({ key: 'Enter' }));
+  for (let i = 0; i < 5; i++) await tick();
+  const status = document.querySelector('.mcd-status')!;
+  return { className: status.className, text: status.textContent, reply: document.querySelector('.mcd-text')?.textContent };
+}
+
+test('a text-only reply is shown as a message, not a warning', async () => {
+  const o = await outcome({ mvsj: null, text: 'PDB 1CRN, crambin, is loaded.' });
+  assert.equal(o.className, 'mcd-status msg');
+  assert.match(o.text!, /💬/);
+  assert.equal(o.reply, 'PDB 1CRN, crambin, is loaded.');
+});
+
+test('no scene and no text is still a warning', async () => {
+  const o = await outcome({ mvsj: null });
+  assert.equal(o.className, 'mcd-status warn');
+  assert.match(o.text!, /⚠ No scene produced/);
+});
+
+test('a backend error is an error', async () => {
+  const o = await outcome({ mvsj: null, error: 'PDB entry 1UJ7 does not exist' });
+  assert.equal(o.className, 'mcd-status err');
+  assert.match(o.text!, /✗ PDB entry 1UJ7 does not exist/);
+});

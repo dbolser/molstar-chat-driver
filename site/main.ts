@@ -160,7 +160,7 @@ async function start(name: string): Promise<void> {
         return []; // a network hiccup just means no chips this round
       }
     },
-    placeholder: 'Ask for any molecular view…',
+    placeholder: 'Ask for any molecular view or ask me a question…',
     welcome: `Hi ${name} — type anything to build a molecular scene, then refine it. Tap a suggestion or 🎲 for ideas, and hit ↺ New scene to start fresh. Your prompts and feedback are being recorded.`,
   });
 

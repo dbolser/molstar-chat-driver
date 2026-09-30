@@ -28,6 +28,13 @@ export interface MolstarUmd {
   };
 }
 
+/** A Mol* state cell, as far as we read it: did its transform succeed, and if not, why. */
+interface StateCellLike {
+  status: string;
+  errorText?: unknown;
+  transform?: { transformer?: { id?: string } };
+}
+
 /** The bit of a Mol* `Viewer` instance we need: its underlying plugin context. */
 export interface MolstarViewerLike {
   plugin: unknown;
@@ -49,6 +56,24 @@ export function createUmdRenderer(molstar: MolstarUmd, viewer: MolstarViewerLike
       const issues = MVSData.validationIssues?.(data);
       if (issues?.length) throw new Error(`Invalid scene: ${issues.map((s) => s.replace(/\s+/g, ' ').trim()).join(' ')}`);
       await loadMVS(viewer.plugin, data, { sanityChecks: true });
+      // `loadMVS` resolves even when a step inside the scene failed (a 404 on the download URL
+      // leaves the download cell at status "error" and everything below it pending) — which
+      // would report "rendered" over an empty viewer. Surface the first failed cell instead.
+      const failed = failedCells(viewer.plugin);
+      if (failed.length) throw new Error(failed.join('; '));
     },
   };
+}
+
+/** Error text of every state cell that failed, e.g. `download: Download failed with status code 404`. */
+function failedCells(plugin: unknown): string[] {
+  const cells = (plugin as { state?: { data?: { cells?: Map<string, StateCellLike> } } })?.state?.data?.cells;
+  if (!cells) return [];
+  const out: string[] = [];
+  for (const cell of cells.values()) {
+    if (cell.status !== 'error') continue;
+    const step = cell.transform?.transformer?.id?.split('.').pop() ?? 'step';
+    out.push(`${step}: ${String(cell.errorText ?? 'failed')}`);
+  }
+  return out;
 }
