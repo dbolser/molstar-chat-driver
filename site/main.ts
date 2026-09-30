@@ -137,6 +137,11 @@ async function start(name: string): Promise<void> {
     renderer: createUmdRenderer(window.molstar, viewer),
     onTurn: (t) => {
       latestTurnId = ((t.response as Record<string, unknown>)?.turnId as string) ?? null;
+      // Tell the backend whether Mol* actually drew the scene — the server only knows it parsed.
+      if (latestTurnId && t.response?.mvsj) {
+        const error = t.renderError instanceof Error ? t.renderError.message : t.renderError ? String(t.renderError) : null;
+        void capture({ kind: 'render', turnId: latestTurnId, rendered: t.rendered, error });
+      }
     },
     // Chip row above the composer: starter ideas for a blank session (the 🎲 reshuffles them),
     // and predicted next steps once a scene is going. The content comes from the `suggest` Edge

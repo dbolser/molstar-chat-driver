@@ -121,6 +121,7 @@ Deno.serve(async (req) => {
         raw: result.raw,
         tier0: result.tier0,
         repaired: result.repaired ?? false,
+        lint: result.lint?.length ? result.lint : null,
       })
       .select('id')
       .single();

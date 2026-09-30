@@ -29,11 +29,17 @@ create table if not exists turns (
   raw             text,        -- the model's raw reply / error text
   tier0           boolean,     -- did it produce a parseable scene?
   repaired        boolean,     -- did the scene only parse after a JSON self-repair retry?
+  lint            jsonb,       -- what the server-side scene lint changed (null = untouched)
+  rendered        boolean,     -- did Mol* render it? (reported back by the site after the turn)
+  render_error    text,        -- Mol*'s reason when it did not
   created_at      timestamptz not null default now()
 );
 -- (idempotent for projects created before these columns existed)
 alter table turns add column if not exists session_id text;
 alter table turns add column if not exists repaired boolean;
+alter table turns add column if not exists lint jsonb;
+alter table turns add column if not exists rendered boolean;
+alter table turns add column if not exists render_error text;
 
 create table if not exists feedback (
   id              uuid primary key default gen_random_uuid(),
