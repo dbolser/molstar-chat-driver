@@ -1,14 +1,39 @@
 // Edge Function `capture` — records evaluator identity and free-text feedback.
 // POST { token, kind: 'register', name } -> set the invited evaluator's name.
-// POST { token, kind: 'feedback', comment, rating?, turnId? } -> store feedback.
+// POST { token, kind: 'feedback', comment?, rating?, turnId?, screenshot? } -> store feedback
+//      (`screenshot` is a small JPEG/PNG data URL of the viewer; saved to the `shots` bucket).
 // POST { token, kind: 'render', turnId, rendered, error? } -> record whether Mol* rendered a turn.
 // Writes use the service role (bypasses RLS), so the browser never touches the DB directly.
 // The token must match a pre-issued invite (the `evaluators` allowlist) or the call is rejected.
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { cors, json } from '../_shared/cors.ts';
 import { isInvited } from '../_shared/auth.ts';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Screenshots go to the private `shots` storage bucket (see schema.sql), one file per feedback
+// row, and the row keeps the path. Capped at 1 MB; anything odd is dropped, never a failure —
+// the words matter more than the picture.
+const SHOT_MAX_BYTES = 1_000_000;
+const DATA_URL_RE = /^data:image\/(jpeg|png);base64,([A-Za-z0-9+/=]+)$/;
+
+async function saveScreenshot(supabase: SupabaseClient, token: string, shot: unknown): Promise<string | null> {
+  if (typeof shot !== 'string') return null;
+  const m = shot.match(DATA_URL_RE);
+  if (!m) return null;
+  const [, ext, b64] = m;
+  try {
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); // atob throws on bad base64
+    if (bytes.byteLength > SHOT_MAX_BYTES) return null;
+    const path = `${token.slice(0, 8)}/${crypto.randomUUID()}.${ext === 'jpeg' ? 'jpg' : 'png'}`;
+    const { error } = await supabase.storage.from('shots').upload(path, bytes, { contentType: `image/${ext}` });
+    if (error) throw new Error(error.message);
+    return path;
+  } catch (e) {
+    console.error('screenshot dropped', { message: (e as Error).message });
+    return null;
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -49,6 +74,7 @@ Deno.serve(async (req) => {
         turn_id: typeof body.turnId === 'string' ? body.turnId : null,
         rating: typeof body.rating === 'string' ? body.rating : null,
         comment: typeof body.comment === 'string' ? body.comment.slice(0, 5000) : null,
+        screenshot: await saveScreenshot(supabase, token, body.screenshot),
       });
       if (error) {
         console.error('feedback insert failed', error);

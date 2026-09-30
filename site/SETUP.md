@@ -20,7 +20,12 @@ can't be used to burn model quota or pollute the capture tables.
 In the Supabase **SQL editor**, run [`../supabase/schema.sql`](../supabase/schema.sql). It
 creates `evaluators`, `turns`, `feedback`, and `waitlist` with RLS on and **no public policies** —
 only the Edge Functions (service role) can touch the data; you read it via the dashboard.
-(`waitlist` collects emails from visitors who arrive without an invite token — see §8.)
+(`waitlist` collects emails from visitors who arrive without an invite token — see §8.) It also
+creates the private `shots` storage bucket for feedback screenshots. Safe to re-run after an
+upgrade: every column and the bucket are added `if not exists`. From a terminal:
+`node scripts/apply-schema.mjs --project-ref <ref>` — it uses `SUPABASE_ACCESS_TOKEN` if set, else
+the token `npx supabase login` left in `~/.supabase/access-token` (the CLI prefers the OS keychain
+when there is one, so on a desktop set the variable).
 
 ## 2. Edge Function secrets
 Set at least one model key (Project Settings → Edge Functions → Secrets, or the CLI):
@@ -89,8 +94,11 @@ Email each person their `?e=<token>` line and ask them to keep it private. To re
 delete their row from the `evaluators` table.
 
 ## 7. See the data
-Supabase dashboard → **Table editor** → `turns` (every prompt + scene + tier0), `feedback`
-(their comments), and `waitlist` (emails from would-be evaluators). The `turns` prompts are the
+Supabase dashboard → **Table editor** → `turns` (every prompt + scene, with `tier0` / `repaired` /
+`lint` for what the server did, `rendered` / `render_error` for what Mol* did, and `client` /
+`server` for which build did it), `feedback` (their comments; `screenshot` is a path in the
+`shots` bucket — Storage → shots — showing what they were looking at), and `waitlist` (emails from
+would-be evaluators). A turn's rating is the *latest* feedback row for it. The `turns` prompts are the
 harvested corpus that will seed the standardised eval and MolBench — and also fuel the starter
 suggestions in §9.
 
