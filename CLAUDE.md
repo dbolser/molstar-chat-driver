@@ -42,8 +42,9 @@ The reference backend does this with `molbench.mvs.extract_root` (which accepts 
   prompt + provider adapters, the envelope wrap above). Needs `pip install -e <MolBench>` and a
   provider key. See README → "Run a local production setup".
 
-> A hosted preview site (static Pages + Supabase Edge Functions) is being added — once merged it
-> lands under `site/` and `supabase/` with its own `site/SETUP.md`.
+- **`supabase/functions/chat`** — the hosted preview site's backend (Deno port of the Python
+  one, plus scene lint + RCSB grounding). Live at https://dbolser.github.io/molstar-chat-driver/
+  (static Pages under `site/`, Edge Functions under `supabase/`; setup in `site/SETUP.md`).
 
 ## Commands (Node ≥ 22)
 

@@ -3,8 +3,20 @@
 //   node esbuild.mjs demo        -> serves the playable demo + keyword backend at :8765/:8787
 //   node esbuild.mjs build-demo  -> bundles the demo page only (serve it yourself, any backend)
 import * as esbuild from 'esbuild';
+import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 
 const mode = process.argv[2] ?? 'build';
+
+// "0.2.1+abc1234": stamped into the site bundle so every captured turn says which build made it.
+function siteVersion() {
+  const { version } = JSON.parse(readFileSync('package.json', 'utf8'));
+  let sha = 'unknown';
+  try {
+    sha = execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+  } catch { /* not a git checkout (e.g. a tarball build) */ }
+  return `${version}+${sha}`;
+}
 
 const shared = {
   bundle: true,
@@ -54,6 +66,7 @@ if (mode === 'build') {
     ...shared,
     entryPoints: ['site/main.ts'],
     outfile: 'site/dist/site.js',
+    define: { __MCD_CLIENT_VERSION__: JSON.stringify(siteVersion()) },
   });
   console.log('✓ built site/dist/site.js');
 } else {

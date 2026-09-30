@@ -7,6 +7,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { cors, json } from '../_shared/cors.ts';
 import { isInvited } from '../_shared/auth.ts';
+import { SERVER_VERSION } from '../_shared/version.ts';
 import { generateScene } from '../_shared/model.ts';
 
 const DEFAULT_MODEL = Deno.env.get('MCD_MODEL') || 'anthropic:claude-haiku-4-5';
@@ -122,6 +123,8 @@ Deno.serve(async (req) => {
         tier0: result.tier0,
         repaired: result.repaired ?? false,
         lint: result.lint?.length ? result.lint : null,
+        client: req.headers.get('x-mcd-client')?.slice(0, 64) ?? null,
+        server: SERVER_VERSION,
       })
       .select('id')
       .single();

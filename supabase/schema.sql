@@ -32,6 +32,8 @@ create table if not exists turns (
   lint            jsonb,       -- what the server-side scene lint changed (null = untouched)
   rendered        boolean,     -- did Mol* render it? (reported back by the site after the turn)
   render_error    text,        -- Mol*'s reason when it did not
+  client          text,        -- site build stamp ("0.2.1+abc1234") that produced the turn
+  server          text,        -- chat function version
   created_at      timestamptz not null default now()
 );
 -- (idempotent for projects created before these columns existed)
@@ -40,6 +42,8 @@ alter table turns add column if not exists repaired boolean;
 alter table turns add column if not exists lint jsonb;
 alter table turns add column if not exists rendered boolean;
 alter table turns add column if not exists render_error text;
+alter table turns add column if not exists client text;   -- site build stamp ("0.2.1+abc1234")
+alter table turns add column if not exists server text;   -- chat function version
 
 create table if not exists feedback (
   id              uuid primary key default gen_random_uuid(),
@@ -47,8 +51,15 @@ create table if not exists feedback (
   turn_id         uuid references turns (id) on delete set null,  -- the turn it refers to (null = general)
   rating          text,        -- optional quick rating
   comment         text,        -- free-text feedback
+  screenshot      text,        -- path in the `shots` storage bucket: what the viewer showed
   created_at      timestamptz not null default now()
 );
+alter table feedback add column if not exists screenshot text;
+
+-- Screenshots taken with feedback. Private bucket: read them via the dashboard or a signed URL;
+-- only the `capture` function (service role) writes.
+insert into storage.buckets (id, name, public) values ('shots', 'shots', false)
+  on conflict (id) do nothing;
 
 -- Waitlist: people who reach the public URL WITHOUT an invite token and ask for access. Unlike
 -- everything above this is NOT gated on an invite (it's the front door), so the `waitlist` Edge
