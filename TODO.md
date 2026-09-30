@@ -1,6 +1,21 @@
 # TODO
 
-_Nothing open right now._
+### Preview site
+
+- [ ] **Stamp the code version on captured data.** `turns` / `feedback` rows don't say which build
+      produced them. Put the git SHA into `site.js` at build time (esbuild `define`) and send it
+      with each turn; add a version constant to the `chat` function. Needed to slice benchmark
+      data by prompt/lint version.
+- [ ] **Feedback clicks are all recorded.** Every emoji tap is a `feedback` row, so browsing while
+      deciding looks like ratings. Either debounce (~1.5 s, send the settled choice) or take the
+      latest row per turn at analysis time. Decide which.
+- [ ] **Structured outputs experiment (MolBench).** Constrained decoding
+      (`response_format: json_schema`, `strict`) with a trimmed MVS schema would make invalid
+      trees impossible by construction. Compare validation failures + F1 against the prompt-only
+      path on cheap models.
+- [ ] Port the colour-scheme prompt guidance (`custom.molstar_color_theme_name` on the colour
+      child) back to MolBench's prompt; the site's `_shared/prompt.ts` has drifted.
+- [ ] `CLAUDE.md` still says the preview site "is being added". It's live.
 
 ---
 
