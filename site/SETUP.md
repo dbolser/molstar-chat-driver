@@ -22,7 +22,8 @@ creates `evaluators`, `turns`, `feedback`, and `waitlist` with RLS on and **no p
 only the Edge Functions (service role) can touch the data; you read it via the dashboard.
 (`waitlist` collects emails from visitors who arrive without an invite token — see §8.) It also
 creates the private `shots` storage bucket for feedback screenshots. Safe to re-run after an
-upgrade: every column and the bucket are added `if not exists`.
+upgrade: every column and the bucket are added `if not exists`. From a terminal (after
+`npx supabase login`): `node scripts/apply-schema.mjs --project-ref <ref>`.
 
 ## 2. Edge Function secrets
 Set at least one model key (Project Settings → Edge Functions → Secrets, or the CLI):
