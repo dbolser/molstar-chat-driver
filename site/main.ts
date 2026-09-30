@@ -34,13 +34,15 @@ const nameKey = `mcd-name-${token}`;
 declare const __MCD_CLIENT_VERSION__: string;
 const CLIENT_VERSION = typeof __MCD_CLIENT_VERSION__ === 'string' ? __MCD_CLIENT_VERSION__ : 'dev';
 
-/** Fire-and-forget POST to /capture. Resolves to the Response, or null on network failure. */
+/** Fire-and-forget POST to /capture. Resolves to the Response, or null on network failure.
+ *  `keepalive` lets a small request survive the page closing, but caps the body at 64 KiB — so a
+ *  request carrying a screenshot goes without it rather than be rejected outright. */
 function capture(body: Record<string, unknown>): Promise<Response | null> {
   return fetch(`${cfg.functionsUrl}/capture`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', apikey: cfg.anonKey, 'x-mcd-client': CLIENT_VERSION },
     body: JSON.stringify({ token, ...body }),
-    keepalive: true,
+    keepalive: !body.screenshot,
   }).catch(() => null);
 }
 
