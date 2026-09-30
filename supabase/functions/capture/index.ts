@@ -22,15 +22,17 @@ async function saveScreenshot(supabase: SupabaseClient, token: string, shot: unk
   const m = shot.match(DATA_URL_RE);
   if (!m) return null;
   const [, ext, b64] = m;
-  const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-  if (bytes.byteLength > SHOT_MAX_BYTES) return null;
-  const path = `${token.slice(0, 8)}/${crypto.randomUUID()}.${ext === 'jpeg' ? 'jpg' : 'png'}`;
-  const { error } = await supabase.storage.from('shots').upload(path, bytes, { contentType: `image/${ext}` });
-  if (error) {
-    console.error('screenshot upload failed', { message: error.message });
+  try {
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); // atob throws on bad base64
+    if (bytes.byteLength > SHOT_MAX_BYTES) return null;
+    const path = `${token.slice(0, 8)}/${crypto.randomUUID()}.${ext === 'jpeg' ? 'jpg' : 'png'}`;
+    const { error } = await supabase.storage.from('shots').upload(path, bytes, { contentType: `image/${ext}` });
+    if (error) throw new Error(error.message);
+    return path;
+  } catch (e) {
+    console.error('screenshot dropped', { message: (e as Error).message });
     return null;
   }
-  return path;
 }
 
 Deno.serve(async (req) => {

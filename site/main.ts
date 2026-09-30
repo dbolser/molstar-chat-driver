@@ -61,7 +61,12 @@ async function screenshot(viewer: { plugin: any }): Promise<string | null> {
     const uri: string = await viewer.plugin.helpers.viewportScreenshot.getImageDataUri();
     // Shrink to ≤ 800px wide JPEG: plenty to see what went wrong, ~50 KB instead of a full PNG.
     const img = new Image();
-    await new Promise<void>((ok, fail) => { img.onload = () => ok(); img.onerror = () => fail(new Error('decode')); img.src = uri; });
+    await new Promise<void>((ok, fail) => {
+      const timer = setTimeout(() => fail(new Error('decode timeout')), 3000); // never hold up the feedback
+      img.onload = () => { clearTimeout(timer); ok(); };
+      img.onerror = () => { clearTimeout(timer); fail(new Error('decode')); };
+      img.src = uri;
+    });
     const scale = Math.min(1, 800 / img.width);
     const c = document.createElement('canvas');
     c.width = Math.round(img.width * scale);

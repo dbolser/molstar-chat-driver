@@ -68,7 +68,7 @@ export function createUmdRenderer(molstar: MolstarUmd, viewer: MolstarViewerLike
 /** Error text of every state cell that failed, e.g. `download: Download failed with status code 404`. */
 function failedCells(plugin: unknown): string[] {
   const cells = (plugin as { state?: { data?: { cells?: Map<string, StateCellLike> } } })?.state?.data?.cells;
-  if (!cells) return [];
+  if (!cells || typeof cells.values !== 'function') return []; // Mol* internals may change shape
   const out: string[] = [];
   for (const cell of cells.values()) {
     if (cell.status !== 'error') continue;
