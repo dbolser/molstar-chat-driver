@@ -15,7 +15,8 @@
     <style>
       html, body { height: 100%; margin: 0; }
       body { min-height: 100%; display: flex; flex-direction: column; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-      #banner { padding: 6px 12px; background: #fff7e6; border-bottom: 1px solid #ffe2a8; color: #7a5b00; font-size: 13px; }
+      #banner { display: flex; gap: 12px; padding: 6px 12px; background: #fff7e6; border-bottom: 1px solid #ffe2a8; color: #7a5b00; font-size: 13px; }
+      #banner a { margin-left: auto; color: inherit; white-space: nowrap; }
       #app { display: flex; flex: 1; min-height: 0; }
       #viewer { position: relative; flex: 1; min-width: 0; }
       #divider { flex: 0 0 6px; cursor: col-resize; background: #e6e6e6; position: relative; }
@@ -56,7 +57,7 @@
     </style>
   </head>
   <body>
-    <div id="banner">● Preview release. Note: your prompts and feedback are being recorded to help build an open benchmark. Please keep this link private.</div>
+    <div id="banner"><span>● Preview release. Note: your prompts and feedback are being recorded to help build an open benchmark. Please keep this link private.</span><a href="https://github.com/dbolser/molstar-chat-driver" target="_blank" rel="noopener">GitHub ↗</a></div>
     <div id="app">
       <div id="viewer"></div>
       <div id="divider" role="separator" aria-orientation="vertical" tabindex="0" aria-label="Resize chat panel — drag or use arrow keys" title="Drag to resize"></div>
