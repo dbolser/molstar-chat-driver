@@ -10,6 +10,7 @@ import { SYSTEM } from './prompt.ts';
 import { jsonrepair } from 'https://esm.sh/jsonrepair@3.15.0';
 import { lintScene } from './lint.ts';
 import { candidatesMessage, checkMessage, loadedText, lookup, pdbIds, search, searchPhrase } from './ground.ts';
+import { type Atom, checkScene, parseAtomSite } from './selections.ts';
 
 type Kind = 'anthropic' | 'openai';
 interface Provider {
@@ -150,6 +151,31 @@ export function extractJsonObject(raw: string): { obj: unknown; repaired: boolea
   }
 }
 
+// The empty-selection check (selections.ts) downloads the scene's structure file. Best-effort:
+// a slow or huge file is skipped, never allowed to hold up or break the turn. Parsing costs ~60 ms
+// of CPU per MB (a 25 MB ribosome took 1.5 s), so the cap keeps us well inside the Edge Function
+// CPU budget.
+const STRUCTURE_TIMEOUT_MS = 8000;
+const STRUCTURE_MAX_BYTES = 10_000_000;
+
+async function fetchAtoms(url: string): Promise<Atom[] | null> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), STRUCTURE_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    if (!res.ok || Number(res.headers.get('content-length') ?? 0) > STRUCTURE_MAX_BYTES) {
+      await res.body?.cancel();
+      return null;
+    }
+    const cif = await res.text();
+    return cif.length > STRUCTURE_MAX_BYTES ? null : parseAtomSite(cif);
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export interface SceneResult {
   mvsj: string | null;
   text?: string;
@@ -249,5 +275,20 @@ export async function generateScene(
     }
   }
 
-  return { mvsj: scene.mvsj, text, raw, tier0: true, repaired: scene.repaired, lint: notes };
+  // Selections that match no atom (wrong chain / residue / atom name): drop primitives that would
+  // be drawn to the origin, and tell the user what was skipped.
+  let mvsj = scene.mvsj;
+  try {
+    const state = JSON.parse(mvsj);
+    const checked = await checkScene(state.root, fetchAtoms);
+    if (checked.notes.length) {
+      notes.push(...checked.notes);
+      mvsj = JSON.stringify(state);
+    }
+    if (checked.messages.length) text = [text, ...checked.messages].filter(Boolean).join('\n');
+  } catch (e) {
+    console.error('selection check skipped', e);
+  }
+
+  return { mvsj, text, raw, tier0: true, repaired: scene.repaired, lint: notes };
 }

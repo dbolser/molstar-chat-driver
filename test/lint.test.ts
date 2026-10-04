@@ -119,3 +119,36 @@ test('a component under parse or root moves under the single structure', () => {
   assert.deepEqual(root2.children.map((c: any) => c.kind), ['download']);
   assert.equal(root2.children[0].children[0].children[0].children[0], stray2);
 });
+
+// The node kinds the MVS reference now teaches (Mol* 5.9 subset) must pass through untouched.
+test('primitives, opacity, canvas, camera, tooltip and custom keys are left alone', () => {
+  const hbond = {
+    kind: 'primitive',
+    params: {
+      kind: 'distance_measurement', color: 'yellow', dash_length: 0.15, label_template: '{{distance}}',
+      start: { auth_asym_id: 'A', auth_seq_id: 64, label_atom_id: 'NE2' },
+      end: { auth_asym_id: 'A', label_comp_id: 'OXY', label_atom_id: 'O2' },
+    },
+  };
+  const root = scene(
+    [
+      {
+        kind: 'component', params: { selector: 'polymer' },
+        children: [rep([color('gray'), { kind: 'opacity', params: { opacity: 0.5 } }]), { kind: 'tooltip', params: { text: 'protein' } }],
+      },
+      {
+        kind: 'component', params: { selector: 'ligand' },
+        custom: { molstar_show_non_covalent_interactions: true, molstar_non_covalent_interactions_radius_ang: 5 },
+      },
+      { kind: 'primitives', params: { color: 'yellow', label_color: 'yellow' }, children: [hbond, { kind: 'primitive', params: { kind: 'label', position: [0, 0, 0], text: 'hi' } }] },
+    ],
+    [],
+    [
+      { kind: 'canvas', params: { background_color: 'white' } },
+      { kind: 'camera', params: { target: [0, 0, 0], position: [0, 0, 50], up: [0, 1, 0] } },
+    ],
+  );
+  const before = JSON.stringify(root);
+  assert.deepEqual(lintScene(root), []);
+  assert.equal(JSON.stringify(root), before);
+});

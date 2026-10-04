@@ -43,8 +43,8 @@ The reference backend does this with `molbench.mvs.extract_root` (which accepts 
   provider key. See README → "Run a local production setup".
 
 - **`supabase/functions/chat`** — the hosted preview site's backend (Deno port of the Python
-  one, plus scene lint + RCSB grounding). Live at https://dbolser.github.io/molstar-chat-driver/
-  (static Pages under `site/`, Edge Functions under `supabase/`; setup in `site/SETUP.md`).
+  one, plus scene lint, RCSB grounding and an empty-selection check). Live at
+  https://dbolser.github.io/molstar-chat-driver/ (static Pages under `site/`, Edge Functions under `supabase/`; setup in `site/SETUP.md`).
 
 ## Commands (Node ≥ 22)
 
@@ -55,6 +55,7 @@ The reference backend does this with `molbench.mvs.extract_root` (which accepts 
 | `npm run build:demo` | bundle the demo page only (serve it yourself, any backend) |
 | `npm test` | run the test suite (`node --test` via tsx) |
 | `npm run typecheck` | `tsc --noEmit` |
+| `node scripts/sync-prompt.mjs <MolBench>` | re-vendor MolBench's MVS reference into the chat backend's prompt |
 
 ## Layout & conventions
 
