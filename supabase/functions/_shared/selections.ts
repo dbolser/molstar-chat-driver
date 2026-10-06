@@ -26,17 +26,18 @@ const TOKEN = /'(.*?)'(?=\s|$)|"(.*?)"(?=\s|$)|(\S+)/g;
 /** Minimal mmCIF `_atom_site` loop parse. Empty when the file has none (e.g. not mmCIF). */
 export function parseAtomSite(cif: string): Atom[] {
   const lines = cif.split(/\r?\n/);
-  let i = lines.findIndex((l, j) => l.trim() === 'loop_' && lines[j + 1]?.startsWith('_atom_site.'));
+  let i = lines.findIndex((l, j) => l.trim() === 'loop_' && lines[j + 1]?.trim().startsWith('_atom_site.'));
   if (i === -1) return [];
   const cols: string[] = [];
-  for (i++; i < lines.length && lines[i].startsWith('_atom_site.'); i++) cols.push(lines[i].trim().slice(11));
+  for (i++; i < lines.length && lines[i].trim().startsWith('_atom_site.'); i++) cols.push(lines[i].trim().slice(11));
   const at = Object.fromEntries([...COLUMNS, 'pdbx_PDB_model_num'].map((c) => [c, cols.indexOf(c)]));
   const atoms: Atom[] = [];
   let row: string[] = [];
   let model: string | undefined;
   for (; i < lines.length; i++) {
     const l = lines[i];
-    if (l.startsWith('#') || l.startsWith('_') || l.startsWith('loop_') || l.startsWith('data_')) break;
+    const t = l.trimStart();
+    if (t.startsWith('#') || t.startsWith('_') || t.startsWith('loop_') || t.startsWith('data_')) break;
     for (const m of l.matchAll(TOKEN)) {
       row.push(m[1] ?? m[2] ?? m[3]);
       if (row.length < cols.length) continue;

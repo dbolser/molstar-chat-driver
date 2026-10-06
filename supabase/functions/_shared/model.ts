@@ -163,12 +163,28 @@ async function fetchAtoms(url: string): Promise<Atom[] | null> {
   const timer = setTimeout(() => ctrl.abort(), STRUCTURE_TIMEOUT_MS);
   try {
     const res = await fetch(url, { signal: ctrl.signal });
-    if (!res.ok || Number(res.headers.get('content-length') ?? 0) > STRUCTURE_MAX_BYTES) {
+    if (!res.ok || !res.body || Number(res.headers.get('content-length') ?? 0) > STRUCTURE_MAX_BYTES) {
       await res.body?.cancel();
       return null;
     }
-    const cif = await res.text();
-    return cif.length > STRUCTURE_MAX_BYTES ? null : parseAtomSite(cif);
+    // Count bytes as they arrive: a chunked response has no content-length to check up front.
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    for await (const chunk of res.body) {
+      size += chunk.length;
+      if (size > STRUCTURE_MAX_BYTES) {
+        ctrl.abort();
+        return null;
+      }
+      chunks.push(chunk);
+    }
+    const bytes = new Uint8Array(size);
+    let at = 0;
+    for (const c of chunks) {
+      bytes.set(c, at);
+      at += c.length;
+    }
+    return parseAtomSite(new TextDecoder().decode(bytes));
   } catch {
     return null;
   } finally {

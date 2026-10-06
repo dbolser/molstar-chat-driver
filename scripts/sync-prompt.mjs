@@ -27,6 +27,6 @@ if (at === -1) throw new Error(`SYSTEM has no "${MARK.trim()}" heading`);
 const reference = readFileSync(join(molbench, 'molbench', 'mvs_reference.md'), 'utf8');
 const next = system.slice(0, at + MARK.length) + reference;
 // JSON-escaped (and ASCII-only, like the original) so backticks / ${} / non-ASCII are all safe.
-const literal = JSON.stringify(next).replace(/[\u007f-￿]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
+const literal = JSON.stringify(next).replace(/[\u007f-\uffff]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
 writeFileSync(PROMPT_TS, `${m[1]}export const SYSTEM = ${literal};\n`);
 console.log(next === system ? 'prompt.ts already in sync' : `prompt.ts updated (${system.length} → ${next.length} chars)`);
