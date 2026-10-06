@@ -185,3 +185,15 @@ test('a colour selector is checked within its component, not the whole structure
   const r = checkSelections(download([comp]), atoms, '1A6M');
   assert.deepEqual(r.notes, ['empty selection: color {"label_comp_id":"OXY"}']);
 });
+
+test('checkScene shares one time budget across sequential loads', async () => {
+  const root = { kind: 'root', children: ['1aaa', '1bbb', '1ccc'].map((id) => download([], `https://files.rcsb.org/download/${id}.cif`)) };
+  const given: number[] = [];
+  await checkScene(root, async (_url, timeoutMs) => {
+    given.push(timeoutMs);
+    await new Promise((r) => setTimeout(r, 30)); // a slow host
+    return null;
+  }, 50);
+  assert.equal(given.length, 2); // the third never starts: the budget is spent
+  assert.ok(given[0] <= 50 && given[1] < given[0]);
+});

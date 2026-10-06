@@ -90,8 +90,10 @@ export function isStructureUrl(url: string): boolean {
   }
 }
 
-/** At most this many structures are checked per scene, one at a time (each parse is held in memory). */
+/** At most this many structures are checked per scene, one at a time (each parse is held in memory),
+ *  all within one scene-wide time budget so a stalled host can't stack timeouts. */
 const MAX_CHECKED_STRUCTURES = 3;
+const SCENE_BUDGET_MS = 8000;
 
 /** True when the expression is known to select no atom. */
 export function isEmpty(atoms: Atom[], e: Expr): boolean {
@@ -191,7 +193,8 @@ export function checkSelections(download: Node, atoms: Atom[], pdb: string): { n
  */
 export async function checkScene(
   root: Node,
-  load: (url: string) => Promise<Atom[] | null>,
+  load: (url: string, timeoutMs: number) => Promise<Atom[] | null>,
+  budgetMs = SCENE_BUDGET_MS,
 ): Promise<{ notes: string[]; messages: string[] }> {
   // Only text mmCIF from a known host, read as its first model (the parser keeps model 1 only).
   const firstModel = (d: Node) => kids(d).every((p) => kids(p).every((s) => !s.params?.model_index));
@@ -201,8 +204,11 @@ export async function checkScene(
   ).slice(0, MAX_CHECKED_STRUCTURES);
   const notes: string[] = [];
   const messages: string[] = [];
+  const deadline = Date.now() + budgetMs;
   for (const d of downloads) { // one at a time, so only one parsed structure is held at once
-    const atoms = await load(d.params!.url as string).catch(() => null);
+    const left = deadline - Date.now();
+    if (left <= 0) break; // out of time: leave the rest as the model wrote them
+    const atoms = await load(d.params!.url as string, left).catch(() => null);
     if (!atoms?.length) continue; // couldn't check — leave the scene as the model wrote it
     const r = checkSelections(d, atoms, pdbIds(d.params!.url as string)[0] ?? 'the structure');
     notes.push(...r.notes);
