@@ -6,13 +6,14 @@
       (`response_format: json_schema`, `strict`) with a trimmed MVS schema would make invalid
       trees impossible by construction. Compare validation failures + F1 against the prompt-only
       path on cheap models.
-- [ ] Port the colour-scheme prompt guidance (`custom.molstar_color_theme_name` on the colour
-      child) back to MolBench's prompt; the site's `_shared/prompt.ts` has drifted.
 
 
 ---
 
 ### Done
+
+- [x] `_shared/prompt.ts` re-synced to MolBench's MVS reference (primitives, opacity,
+      interactions, colour schemes) via `scripts/sync-prompt.mjs`; no more drift.
 
 - [x] 0.2.1: version stamp on captured data (`turns.client` / `turns.server`); feedback taps
       debounced to the settled choice, with a viewer screenshot; RCSB grounding of PDB entries;
