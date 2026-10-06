@@ -77,6 +77,22 @@ function atomMatches(a: Atom, e: Expr): boolean {
   return true;
 }
 
+/** Hosts we will download a structure from. The URL comes from model output, so anything else
+ *  (a private address, an arbitrary endpoint) is never fetched. */
+const STRUCTURE_HOSTS = new Set(['files.rcsb.org', 'models.rcsb.org', 'www.ebi.ac.uk', 'alphafold.ebi.ac.uk']);
+
+export function isStructureUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' && STRUCTURE_HOSTS.has(u.hostname) && !u.username && !u.password && !u.port;
+  } catch {
+    return false;
+  }
+}
+
+/** At most this many structures are checked per scene, one at a time (each parse is held in memory). */
+const MAX_CHECKED_STRUCTURES = 3;
+
 /** True when the expression is known to select no atom. */
 export function isEmpty(atoms: Atom[], e: Expr): boolean {
   return checkable(e) && !atoms.some((a) => atomMatches(a, e));
@@ -125,15 +141,23 @@ export function checkSelections(download: Node, atoms: Atom[], pdb: string): { n
   const messages = new Set<string>();
   const missed = (e: Expr) => messages.add(`Couldn't find ${describe(e)} in ${pdb} — that part was skipped.`);
 
-  const walk = (n: Node) => {
+  // `scope` is what a colour selector can reach: Mol* applies it within the enclosing component.
+  const walk = (n: Node, scope: Atom[]) => {
     for (const c of kids(n)) {
       const sel = c.params?.selector;
+      let inner = scope;
       if ((c.kind === 'component' || c.kind === 'color') && sel != null && typeof sel !== 'string') {
         const exprs = (Array.isArray(sel) ? sel : [sel]).filter(isExpr);
-        const empty = exprs.filter((e) => isEmpty(atoms, e));
+        const empty = exprs.filter((e) => isEmpty(scope, e));
         if (empty.length) {
           notes.push(`empty selection: ${c.kind} ${short(empty.length === 1 ? empty[0] : empty)}`);
           empty.forEach(missed);
+        }
+        // Narrow to the component's atoms (unless it has a field we can't judge, or matched nothing:
+        // an empty component is already reported, so don't report its colours again).
+        if (c.kind === 'component' && exprs.every(checkable)) {
+          const hit = scope.filter((a) => exprs.some((e) => atomMatches(a, e)));
+          if (hit.length) inner = hit;
         }
       }
       if (c.kind === 'primitive') {
@@ -147,7 +171,7 @@ export function checkSelections(download: Node, atoms: Atom[], pdb: string): { n
           break;
         }
       }
-      walk(c);
+      walk(c, inner);
     }
     // A primitives group left with no shapes has nothing to draw.
     for (const c of kids(n)) {
@@ -156,7 +180,7 @@ export function checkSelections(download: Node, atoms: Atom[], pdb: string): { n
       }
     }
   };
-  walk(download);
+  walk(download, atoms);
   return { notes, messages: [...messages] };
 }
 
@@ -169,19 +193,20 @@ export async function checkScene(
   root: Node,
   load: (url: string) => Promise<Atom[] | null>,
 ): Promise<{ notes: string[]; messages: string[] }> {
+  // Only text mmCIF from a known host, read as its first model (the parser keeps model 1 only).
+  const firstModel = (d: Node) => kids(d).every((p) => kids(p).every((s) => !s.params?.model_index));
   const downloads = kids(root).filter(
-    (d) => d.kind === 'download' && typeof d.params?.url === 'string' &&
-      kids(d).some((p) => p.kind === 'parse' && p.params?.format === 'mmcif'),
-  );
-  const loaded = await Promise.all(downloads.map((d) => load(d.params!.url as string).catch(() => null)));
+    (d) => d.kind === 'download' && typeof d.params?.url === 'string' && isStructureUrl(d.params.url) &&
+      kids(d).some((p) => p.kind === 'parse' && p.params?.format === 'mmcif') && firstModel(d),
+  ).slice(0, MAX_CHECKED_STRUCTURES);
   const notes: string[] = [];
   const messages: string[] = [];
-  downloads.forEach((d, i) => {
-    const atoms = loaded[i];
-    if (!atoms?.length) return; // couldn't check — leave the scene as the model wrote it
+  for (const d of downloads) { // one at a time, so only one parsed structure is held at once
+    const atoms = await load(d.params!.url as string).catch(() => null);
+    if (!atoms?.length) continue; // couldn't check — leave the scene as the model wrote it
     const r = checkSelections(d, atoms, pdbIds(d.params!.url as string)[0] ?? 'the structure');
     notes.push(...r.notes);
     messages.push(...r.messages);
-  });
+  }
   return { notes, messages };
 }

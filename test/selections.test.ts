@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkScene, checkSelections, describe, isEmpty, parseAtomSite } from '../supabase/functions/_shared/selections.ts';
+import { checkScene, checkSelections, describe, isEmpty, isStructureUrl, parseAtomSite } from '../supabase/functions/_shared/selections.ts';
 
 // A trimmed 1A6M-style `_atom_site` loop: chain A His64 + a bound O2 (OXY), a second model (NMR
 // style) that must be ignored, and quoted atom names (O5') that must stay one token.
@@ -139,4 +139,49 @@ test('checkScene loads each mmCIF download and skips what it cannot check', asyn
   assert.deepEqual(asked, ['https://files.rcsb.org/download/1a6m.cif', 'https://files.rcsb.org/download/4cha.cif']);
   assert.deepEqual(root.children.map((d) => structureOf(d).children.length), [0, 1, 1]);
   assert.deepEqual(r.messages, ["Couldn't find chain B residue 57 in 1A6M — that part was skipped."]);
+});
+
+test('isStructureUrl only allows https downloads from known structure hosts', () => {
+  assert.ok(isStructureUrl('https://files.rcsb.org/download/1a6m.cif'));
+  assert.ok(isStructureUrl('https://www.ebi.ac.uk/pdbe/entry-files/download/1a6m_updated.cif'));
+  for (const bad of ['http://files.rcsb.org/download/1a6m.cif', 'https://169.254.169.254/latest/meta-data',
+    'https://files.rcsb.org.evil.example/x.cif', 'https://user@files.rcsb.org/x.cif', 'https://files.rcsb.org:8443/x.cif', 'not a url']) {
+    assert.ok(!isStructureUrl(bad), bad);
+  }
+});
+
+test('checkScene never loads an off-allowlist URL or a non-first model, and loads one at a time', async () => {
+  const bad = () => dist({ auth_asym_id: 'B', auth_seq_id: 57 }, [0, 0, 0]);
+  const model2 = download([{ kind: 'primitives', children: [bad()] }]);
+  (structureOf(model2).params as any).model_index = 1;
+  const root = {
+    kind: 'root',
+    children: [
+      download([{ kind: 'primitives', children: [bad()] }], 'http://127.0.0.1/x.cif'),
+      model2,
+      ...['1aaa', '1bbb', '1ccc', '1ddd'].map((id) => download([], `https://files.rcsb.org/download/${id}.cif`)),
+    ],
+  };
+  const asked: string[] = [];
+  let inFlight = 0;
+  await checkScene(root, async (url) => {
+    asked.push(url);
+    assert.equal(++inFlight, 1);
+    await new Promise((r) => setTimeout(r, 1));
+    inFlight--;
+    return atoms;
+  });
+  assert.deepEqual(asked, ['1aaa', '1bbb', '1ccc'].map((id) => `https://files.rcsb.org/download/${id}.cif`));
+});
+
+test('a colour selector is checked within its component, not the whole structure', () => {
+  const comp = {
+    kind: 'component', params: { selector: { auth_asym_id: 'A', auth_seq_id: 64 } },
+    children: [{ kind: 'representation', params: { type: 'ball_and_stick' }, children: [
+      { kind: 'color', params: { color: 'red', selector: { label_comp_id: 'OXY' } } }, // in the structure, not in His64
+      { kind: 'color', params: { color: 'blue', selector: { label_atom_id: 'NE2' } } },
+    ] }],
+  };
+  const r = checkSelections(download([comp]), atoms, '1A6M');
+  assert.deepEqual(r.notes, ['empty selection: color {"label_comp_id":"OXY"}']);
 });

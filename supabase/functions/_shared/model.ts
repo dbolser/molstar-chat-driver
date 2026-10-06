@@ -10,7 +10,7 @@ import { SYSTEM } from './prompt.ts';
 import { jsonrepair } from 'https://esm.sh/jsonrepair@3.15.0';
 import { lintScene } from './lint.ts';
 import { candidatesMessage, checkMessage, loadedText, lookup, pdbIds, search, searchPhrase } from './ground.ts';
-import { type Atom, checkScene, parseAtomSite } from './selections.ts';
+import { type Atom, checkScene, isStructureUrl, parseAtomSite } from './selections.ts';
 
 type Kind = 'anthropic' | 'openai';
 interface Provider {
@@ -159,10 +159,11 @@ const STRUCTURE_TIMEOUT_MS = 8000;
 const STRUCTURE_MAX_BYTES = 10_000_000;
 
 async function fetchAtoms(url: string): Promise<Atom[] | null> {
+  if (!isStructureUrl(url)) return null; // the URL is model output: never fetch an arbitrary host
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), STRUCTURE_TIMEOUT_MS);
   try {
-    const res = await fetch(url, { signal: ctrl.signal });
+    const res = await fetch(url, { signal: ctrl.signal, redirect: 'error' }); // no hop off the allowlist
     if (!res.ok || !res.body || Number(res.headers.get('content-length') ?? 0) > STRUCTURE_MAX_BYTES) {
       await res.body?.cancel();
       return null;
