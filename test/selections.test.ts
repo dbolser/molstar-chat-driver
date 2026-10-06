@@ -189,11 +189,11 @@ test('a colour selector is checked within its component, not the whole structure
 test('checkScene shares one time budget across sequential loads', async () => {
   const root = { kind: 'root', children: ['1aaa', '1bbb', '1ccc'].map((id) => download([], `https://files.rcsb.org/download/${id}.cif`)) };
   const given: number[] = [];
+  let clock = 0; // a fake clock: each load "takes" 30 ms
   await checkScene(root, async (_url, timeoutMs) => {
     given.push(timeoutMs);
-    await new Promise((r) => setTimeout(r, 30)); // a slow host
+    clock += 30;
     return null;
-  }, 50);
-  assert.equal(given.length, 2); // the third never starts: the budget is spent
-  assert.ok(given[0] <= 50 && given[1] < given[0]);
+  }, 50, () => clock);
+  assert.deepEqual(given, [50, 20]); // the third never starts: the budget is spent
 });

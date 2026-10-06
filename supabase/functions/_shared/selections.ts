@@ -195,6 +195,7 @@ export async function checkScene(
   root: Node,
   load: (url: string, timeoutMs: number) => Promise<Atom[] | null>,
   budgetMs = SCENE_BUDGET_MS,
+  now: () => number = Date.now,
 ): Promise<{ notes: string[]; messages: string[] }> {
   // Only text mmCIF from a known host, read as its first model (the parser keeps model 1 only).
   const firstModel = (d: Node) => kids(d).every((p) => kids(p).every((s) => !s.params?.model_index));
@@ -204,9 +205,9 @@ export async function checkScene(
   ).slice(0, MAX_CHECKED_STRUCTURES);
   const notes: string[] = [];
   const messages: string[] = [];
-  const deadline = Date.now() + budgetMs;
+  const deadline = now() + budgetMs;
   for (const d of downloads) { // one at a time, so only one parsed structure is held at once
-    const left = deadline - Date.now();
+    const left = deadline - now();
     if (left <= 0) break; // out of time: leave the rest as the model wrote them
     const atoms = await load(d.params!.url as string, left).catch(() => null);
     if (!atoms?.length) continue; // couldn't check — leave the scene as the model wrote it
