@@ -10,7 +10,7 @@ import { SYSTEM } from './prompt.ts';
 import { jsonrepair } from 'https://esm.sh/jsonrepair@3.15.0';
 import { lintScene } from './lint.ts';
 import { candidatesMessage, checkMessage, loadedText, lookup, pdbIds, search, searchPhrase } from './ground.ts';
-import { type Atom, checkScene, parseAtomSite } from './selections.ts';
+import { type Atom, checkScene, isStructureUrl, parseAtomSite } from './selections.ts';
 
 type Kind = 'anthropic' | 'openai';
 interface Provider {
@@ -155,14 +155,14 @@ export function extractJsonObject(raw: string): { obj: unknown; repaired: boolea
 // a slow or huge file is skipped, never allowed to hold up or break the turn. Parsing costs ~60 ms
 // of CPU per MB (a 25 MB ribosome took 1.5 s), so the cap keeps us well inside the Edge Function
 // CPU budget.
-const STRUCTURE_TIMEOUT_MS = 8000;
 const STRUCTURE_MAX_BYTES = 10_000_000;
 
-async function fetchAtoms(url: string): Promise<Atom[] | null> {
+async function fetchAtoms(url: string, timeoutMs: number): Promise<Atom[] | null> {
+  if (!isStructureUrl(url)) return null; // the URL is model output: never fetch an arbitrary host
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), STRUCTURE_TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { signal: ctrl.signal });
+    const res = await fetch(url, { signal: ctrl.signal, redirect: 'error' }); // no hop off the allowlist
     if (!res.ok || !res.body || Number(res.headers.get('content-length') ?? 0) > STRUCTURE_MAX_BYTES) {
       await res.body?.cancel();
       return null;
