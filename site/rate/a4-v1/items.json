@@ -3,1504 +3,16 @@
  "question": "Ignore camera angle, zoom and orientation. Does the model's scene show the SAME visualization as the reference: same structure, same parts shown, equivalent representations (cartoon / surface / ball-and-stick), equivalent colours, and the same region highlighted or focused?",
  "items": [
   {
-   "id": "7ad53bb95aeb",
-   "prompt": "Load 1CBS; protein as grey cartoon, and show residues 20-60 of chain A as orange ball-and-stick.",
-   "ref": "img/7ad53bb95aeb-ref.jpg",
-   "out": "img/7ad53bb95aeb-out.jpg"
-  },
-  {
-   "id": "767ee24d7e1a",
-   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/767ee24d7e1a-ref.jpg",
-   "out": "img/767ee24d7e1a-out.jpg"
-  },
-  {
-   "id": "5f6f28592172",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/5f6f28592172-ref.jpg",
-   "out": "img/5f6f28592172-out.jpg"
-  },
-  {
-   "id": "b915748ebb7c",
-   "prompt": "Load 1CBS; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/b915748ebb7c-ref.jpg",
-   "out": "img/b915748ebb7c-out.jpg"
-  },
-  {
-   "id": "7db8726113b2",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/7db8726113b2-ref.jpg",
-   "out": "img/7db8726113b2-out.jpg"
-  },
-  {
-   "id": "95024538b3b9",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/95024538b3b9-ref.jpg",
-   "out": "img/95024538b3b9-out.jpg"
-  },
-  {
-   "id": "4a0e8f2ba5b1",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/4a0e8f2ba5b1-ref.jpg",
-   "out": "img/4a0e8f2ba5b1-out.jpg"
-  },
-  {
-   "id": "6091a5632c01",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/6091a5632c01-ref.jpg",
-   "out": "img/6091a5632c01-out.jpg"
-  },
-  {
-   "id": "3284af2ead10",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
-   "ref": "img/3284af2ead10-ref.jpg",
-   "out": "img/3284af2ead10-out.jpg"
-  },
-  {
-   "id": "29ed2f014703",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/29ed2f014703-ref.jpg",
-   "out": "img/29ed2f014703-out.jpg"
-  },
-  {
-   "id": "d6df4d8e76b9",
-   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/d6df4d8e76b9-ref.jpg",
-   "out": "img/d6df4d8e76b9-out.jpg"
-  },
-  {
-   "id": "254af70c2909",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/254af70c2909-ref.jpg",
-   "out": "img/254af70c2909-out.jpg"
-  },
-  {
-   "id": "88bf104bb70e",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/88bf104bb70e-ref.jpg",
-   "out": "img/88bf104bb70e-out.jpg"
-  },
-  {
-   "id": "41ca4b5290e8",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/41ca4b5290e8-ref.jpg",
-   "out": "img/41ca4b5290e8-out.jpg"
-  },
-  {
-   "id": "486f565b51f1",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/486f565b51f1-ref.jpg",
-   "out": "img/486f565b51f1-out.jpg"
-  },
-  {
-   "id": "b7a70145ae84",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/b7a70145ae84-ref.jpg",
-   "out": "img/b7a70145ae84-out.jpg"
-  },
-  {
-   "id": "7d3fbf92af2f",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/7d3fbf92af2f-ref.jpg",
-   "out": "img/7d3fbf92af2f-out.jpg"
-  },
-  {
-   "id": "285d78152813",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/285d78152813-ref.jpg",
-   "out": "img/285d78152813-out.jpg"
-  },
-  {
-   "id": "289a8612ba67",
-   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
-   "ref": "img/289a8612ba67-ref.jpg",
-   "out": "img/289a8612ba67-out.jpg"
-  },
-  {
-   "id": "d01125e81dfc",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/d01125e81dfc-ref.jpg",
-   "out": "img/d01125e81dfc-out.jpg"
-  },
-  {
-   "id": "138d681e305e",
-   "prompt": "Load 1CBS; show the protein as a grey cartoon and the ligands as purple ball-and-stick.",
-   "ref": "img/138d681e305e-ref.jpg",
-   "out": "img/138d681e305e-out.jpg"
-  },
-  {
-   "id": "672ba6933db4",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/672ba6933db4-ref.jpg",
-   "out": "img/672ba6933db4-out.jpg"
-  },
-  {
-   "id": "00316b9567ec",
-   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
-   "ref": "img/00316b9567ec-ref.jpg",
-   "out": "img/00316b9567ec-out.jpg"
-  },
-  {
-   "id": "db11c74f47f9",
-   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
-   "ref": "img/db11c74f47f9-ref.jpg",
-   "out": "img/db11c74f47f9-out.jpg"
-  },
-  {
-   "id": "7804585d1583",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/7804585d1583-ref.jpg",
-   "out": "img/7804585d1583-out.jpg"
-  },
-  {
-   "id": "fcf403c6bddf",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/fcf403c6bddf-ref.jpg",
-   "out": "img/fcf403c6bddf-out.jpg"
-  },
-  {
-   "id": "8448c68244af",
-   "prompt": "Load 1HHO; protein as grey cartoon, and show the ions as purple spheres.",
-   "ref": "img/8448c68244af-ref.jpg",
-   "out": "img/8448c68244af-out.jpg"
-  },
-  {
-   "id": "855914311f68",
-   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/855914311f68-ref.jpg",
-   "out": "img/855914311f68-out.jpg"
-  },
-  {
-   "id": "c7099b507c80",
-   "prompt": "show me the CFTR channel",
-   "ref": "img/c7099b507c80-ref.jpg",
-   "out": "img/c7099b507c80-out.jpg"
-  },
-  {
-   "id": "0d2835220019",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/0d2835220019-ref.jpg",
-   "out": "img/0d2835220019-out.jpg"
-  },
-  {
-   "id": "80db3dbb63cb",
-   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/80db3dbb63cb-ref.jpg",
-   "out": "img/80db3dbb63cb-out.jpg"
-  },
-  {
-   "id": "4843ce40a377",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/4843ce40a377-ref.jpg",
-   "out": "img/4843ce40a377-out.jpg"
-  },
-  {
-   "id": "2160fd64cb08",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/2160fd64cb08-ref.jpg",
-   "out": "img/2160fd64cb08-out.jpg"
-  },
-  {
-   "id": "73578539817a",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/73578539817a-ref.jpg",
-   "out": "img/73578539817a-out.jpg"
-  },
-  {
-   "id": "02c02d5b77b5",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/02c02d5b77b5-ref.jpg",
-   "out": "img/02c02d5b77b5-out.jpg"
-  },
-  {
-   "id": "f6d30c3ab6cd",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/f6d30c3ab6cd-ref.jpg",
-   "out": "img/f6d30c3ab6cd-out.jpg"
-  },
-  {
-   "id": "7c1140d8aee0",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/7c1140d8aee0-ref.jpg",
-   "out": "img/7c1140d8aee0-out.jpg"
-  },
-  {
-   "id": "939f84f02bc8",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/939f84f02bc8-ref.jpg",
-   "out": "img/939f84f02bc8-out.jpg"
-  },
-  {
-   "id": "5b7a4e3e1dc1",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/5b7a4e3e1dc1-ref.jpg",
-   "out": "img/5b7a4e3e1dc1-out.jpg"
-  },
-  {
-   "id": "c3f7c40a073f",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/c3f7c40a073f-ref.jpg",
-   "out": "img/c3f7c40a073f-out.jpg"
-  },
-  {
-   "id": "c452050162d4",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/c452050162d4-ref.jpg",
-   "out": "img/c452050162d4-out.jpg"
-  },
-  {
-   "id": "704058692b6a",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/704058692b6a-ref.jpg",
-   "out": "img/704058692b6a-out.jpg"
-  },
-  {
-   "id": "b21abf9b14da",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/b21abf9b14da-ref.jpg",
-   "out": "img/b21abf9b14da-out.jpg"
-  },
-  {
-   "id": "8f8e823aef53",
-   "prompt": "show the structure of PCSK9",
-   "ref": "img/8f8e823aef53-ref.jpg",
-   "out": "img/8f8e823aef53-out.jpg"
-  },
-  {
-   "id": "52f50b3b43bc",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
-   "ref": "img/52f50b3b43bc-ref.jpg",
-   "out": "img/52f50b3b43bc-out.jpg"
-  },
-  {
-   "id": "ed33dfae4615",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/ed33dfae4615-ref.jpg",
-   "out": "img/ed33dfae4615-out.jpg"
-  },
-  {
-   "id": "a68e499169c9",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/a68e499169c9-ref.jpg",
-   "out": "img/a68e499169c9-out.jpg"
-  },
-  {
-   "id": "d687f3d93fa5",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/d687f3d93fa5-ref.jpg",
-   "out": "img/d687f3d93fa5-out.jpg"
-  },
-  {
-   "id": "2d4478f51e9f",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/2d4478f51e9f-ref.jpg",
-   "out": "img/2d4478f51e9f-out.jpg"
-  },
-  {
-   "id": "1ee180e43509",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/1ee180e43509-ref.jpg",
-   "out": "img/1ee180e43509-out.jpg"
-  },
-  {
-   "id": "4dbfdbaf2f9e",
-   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
-   "ref": "img/4dbfdbaf2f9e-ref.jpg",
-   "out": "img/4dbfdbaf2f9e-out.jpg"
-  },
-  {
-   "id": "d15f47c08636",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/d15f47c08636-ref.jpg",
-   "out": "img/d15f47c08636-out.jpg"
-  },
-  {
-   "id": "726dc0016864",
-   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/726dc0016864-ref.jpg",
-   "out": "img/726dc0016864-out.jpg"
-  },
-  {
-   "id": "d5a959f2faed",
-   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/d5a959f2faed-ref.jpg",
-   "out": "img/d5a959f2faed-out.jpg"
-  },
-  {
-   "id": "6d583809076b",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/6d583809076b-ref.jpg",
-   "out": "img/6d583809076b-out.jpg"
-  },
-  {
-   "id": "5cd5af7796f8",
-   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
-   "ref": "img/5cd5af7796f8-ref.jpg",
-   "out": "img/5cd5af7796f8-out.jpg"
-  },
-  {
-   "id": "4049e1e56130",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/4049e1e56130-ref.jpg",
-   "out": "img/4049e1e56130-out.jpg"
-  },
-  {
-   "id": "da2221cc29b5",
-   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
-   "ref": "img/da2221cc29b5-ref.jpg",
-   "out": "img/da2221cc29b5-out.jpg"
-  },
-  {
-   "id": "4035a41d5085",
-   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
-   "ref": "img/4035a41d5085-ref.jpg",
-   "out": "img/4035a41d5085-out.jpg"
-  },
-  {
-   "id": "da4e58a43c0a",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/da4e58a43c0a-ref.jpg",
-   "out": "img/da4e58a43c0a-out.jpg"
-  },
-  {
-   "id": "b4ef29e51996",
-   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
-   "ref": "img/b4ef29e51996-ref.jpg",
-   "out": "img/b4ef29e51996-out.jpg"
-  },
-  {
-   "id": "a0a19b22de86",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/a0a19b22de86-ref.jpg",
-   "out": "img/a0a19b22de86-out.jpg"
-  },
-  {
-   "id": "df3943edaea0",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/df3943edaea0-ref.jpg",
-   "out": "img/df3943edaea0-out.jpg"
-  },
-  {
-   "id": "ce4c052a56bd",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/ce4c052a56bd-ref.jpg",
-   "out": "img/ce4c052a56bd-out.jpg"
-  },
-  {
-   "id": "30a634aa6113",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/30a634aa6113-ref.jpg",
-   "out": "img/30a634aa6113-out.jpg"
-  },
-  {
-   "id": "5c90ea8300c8",
-   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
-   "ref": "img/5c90ea8300c8-ref.jpg",
-   "out": "img/5c90ea8300c8-out.jpg"
-  },
-  {
-   "id": "292c8089956d",
-   "prompt": "Load 4INS; protein as grey cartoon, and show the ions as purple spheres.",
-   "ref": "img/292c8089956d-ref.jpg",
-   "out": "img/292c8089956d-out.jpg"
-  },
-  {
-   "id": "4677a97f7f62",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/4677a97f7f62-ref.jpg",
-   "out": "img/4677a97f7f62-out.jpg"
-  },
-  {
-   "id": "a8ee4819f0a8",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/a8ee4819f0a8-ref.jpg",
-   "out": "img/a8ee4819f0a8-out.jpg"
-  },
-  {
-   "id": "bdaa30f793dc",
-   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/bdaa30f793dc-ref.jpg",
-   "out": "img/bdaa30f793dc-out.jpg"
-  },
-  {
-   "id": "d7c5cc4fe026",
-   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
-   "ref": "img/d7c5cc4fe026-ref.jpg",
-   "out": "img/d7c5cc4fe026-out.jpg"
-  },
-  {
-   "id": "b5c58d01b544",
-   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/b5c58d01b544-ref.jpg",
-   "out": "img/b5c58d01b544-out.jpg"
-  },
-  {
-   "id": "7b8b245572bd",
-   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
-   "ref": "img/7b8b245572bd-ref.jpg",
-   "out": "img/7b8b245572bd-out.jpg"
-  },
-  {
-   "id": "33b9794d1413",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/33b9794d1413-ref.jpg",
-   "out": "img/33b9794d1413-out.jpg"
-  },
-  {
-   "id": "edd1f5779e46",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/edd1f5779e46-ref.jpg",
-   "out": "img/edd1f5779e46-out.jpg"
-  },
-  {
-   "id": "a6e301379dd1",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/a6e301379dd1-ref.jpg",
-   "out": "img/a6e301379dd1-out.jpg"
-  },
-  {
-   "id": "82be99c1e4a9",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/82be99c1e4a9-ref.jpg",
-   "out": "img/82be99c1e4a9-out.jpg"
-  },
-  {
-   "id": "62d06ceeb6f1",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/62d06ceeb6f1-ref.jpg",
-   "out": "img/62d06ceeb6f1-out.jpg"
-  },
-  {
-   "id": "c190732cf364",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
-   "ref": "img/c190732cf364-ref.jpg",
-   "out": "img/c190732cf364-out.jpg"
-  },
-  {
-   "id": "15805e69986f",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/15805e69986f-ref.jpg",
-   "out": "img/15805e69986f-out.jpg"
-  },
-  {
-   "id": "a4c98f74e3a1",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/a4c98f74e3a1-ref.jpg",
-   "out": "img/a4c98f74e3a1-out.jpg"
-  },
-  {
-   "id": "28e622a357c9",
-   "prompt": "show the structure of PCSK9",
-   "ref": "img/28e622a357c9-ref.jpg",
-   "out": "img/28e622a357c9-out.jpg"
-  },
-  {
-   "id": "9ce95ed04197",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/9ce95ed04197-ref.jpg",
-   "out": "img/9ce95ed04197-out.jpg"
-  },
-  {
-   "id": "adf9690bd03c",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/adf9690bd03c-ref.jpg",
-   "out": "img/adf9690bd03c-out.jpg"
-  },
-  {
-   "id": "9b3021a82e89",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/9b3021a82e89-ref.jpg",
-   "out": "img/9b3021a82e89-out.jpg"
-  },
-  {
-   "id": "e0d195b62ca8",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/e0d195b62ca8-ref.jpg",
-   "out": "img/e0d195b62ca8-out.jpg"
-  },
-  {
-   "id": "c037aa89dd18",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/c037aa89dd18-ref.jpg",
-   "out": "img/c037aa89dd18-out.jpg"
-  },
-  {
-   "id": "407a76b857ba",
-   "prompt": "show the structure of PCSK9",
-   "ref": "img/407a76b857ba-ref.jpg",
-   "out": "img/407a76b857ba-out.jpg"
-  },
-  {
-   "id": "2cab903f4ed7",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/2cab903f4ed7-ref.jpg",
-   "out": "img/2cab903f4ed7-out.jpg"
-  },
-  {
-   "id": "ada098377aaa",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/ada098377aaa-ref.jpg",
-   "out": "img/ada098377aaa-out.jpg"
-  },
-  {
-   "id": "057f3ef1d94f",
-   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/057f3ef1d94f-ref.jpg",
-   "out": "img/057f3ef1d94f-out.jpg"
-  },
-  {
-   "id": "94e47ebbe487",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/94e47ebbe487-ref.jpg",
-   "out": "img/94e47ebbe487-out.jpg"
-  },
-  {
-   "id": "3769216198ce",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/3769216198ce-ref.jpg",
-   "out": "img/3769216198ce-out.jpg"
-  },
-  {
-   "id": "fdea0ec5a9d2",
+   "id": "1d74f1ee0263",
    "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
-   "ref": "img/fdea0ec5a9d2-ref.jpg",
-   "out": "img/fdea0ec5a9d2-out.jpg"
+   "ref": "img/1d74f1ee0263-ref.jpg",
+   "out": "img/1d74f1ee0263-out.jpg"
   },
   {
-   "id": "6bfd79d947e6",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/6bfd79d947e6-ref.jpg",
-   "out": "img/6bfd79d947e6-out.jpg"
-  },
-  {
-   "id": "acb4da910412",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/acb4da910412-ref.jpg",
-   "out": "img/acb4da910412-out.jpg"
-  },
-  {
-   "id": "7cd779204a99",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
-   "ref": "img/7cd779204a99-ref.jpg",
-   "out": "img/7cd779204a99-out.jpg"
-  },
-  {
-   "id": "4f8ce0c6e897",
-   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/4f8ce0c6e897-ref.jpg",
-   "out": "img/4f8ce0c6e897-out.jpg"
-  },
-  {
-   "id": "2a699321f16f",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/2a699321f16f-ref.jpg",
-   "out": "img/2a699321f16f-out.jpg"
-  },
-  {
-   "id": "ef76124e0e51",
-   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
-   "ref": "img/ef76124e0e51-ref.jpg",
-   "out": "img/ef76124e0e51-out.jpg"
-  },
-  {
-   "id": "3aed38efaf80",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/3aed38efaf80-ref.jpg",
-   "out": "img/3aed38efaf80-out.jpg"
-  },
-  {
-   "id": "95e9f0fff7e0",
-   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
-   "ref": "img/95e9f0fff7e0-ref.jpg",
-   "out": "img/95e9f0fff7e0-out.jpg"
-  },
-  {
-   "id": "c920ba118993",
-   "prompt": "Load 1LYZ; render the protein as a khaki molecular surface.",
-   "ref": "img/c920ba118993-ref.jpg",
-   "out": "img/c920ba118993-out.jpg"
-  },
-  {
-   "id": "241287d941da",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/241287d941da-ref.jpg",
-   "out": "img/241287d941da-out.jpg"
-  },
-  {
-   "id": "407abb08c720",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/407abb08c720-ref.jpg",
-   "out": "img/407abb08c720-out.jpg"
-  },
-  {
-   "id": "56a4cd9bdd09",
-   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
-   "ref": "img/56a4cd9bdd09-ref.jpg",
-   "out": "img/56a4cd9bdd09-out.jpg"
-  },
-  {
-   "id": "a068be07b19e",
-   "prompt": "show me the CFTR channel",
-   "ref": "img/a068be07b19e-ref.jpg",
-   "out": "img/a068be07b19e-out.jpg"
-  },
-  {
-   "id": "2469ae503ec3",
-   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
-   "ref": "img/2469ae503ec3-ref.jpg",
-   "out": "img/2469ae503ec3-out.jpg"
-  },
-  {
-   "id": "15579b684558",
-   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
-   "ref": "img/15579b684558-ref.jpg",
-   "out": "img/15579b684558-out.jpg"
-  },
-  {
-   "id": "c366562074a3",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/c366562074a3-ref.jpg",
-   "out": "img/c366562074a3-out.jpg"
-  },
-  {
-   "id": "dec11999ff44",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/dec11999ff44-ref.jpg",
-   "out": "img/dec11999ff44-out.jpg"
-  },
-  {
-   "id": "789c77cfc7bb",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/789c77cfc7bb-ref.jpg",
-   "out": "img/789c77cfc7bb-out.jpg"
-  },
-  {
-   "id": "1123a1d603f7",
-   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
-   "ref": "img/1123a1d603f7-ref.jpg",
-   "out": "img/1123a1d603f7-out.jpg"
-  },
-  {
-   "id": "86c52a251c65",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/86c52a251c65-ref.jpg",
-   "out": "img/86c52a251c65-out.jpg"
-  },
-  {
-   "id": "17029974d97a",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/17029974d97a-ref.jpg",
-   "out": "img/17029974d97a-out.jpg"
-  },
-  {
-   "id": "9e9961c30706",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/9e9961c30706-ref.jpg",
-   "out": "img/9e9961c30706-out.jpg"
-  },
-  {
-   "id": "55050d45e8a3",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/55050d45e8a3-ref.jpg",
-   "out": "img/55050d45e8a3-out.jpg"
-  },
-  {
-   "id": "2bc711fb1a16",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/2bc711fb1a16-ref.jpg",
-   "out": "img/2bc711fb1a16-out.jpg"
-  },
-  {
-   "id": "bf7e977c5d98",
-   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
-   "ref": "img/bf7e977c5d98-ref.jpg",
-   "out": "img/bf7e977c5d98-out.jpg"
-  },
-  {
-   "id": "18eb48e75cf4",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/18eb48e75cf4-ref.jpg",
-   "out": "img/18eb48e75cf4-out.jpg"
-  },
-  {
-   "id": "89f8605fed13",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/89f8605fed13-ref.jpg",
-   "out": "img/89f8605fed13-out.jpg"
-  },
-  {
-   "id": "4e9cd6a9280e",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/4e9cd6a9280e-ref.jpg",
-   "out": "img/4e9cd6a9280e-out.jpg"
-  },
-  {
-   "id": "849efdaf2624",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/849efdaf2624-ref.jpg",
-   "out": "img/849efdaf2624-out.jpg"
-  },
-  {
-   "id": "aa2feaf60a0c",
-   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/aa2feaf60a0c-ref.jpg",
-   "out": "img/aa2feaf60a0c-out.jpg"
-  },
-  {
-   "id": "7abe4e4e444e",
-   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/7abe4e4e444e-ref.jpg",
-   "out": "img/7abe4e4e444e-out.jpg"
-  },
-  {
-   "id": "b2d5b11786e4",
-   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
-   "ref": "img/b2d5b11786e4-ref.jpg",
-   "out": "img/b2d5b11786e4-out.jpg"
-  },
-  {
-   "id": "798a928506d8",
-   "prompt": "show me the CFTR channel",
-   "ref": "img/798a928506d8-ref.jpg",
-   "out": "img/798a928506d8-out.jpg"
-  },
-  {
-   "id": "e305786c6e1d",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/e305786c6e1d-ref.jpg",
-   "out": "img/e305786c6e1d-out.jpg"
-  },
-  {
-   "id": "dcd12eba670f",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/dcd12eba670f-ref.jpg",
-   "out": "img/dcd12eba670f-out.jpg"
-  },
-  {
-   "id": "d190fbc74f45",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/d190fbc74f45-ref.jpg",
-   "out": "img/d190fbc74f45-out.jpg"
-  },
-  {
-   "id": "0b5a9fbd41c9",
-   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
-   "ref": "img/0b5a9fbd41c9-ref.jpg",
-   "out": "img/0b5a9fbd41c9-out.jpg"
-  },
-  {
-   "id": "dcc12cc2c07a",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/dcc12cc2c07a-ref.jpg",
-   "out": "img/dcc12cc2c07a-out.jpg"
-  },
-  {
-   "id": "f2bac776c068",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/f2bac776c068-ref.jpg",
-   "out": "img/f2bac776c068-out.jpg"
-  },
-  {
-   "id": "c71f334f7a0b",
-   "prompt": "show me the CFTR channel",
-   "ref": "img/c71f334f7a0b-ref.jpg",
-   "out": "img/c71f334f7a0b-out.jpg"
-  },
-  {
-   "id": "ce0f016177a1",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/ce0f016177a1-ref.jpg",
-   "out": "img/ce0f016177a1-out.jpg"
-  },
-  {
-   "id": "8e0fac82e49a",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/8e0fac82e49a-ref.jpg",
-   "out": "img/8e0fac82e49a-out.jpg"
-  },
-  {
-   "id": "309d3703dda3",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/309d3703dda3-ref.jpg",
-   "out": "img/309d3703dda3-out.jpg"
-  },
-  {
-   "id": "d33c79fd5d24",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/d33c79fd5d24-ref.jpg",
-   "out": "img/d33c79fd5d24-out.jpg"
-  },
-  {
-   "id": "f5abf982240b",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/f5abf982240b-ref.jpg",
-   "out": "img/f5abf982240b-out.jpg"
-  },
-  {
-   "id": "0c8e349302cd",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/0c8e349302cd-ref.jpg",
-   "out": "img/0c8e349302cd-out.jpg"
-  },
-  {
-   "id": "5216da5ecc40",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/5216da5ecc40-ref.jpg",
-   "out": "img/5216da5ecc40-out.jpg"
-  },
-  {
-   "id": "b287afaf0502",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/b287afaf0502-ref.jpg",
-   "out": "img/b287afaf0502-out.jpg"
-  },
-  {
-   "id": "c869a7982585",
-   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
-   "ref": "img/c869a7982585-ref.jpg",
-   "out": "img/c869a7982585-out.jpg"
-  },
-  {
-   "id": "41a59b124cf9",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/41a59b124cf9-ref.jpg",
-   "out": "img/41a59b124cf9-out.jpg"
-  },
-  {
-   "id": "1c1862cfb967",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
-   "ref": "img/1c1862cfb967-ref.jpg",
-   "out": "img/1c1862cfb967-out.jpg"
-  },
-  {
-   "id": "922983410aad",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/922983410aad-ref.jpg",
-   "out": "img/922983410aad-out.jpg"
-  },
-  {
-   "id": "954a86a39d6a",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/954a86a39d6a-ref.jpg",
-   "out": "img/954a86a39d6a-out.jpg"
-  },
-  {
-   "id": "f793ab3b5f0b",
-   "prompt": "Load 4INS; render the protein as a salmon molecular surface.",
-   "ref": "img/f793ab3b5f0b-ref.jpg",
-   "out": "img/f793ab3b5f0b-out.jpg"
-  },
-  {
-   "id": "9957b232dba3",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/9957b232dba3-ref.jpg",
-   "out": "img/9957b232dba3-out.jpg"
-  },
-  {
-   "id": "7a60092d2c54",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/7a60092d2c54-ref.jpg",
-   "out": "img/7a60092d2c54-out.jpg"
-  },
-  {
-   "id": "2c687ec9d00d",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/2c687ec9d00d-ref.jpg",
-   "out": "img/2c687ec9d00d-out.jpg"
-  },
-  {
-   "id": "6069939d179c",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/6069939d179c-ref.jpg",
-   "out": "img/6069939d179c-out.jpg"
-  },
-  {
-   "id": "00239d9b02f6",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/00239d9b02f6-ref.jpg",
-   "out": "img/00239d9b02f6-out.jpg"
-  },
-  {
-   "id": "8ecb63809cb0",
-   "prompt": "show me the CFTR channel",
-   "ref": "img/8ecb63809cb0-ref.jpg",
-   "out": "img/8ecb63809cb0-out.jpg"
-  },
-  {
-   "id": "734155bba3c3",
-   "prompt": "show the structure of PCSK9",
-   "ref": "img/734155bba3c3-ref.jpg",
-   "out": "img/734155bba3c3-out.jpg"
-  },
-  {
-   "id": "e9360574c766",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/e9360574c766-ref.jpg",
-   "out": "img/e9360574c766-out.jpg"
-  },
-  {
-   "id": "0861f6920665",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/0861f6920665-ref.jpg",
-   "out": "img/0861f6920665-out.jpg"
-  },
-  {
-   "id": "955f9c59f578",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/955f9c59f578-ref.jpg",
-   "out": "img/955f9c59f578-out.jpg"
-  },
-  {
-   "id": "987951bec6d5",
-   "prompt": "Load 2HHB; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/987951bec6d5-ref.jpg",
-   "out": "img/987951bec6d5-out.jpg"
-  },
-  {
-   "id": "b0c5d342cfa7",
-   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
-   "ref": "img/b0c5d342cfa7-ref.jpg",
-   "out": "img/b0c5d342cfa7-out.jpg"
-  },
-  {
-   "id": "e6142dc8824d",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
-   "ref": "img/e6142dc8824d-ref.jpg",
-   "out": "img/e6142dc8824d-out.jpg"
-  },
-  {
-   "id": "e4ebd1e96e78",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/e4ebd1e96e78-ref.jpg",
-   "out": "img/e4ebd1e96e78-out.jpg"
-  },
-  {
-   "id": "9814806506d0",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/9814806506d0-ref.jpg",
-   "out": "img/9814806506d0-out.jpg"
-  },
-  {
-   "id": "a69c69006f85",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/a69c69006f85-ref.jpg",
-   "out": "img/a69c69006f85-out.jpg"
-  },
-  {
-   "id": "eb1bc470b42f",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/eb1bc470b42f-ref.jpg",
-   "out": "img/eb1bc470b42f-out.jpg"
-  },
-  {
-   "id": "f46e9839299a",
-   "prompt": "Load 2HHB; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/f46e9839299a-ref.jpg",
-   "out": "img/f46e9839299a-out.jpg"
-  },
-  {
-   "id": "ccc49dcda540",
-   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
-   "ref": "img/ccc49dcda540-ref.jpg",
-   "out": "img/ccc49dcda540-out.jpg"
-  },
-  {
-   "id": "6fe542594460",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/6fe542594460-ref.jpg",
-   "out": "img/6fe542594460-out.jpg"
-  },
-  {
-   "id": "56e81a854073",
-   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/56e81a854073-ref.jpg",
-   "out": "img/56e81a854073-out.jpg"
-  },
-  {
-   "id": "60af1eae4d80",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/60af1eae4d80-ref.jpg",
-   "out": "img/60af1eae4d80-out.jpg"
-  },
-  {
-   "id": "44cca03474f1",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/44cca03474f1-ref.jpg",
-   "out": "img/44cca03474f1-out.jpg"
-  },
-  {
-   "id": "90a24c73c05b",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/90a24c73c05b-ref.jpg",
-   "out": "img/90a24c73c05b-out.jpg"
-  },
-  {
-   "id": "816bb6ffb50a",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/816bb6ffb50a-ref.jpg",
-   "out": "img/816bb6ffb50a-out.jpg"
-  },
-  {
-   "id": "4ab4f3258462",
-   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
-   "ref": "img/4ab4f3258462-ref.jpg",
-   "out": "img/4ab4f3258462-out.jpg"
-  },
-  {
-   "id": "57cbe684a66b",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/57cbe684a66b-ref.jpg",
-   "out": "img/57cbe684a66b-out.jpg"
-  },
-  {
-   "id": "7011518dde3e",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/7011518dde3e-ref.jpg",
-   "out": "img/7011518dde3e-out.jpg"
-  },
-  {
-   "id": "39d40cc0e684",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/39d40cc0e684-ref.jpg",
-   "out": "img/39d40cc0e684-out.jpg"
-  },
-  {
-   "id": "0beb6c61989b",
-   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/0beb6c61989b-ref.jpg",
-   "out": "img/0beb6c61989b-out.jpg"
-  },
-  {
-   "id": "df0dca8f34f0",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/df0dca8f34f0-ref.jpg",
-   "out": "img/df0dca8f34f0-out.jpg"
-  },
-  {
-   "id": "16b5b45378dd",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/16b5b45378dd-ref.jpg",
-   "out": "img/16b5b45378dd-out.jpg"
-  },
-  {
-   "id": "71d6b0bd3433",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/71d6b0bd3433-ref.jpg",
-   "out": "img/71d6b0bd3433-out.jpg"
-  },
-  {
-   "id": "3e5f02fd950f",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/3e5f02fd950f-ref.jpg",
-   "out": "img/3e5f02fd950f-out.jpg"
-  },
-  {
-   "id": "b26ff27c4697",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/b26ff27c4697-ref.jpg",
-   "out": "img/b26ff27c4697-out.jpg"
-  },
-  {
-   "id": "7d2e1f2a72e7",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/7d2e1f2a72e7-ref.jpg",
-   "out": "img/7d2e1f2a72e7-out.jpg"
-  },
-  {
-   "id": "c5c6dd3dc042",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/c5c6dd3dc042-ref.jpg",
-   "out": "img/c5c6dd3dc042-out.jpg"
-  },
-  {
-   "id": "a4332ed28e89",
-   "prompt": "Load 2HHB; protein as grey cartoon, and show the ions as purple spheres.",
-   "ref": "img/a4332ed28e89-ref.jpg",
-   "out": "img/a4332ed28e89-out.jpg"
-  },
-  {
-   "id": "a57fb192e80e",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/a57fb192e80e-ref.jpg",
-   "out": "img/a57fb192e80e-out.jpg"
-  },
-  {
-   "id": "26eab33b6339",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/26eab33b6339-ref.jpg",
-   "out": "img/26eab33b6339-out.jpg"
-  },
-  {
-   "id": "490d8a71dc5f",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/490d8a71dc5f-ref.jpg",
-   "out": "img/490d8a71dc5f-out.jpg"
-  },
-  {
-   "id": "f2d9e808d6b9",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/f2d9e808d6b9-ref.jpg",
-   "out": "img/f2d9e808d6b9-out.jpg"
-  },
-  {
-   "id": "9ac38217d4c8",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/9ac38217d4c8-ref.jpg",
-   "out": "img/9ac38217d4c8-out.jpg"
-  },
-  {
-   "id": "8feda82e6040",
-   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
-   "ref": "img/8feda82e6040-ref.jpg",
-   "out": "img/8feda82e6040-out.jpg"
-  },
-  {
-   "id": "447a5daa8471",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/447a5daa8471-ref.jpg",
-   "out": "img/447a5daa8471-out.jpg"
-  },
-  {
-   "id": "6f335fc9c492",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/6f335fc9c492-ref.jpg",
-   "out": "img/6f335fc9c492-out.jpg"
-  },
-  {
-   "id": "39199446962a",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/39199446962a-ref.jpg",
-   "out": "img/39199446962a-out.jpg"
-  },
-  {
-   "id": "89454573c148",
-   "prompt": "show the structure of PCSK9",
-   "ref": "img/89454573c148-ref.jpg",
-   "out": "img/89454573c148-out.jpg"
-  },
-  {
-   "id": "dc6418c1ae25",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/dc6418c1ae25-ref.jpg",
-   "out": "img/dc6418c1ae25-out.jpg"
-  },
-  {
-   "id": "1ae29741681e",
-   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
-   "ref": "img/1ae29741681e-ref.jpg",
-   "out": "img/1ae29741681e-out.jpg"
-  },
-  {
-   "id": "d2096f90da8f",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/d2096f90da8f-ref.jpg",
-   "out": "img/d2096f90da8f-out.jpg"
-  },
-  {
-   "id": "874c07e71b01",
-   "prompt": "show the structure of PCSK9",
-   "ref": "img/874c07e71b01-ref.jpg",
-   "out": "img/874c07e71b01-out.jpg"
-  },
-  {
-   "id": "e8a9852011b0",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/e8a9852011b0-ref.jpg",
-   "out": "img/e8a9852011b0-out.jpg"
-  },
-  {
-   "id": "4baefebe89f8",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/4baefebe89f8-ref.jpg",
-   "out": "img/4baefebe89f8-out.jpg"
-  },
-  {
-   "id": "818eef9f9748",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/818eef9f9748-ref.jpg",
-   "out": "img/818eef9f9748-out.jpg"
-  },
-  {
-   "id": "243b76495762",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/243b76495762-ref.jpg",
-   "out": "img/243b76495762-out.jpg"
-  },
-  {
-   "id": "93f78894aaa1",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/93f78894aaa1-ref.jpg",
-   "out": "img/93f78894aaa1-out.jpg"
-  },
-  {
-   "id": "ba6903428646",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/ba6903428646-ref.jpg",
-   "out": "img/ba6903428646-out.jpg"
-  },
-  {
-   "id": "c430c8d567ee",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/c430c8d567ee-ref.jpg",
-   "out": "img/c430c8d567ee-out.jpg"
-  },
-  {
-   "id": "88d0d306c836",
-   "prompt": "Load HIV-1 protease (1HVR); protein as grey cartoon, the bound inhibitor as magenta ball-and-stick, and focus the camera on the inhibitor.",
-   "ref": "img/88d0d306c836-ref.jpg",
-   "out": "img/88d0d306c836-out.jpg"
-  },
-  {
-   "id": "99efdb97171b",
-   "prompt": "Load 2HHB; protein as grey cartoon, and show the ions as purple spheres.",
-   "ref": "img/99efdb97171b-ref.jpg",
-   "out": "img/99efdb97171b-out.jpg"
-  },
-  {
-   "id": "033e2d5c6a7b",
-   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
-   "ref": "img/033e2d5c6a7b-ref.jpg",
-   "out": "img/033e2d5c6a7b-out.jpg"
-  },
-  {
-   "id": "f5c6a9354791",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/f5c6a9354791-ref.jpg",
-   "out": "img/f5c6a9354791-out.jpg"
-  },
-  {
-   "id": "c77a9f5b0693",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/c77a9f5b0693-ref.jpg",
-   "out": "img/c77a9f5b0693-out.jpg"
-  },
-  {
-   "id": "4824a13df042",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/4824a13df042-ref.jpg",
-   "out": "img/4824a13df042-out.jpg"
-  },
-  {
-   "id": "315896b47f08",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/315896b47f08-ref.jpg",
-   "out": "img/315896b47f08-out.jpg"
-  },
-  {
-   "id": "b6ebb03c7f4c",
-   "prompt": "show the structure of PCSK9",
-   "ref": "img/b6ebb03c7f4c-ref.jpg",
-   "out": "img/b6ebb03c7f4c-out.jpg"
-  },
-  {
-   "id": "de7ebae7cede",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/de7ebae7cede-ref.jpg",
-   "out": "img/de7ebae7cede-out.jpg"
-  },
-  {
-   "id": "155958c1badf",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/155958c1badf-ref.jpg",
-   "out": "img/155958c1badf-out.jpg"
-  },
-  {
-   "id": "80697e78b6f4",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
-   "ref": "img/80697e78b6f4-ref.jpg",
-   "out": "img/80697e78b6f4-out.jpg"
-  },
-  {
-   "id": "f77fd8125053",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/f77fd8125053-ref.jpg",
-   "out": "img/f77fd8125053-out.jpg"
-  },
-  {
-   "id": "52f13eb0c650",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/52f13eb0c650-ref.jpg",
-   "out": "img/52f13eb0c650-out.jpg"
-  },
-  {
-   "id": "5172e92dbff3",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/5172e92dbff3-ref.jpg",
-   "out": "img/5172e92dbff3-out.jpg"
-  },
-  {
-   "id": "00cf20fefdbe",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/00cf20fefdbe-ref.jpg",
-   "out": "img/00cf20fefdbe-out.jpg"
-  },
-  {
-   "id": "7ff6324ddf14",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/7ff6324ddf14-ref.jpg",
-   "out": "img/7ff6324ddf14-out.jpg"
-  },
-  {
-   "id": "75e5f398da2e",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/75e5f398da2e-ref.jpg",
-   "out": "img/75e5f398da2e-out.jpg"
-  },
-  {
-   "id": "4018166bde8a",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/4018166bde8a-ref.jpg",
-   "out": "img/4018166bde8a-out.jpg"
-  },
-  {
-   "id": "c693306cfb84",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/c693306cfb84-ref.jpg",
-   "out": "img/c693306cfb84-out.jpg"
-  },
-  {
-   "id": "4260a78d9848",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/4260a78d9848-ref.jpg",
-   "out": "img/4260a78d9848-out.jpg"
-  },
-  {
-   "id": "340af9ec5211",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/340af9ec5211-ref.jpg",
-   "out": "img/340af9ec5211-out.jpg"
-  },
-  {
-   "id": "f5bfee36bdc5",
-   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
-   "ref": "img/f5bfee36bdc5-ref.jpg",
-   "out": "img/f5bfee36bdc5-out.jpg"
-  },
-  {
-   "id": "946341491236",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/946341491236-ref.jpg",
-   "out": "img/946341491236-out.jpg"
-  },
-  {
-   "id": "739cb2cf7ce8",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
-   "ref": "img/739cb2cf7ce8-ref.jpg",
-   "out": "img/739cb2cf7ce8-out.jpg"
-  },
-  {
-   "id": "385ade94050b",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/385ade94050b-ref.jpg",
-   "out": "img/385ade94050b-out.jpg"
-  },
-  {
-   "id": "0d239efcf944",
-   "prompt": "Load HIV-1 protease (1HVR); protein as grey cartoon, the bound inhibitor as magenta ball-and-stick, and focus the camera on the inhibitor.",
-   "ref": "img/0d239efcf944-ref.jpg",
-   "out": "img/0d239efcf944-out.jpg"
-  },
-  {
-   "id": "adbf6838d733",
-   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
-   "ref": "img/adbf6838d733-ref.jpg",
-   "out": "img/adbf6838d733-out.jpg"
-  },
-  {
-   "id": "2812741e39dc",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/2812741e39dc-ref.jpg",
-   "out": "img/2812741e39dc-out.jpg"
-  },
-  {
-   "id": "84f813d0dfe5",
-   "prompt": "Load 3PTB; protein as grey cartoon, and show residues 50-110 of chain A as orange ball-and-stick.",
-   "ref": "img/84f813d0dfe5-ref.jpg",
-   "out": "img/84f813d0dfe5-out.jpg"
-  },
-  {
-   "id": "20abc0f16f58",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/20abc0f16f58-ref.jpg",
-   "out": "img/20abc0f16f58-out.jpg"
-  },
-  {
-   "id": "d6d5de5175b4",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
-   "ref": "img/d6d5de5175b4-ref.jpg",
-   "out": "img/d6d5de5175b4-out.jpg"
-  },
-  {
-   "id": "495c0ca224e2",
-   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
-   "ref": "img/495c0ca224e2-ref.jpg",
-   "out": "img/495c0ca224e2-out.jpg"
-  },
-  {
-   "id": "a660f8435a70",
-   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/a660f8435a70-ref.jpg",
-   "out": "img/a660f8435a70-out.jpg"
-  },
-  {
-   "id": "9fbc846c5393",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/9fbc846c5393-ref.jpg",
-   "out": "img/9fbc846c5393-out.jpg"
-  },
-  {
-   "id": "3529f0451ec6",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/3529f0451ec6-ref.jpg",
-   "out": "img/3529f0451ec6-out.jpg"
-  },
-  {
-   "id": "f1e6cf69adac",
-   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
-   "ref": "img/f1e6cf69adac-ref.jpg",
-   "out": "img/f1e6cf69adac-out.jpg"
-  },
-  {
-   "id": "89ec79ec4af6",
-   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/89ec79ec4af6-ref.jpg",
-   "out": "img/89ec79ec4af6-out.jpg"
-  },
-  {
-   "id": "902ee449ee0e",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
-   "ref": "img/902ee449ee0e-ref.jpg",
-   "out": "img/902ee449ee0e-out.jpg"
-  },
-  {
-   "id": "c486d49c6c0c",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/c486d49c6c0c-ref.jpg",
-   "out": "img/c486d49c6c0c-out.jpg"
-  },
-  {
-   "id": "01568f2f615f",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/01568f2f615f-ref.jpg",
-   "out": "img/01568f2f615f-out.jpg"
-  },
-  {
-   "id": "39d1e4dac0aa",
-   "prompt": "Load 1HHO; protein as grey cartoon, and show the ions as purple spheres.",
-   "ref": "img/39d1e4dac0aa-ref.jpg",
-   "out": "img/39d1e4dac0aa-out.jpg"
-  },
-  {
-   "id": "0ccb1ab05b89",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/0ccb1ab05b89-ref.jpg",
-   "out": "img/0ccb1ab05b89-out.jpg"
-  },
-  {
-   "id": "bfafcd715f91",
-   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
-   "ref": "img/bfafcd715f91-ref.jpg",
-   "out": "img/bfafcd715f91-out.jpg"
+   "id": "e2d14e816849",
+   "prompt": "Load trypsin (3PTB) and show the protein as a orange cartoon.",
+   "ref": "img/e2d14e816849-ref.jpg",
+   "out": "img/e2d14e816849-out.jpg"
   },
   {
    "id": "1e3df36f6211",
@@ -1509,16 +21,808 @@
    "out": "img/1e3df36f6211-out.jpg"
   },
   {
-   "id": "12eb8a0463e5",
+   "id": "4a9f811c39aa",
+   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
+   "ref": "img/4a9f811c39aa-ref.jpg",
+   "out": "img/4a9f811c39aa-out.jpg"
+  },
+  {
+   "id": "7d2e1f2a72e7",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
+   "ref": "img/7d2e1f2a72e7-ref.jpg",
+   "out": "img/7d2e1f2a72e7-out.jpg"
+  },
+  {
+   "id": "56e81a854073",
+   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/56e81a854073-ref.jpg",
+   "out": "img/56e81a854073-out.jpg"
+  },
+  {
+   "id": "80db3dbb63cb",
+   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/80db3dbb63cb-ref.jpg",
+   "out": "img/80db3dbb63cb-out.jpg"
+  },
+  {
+   "id": "c71f334f7a0b",
+   "prompt": "show me the CFTR channel",
+   "ref": "img/c71f334f7a0b-ref.jpg",
+   "out": "img/c71f334f7a0b-out.jpg"
+  },
+  {
+   "id": "347b64912653",
+   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
+   "ref": "img/347b64912653-ref.jpg",
+   "out": "img/347b64912653-out.jpg"
+  },
+  {
+   "id": "02c02d5b77b5",
+   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/02c02d5b77b5-ref.jpg",
+   "out": "img/02c02d5b77b5-out.jpg"
+  },
+  {
+   "id": "95e9f0fff7e0",
+   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
+   "ref": "img/95e9f0fff7e0-ref.jpg",
+   "out": "img/95e9f0fff7e0-out.jpg"
+  },
+  {
+   "id": "aa778682ff30",
+   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/aa778682ff30-ref.jpg",
+   "out": "img/aa778682ff30-out.jpg"
+  },
+  {
+   "id": "194580fb41d4",
+   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
+   "ref": "img/194580fb41d4-ref.jpg",
+   "out": "img/194580fb41d4-out.jpg"
+  },
+  {
+   "id": "4677a97f7f62",
+   "prompt": "Show me sperm whale myoglobin",
+   "ref": "img/4677a97f7f62-ref.jpg",
+   "out": "img/4677a97f7f62-out.jpg"
+  },
+  {
+   "id": "8448c68244af",
+   "prompt": "Load 1HHO; protein as grey cartoon, and show the ions as purple spheres.",
+   "ref": "img/8448c68244af-ref.jpg",
+   "out": "img/8448c68244af-out.jpg"
+  },
+  {
+   "id": "c39cfb886aa4",
+   "prompt": "Load 1LYZ; render the protein as a khaki molecular surface.",
+   "ref": "img/c39cfb886aa4-ref.jpg",
+   "out": "img/c39cfb886aa4-out.jpg"
+  },
+  {
+   "id": "26eab33b6339",
+   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/26eab33b6339-ref.jpg",
+   "out": "img/26eab33b6339-out.jpg"
+  },
+  {
+   "id": "0b5a9fbd41c9",
+   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
+   "ref": "img/0b5a9fbd41c9-ref.jpg",
+   "out": "img/0b5a9fbd41c9-out.jpg"
+  },
+  {
+   "id": "a6e301379dd1",
+   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/a6e301379dd1-ref.jpg",
+   "out": "img/a6e301379dd1-out.jpg"
+  },
+  {
+   "id": "4843ce40a377",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
+   "ref": "img/4843ce40a377-ref.jpg",
+   "out": "img/4843ce40a377-out.jpg"
+  },
+  {
+   "id": "d6d5de5175b4",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
+   "ref": "img/d6d5de5175b4-ref.jpg",
+   "out": "img/d6d5de5175b4-out.jpg"
+  },
+  {
+   "id": "289a8612ba67",
+   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
+   "ref": "img/289a8612ba67-ref.jpg",
+   "out": "img/289a8612ba67-out.jpg"
+  },
+  {
+   "id": "2d44cee70a25",
+   "prompt": "Load 1CBS; protein as grey cartoon, and show residues 20-60 of chain A as orange ball-and-stick.",
+   "ref": "img/2d44cee70a25-ref.jpg",
+   "out": "img/2d44cee70a25-out.jpg"
+  },
+  {
+   "id": "a8ee4819f0a8",
+   "prompt": "I wanna see a structure of PDE5A",
+   "ref": "img/a8ee4819f0a8-ref.jpg",
+   "out": "img/a8ee4819f0a8-out.jpg"
+  },
+  {
+   "id": "4018166bde8a",
+   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/4018166bde8a-ref.jpg",
+   "out": "img/4018166bde8a-out.jpg"
+  },
+  {
+   "id": "1985b35f24bf",
+   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
+   "ref": "img/1985b35f24bf-ref.jpg",
+   "out": "img/1985b35f24bf-out.jpg"
+  },
+  {
+   "id": "0fdac8783113",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/0fdac8783113-ref.jpg",
+   "out": "img/0fdac8783113-out.jpg"
+  },
+  {
+   "id": "7011518dde3e",
+   "prompt": "Show me hen egg white lysozyme",
+   "ref": "img/7011518dde3e-ref.jpg",
+   "out": "img/7011518dde3e-out.jpg"
+  },
+  {
+   "id": "3529f0451ec6",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
+   "ref": "img/3529f0451ec6-ref.jpg",
+   "out": "img/3529f0451ec6-out.jpg"
+  },
+  {
+   "id": "88d0d306c836",
+   "prompt": "Load HIV-1 protease (1HVR); protein as grey cartoon, the bound inhibitor as magenta ball-and-stick, and focus the camera on the inhibitor.",
+   "ref": "img/88d0d306c836-ref.jpg",
+   "out": "img/88d0d306c836-out.jpg"
+  },
+  {
+   "id": "6fe542594460",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
+   "ref": "img/6fe542594460-ref.jpg",
+   "out": "img/6fe542594460-out.jpg"
+  },
+  {
+   "id": "56a4cd9bdd09",
+   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
+   "ref": "img/56a4cd9bdd09-ref.jpg",
+   "out": "img/56a4cd9bdd09-out.jpg"
+  },
+  {
+   "id": "407a76b857ba",
+   "prompt": "show the structure of PCSK9",
+   "ref": "img/407a76b857ba-ref.jpg",
+   "out": "img/407a76b857ba-out.jpg"
+  },
+  {
+   "id": "7fdf60ed68c5",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
+   "ref": "img/7fdf60ed68c5-ref.jpg",
+   "out": "img/7fdf60ed68c5-out.jpg"
+  },
+  {
+   "id": "52f13eb0c650",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
+   "ref": "img/52f13eb0c650-ref.jpg",
+   "out": "img/52f13eb0c650-out.jpg"
+  },
+  {
+   "id": "7abe4e4e444e",
+   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/7abe4e4e444e-ref.jpg",
+   "out": "img/7abe4e4e444e-out.jpg"
+  },
+  {
+   "id": "e8d9553880a4",
+   "prompt": "Show me hen egg white lysozyme",
+   "ref": "img/e8d9553880a4-ref.jpg",
+   "out": "img/e8d9553880a4-out.jpg"
+  },
+  {
+   "id": "1c1862cfb967",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
+   "ref": "img/1c1862cfb967-ref.jpg",
+   "out": "img/1c1862cfb967-out.jpg"
+  },
+  {
+   "id": "4035a41d5085",
+   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
+   "ref": "img/4035a41d5085-ref.jpg",
+   "out": "img/4035a41d5085-out.jpg"
+  },
+  {
+   "id": "28e622a357c9",
+   "prompt": "show the structure of PCSK9",
+   "ref": "img/28e622a357c9-ref.jpg",
+   "out": "img/28e622a357c9-out.jpg"
+  },
+  {
+   "id": "1784fe70592b",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/1784fe70592b-ref.jpg",
+   "out": "img/1784fe70592b-out.jpg"
+  },
+  {
+   "id": "8bf195036c2f",
+   "prompt": "Load 1HHO; show the protein as a grey cartoon and the ligands as red ball-and-stick.",
+   "ref": "img/8bf195036c2f-ref.jpg",
+   "out": "img/8bf195036c2f-out.jpg"
+  },
+  {
+   "id": "057f3ef1d94f",
+   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/057f3ef1d94f-ref.jpg",
+   "out": "img/057f3ef1d94f-out.jpg"
+  },
+  {
+   "id": "315896b47f08",
+   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/315896b47f08-ref.jpg",
+   "out": "img/315896b47f08-out.jpg"
+  },
+  {
+   "id": "86c52a251c65",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
+   "ref": "img/86c52a251c65-ref.jpg",
+   "out": "img/86c52a251c65-out.jpg"
+  },
+  {
+   "id": "e305786c6e1d",
+   "prompt": "Show me hen egg white lysozyme",
+   "ref": "img/e305786c6e1d-ref.jpg",
+   "out": "img/e305786c6e1d-out.jpg"
+  },
+  {
+   "id": "a4332ed28e89",
+   "prompt": "Load 2HHB; protein as grey cartoon, and show the ions as purple spheres.",
+   "ref": "img/a4332ed28e89-ref.jpg",
+   "out": "img/a4332ed28e89-out.jpg"
+  },
+  {
+   "id": "922983410aad",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
+   "ref": "img/922983410aad-ref.jpg",
+   "out": "img/922983410aad-out.jpg"
+  },
+  {
+   "id": "8ecb63809cb0",
+   "prompt": "show me the CFTR channel",
+   "ref": "img/8ecb63809cb0-ref.jpg",
+   "out": "img/8ecb63809cb0-out.jpg"
+  },
+  {
+   "id": "d687f3d93fa5",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
+   "ref": "img/d687f3d93fa5-ref.jpg",
+   "out": "img/d687f3d93fa5-out.jpg"
+  },
+  {
+   "id": "2469ae503ec3",
+   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
+   "ref": "img/2469ae503ec3-ref.jpg",
+   "out": "img/2469ae503ec3-out.jpg"
+  },
+  {
+   "id": "39199446962a",
    "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/12eb8a0463e5-ref.jpg",
-   "out": "img/12eb8a0463e5-out.jpg"
+   "ref": "img/39199446962a-ref.jpg",
+   "out": "img/39199446962a-out.jpg"
+  },
+  {
+   "id": "bee6ee272d99",
+   "prompt": "Load 2HHB; show the protein as a grey cartoon and the ligands as teal ball-and-stick.",
+   "ref": "img/bee6ee272d99-ref.jpg",
+   "out": "img/bee6ee272d99-out.jpg"
+  },
+  {
+   "id": "9e9961c30706",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
+   "ref": "img/9e9961c30706-ref.jpg",
+   "out": "img/9e9961c30706-out.jpg"
+  },
+  {
+   "id": "5c90ea8300c8",
+   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
+   "ref": "img/5c90ea8300c8-ref.jpg",
+   "out": "img/5c90ea8300c8-out.jpg"
+  },
+  {
+   "id": "987951bec6d5",
+   "prompt": "Load 2HHB; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/987951bec6d5-ref.jpg",
+   "out": "img/987951bec6d5-out.jpg"
+  },
+  {
+   "id": "767ee24d7e1a",
+   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/767ee24d7e1a-ref.jpg",
+   "out": "img/767ee24d7e1a-out.jpg"
+  },
+  {
+   "id": "033e2d5c6a7b",
+   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
+   "ref": "img/033e2d5c6a7b-ref.jpg",
+   "out": "img/033e2d5c6a7b-out.jpg"
   },
   {
    "id": "2b6f70ce2460",
    "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
    "ref": "img/2b6f70ce2460-ref.jpg",
    "out": "img/2b6f70ce2460-out.jpg"
+  },
+  {
+   "id": "0d239efcf944",
+   "prompt": "Load HIV-1 protease (1HVR); protein as grey cartoon, the bound inhibitor as magenta ball-and-stick, and focus the camera on the inhibitor.",
+   "ref": "img/0d239efcf944-ref.jpg",
+   "out": "img/0d239efcf944-out.jpg"
+  },
+  {
+   "id": "6ff1a964fd78",
+   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
+   "ref": "img/6ff1a964fd78-ref.jpg",
+   "out": "img/6ff1a964fd78-out.jpg"
+  },
+  {
+   "id": "cfbd99b6f969",
+   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
+   "ref": "img/cfbd99b6f969-ref.jpg",
+   "out": "img/cfbd99b6f969-out.jpg"
+  },
+  {
+   "id": "2812741e39dc",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
+   "ref": "img/2812741e39dc-ref.jpg",
+   "out": "img/2812741e39dc-out.jpg"
+  },
+  {
+   "id": "0861f6920665",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
+   "ref": "img/0861f6920665-ref.jpg",
+   "out": "img/0861f6920665-out.jpg"
+  },
+  {
+   "id": "57cbe684a66b",
+   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
+   "ref": "img/57cbe684a66b-ref.jpg",
+   "out": "img/57cbe684a66b-out.jpg"
+  },
+  {
+   "id": "76478a20c8e4",
+   "prompt": "Load 2HHB; render the protein as a salmon molecular surface.",
+   "ref": "img/76478a20c8e4-ref.jpg",
+   "out": "img/76478a20c8e4-out.jpg"
+  },
+  {
+   "id": "6cc3e997a582",
+   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/6cc3e997a582-ref.jpg",
+   "out": "img/6cc3e997a582-out.jpg"
+  },
+  {
+   "id": "0f5f7cbca5ff",
+   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
+   "ref": "img/0f5f7cbca5ff-ref.jpg",
+   "out": "img/0f5f7cbca5ff-out.jpg"
+  },
+  {
+   "id": "52f50b3b43bc",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
+   "ref": "img/52f50b3b43bc-ref.jpg",
+   "out": "img/52f50b3b43bc-out.jpg"
+  },
+  {
+   "id": "0d882f6686db",
+   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
+   "ref": "img/0d882f6686db-ref.jpg",
+   "out": "img/0d882f6686db-out.jpg"
+  },
+  {
+   "id": "bdaa30f793dc",
+   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/bdaa30f793dc-ref.jpg",
+   "out": "img/bdaa30f793dc-out.jpg"
+  },
+  {
+   "id": "0013b4661799",
+   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
+   "ref": "img/0013b4661799-ref.jpg",
+   "out": "img/0013b4661799-out.jpg"
+  },
+  {
+   "id": "955f9c59f578",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
+   "ref": "img/955f9c59f578-ref.jpg",
+   "out": "img/955f9c59f578-out.jpg"
+  },
+  {
+   "id": "9ac38217d4c8",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S241Y as red ball-and-stick.",
+   "ref": "img/9ac38217d4c8-ref.jpg",
+   "out": "img/9ac38217d4c8-out.jpg"
+  },
+  {
+   "id": "8e0fac82e49a",
+   "prompt": "show green fluorescent protein from Aequorea victoria",
+   "ref": "img/8e0fac82e49a-ref.jpg",
+   "out": "img/8e0fac82e49a-out.jpg"
+  },
+  {
+   "id": "4ba0b218e5da",
+   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
+   "ref": "img/4ba0b218e5da-ref.jpg",
+   "out": "img/4ba0b218e5da-out.jpg"
+  },
+  {
+   "id": "4ab4f3258462",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/4ab4f3258462-ref.jpg",
+   "out": "img/4ab4f3258462-out.jpg"
+  },
+  {
+   "id": "3ac588d519c2",
+   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
+   "ref": "img/3ac588d519c2-ref.jpg",
+   "out": "img/3ac588d519c2-out.jpg"
+  },
+  {
+   "id": "2bc711fb1a16",
+   "prompt": "show green fluorescent protein from Aequorea victoria",
+   "ref": "img/2bc711fb1a16-ref.jpg",
+   "out": "img/2bc711fb1a16-out.jpg"
+  },
+  {
+   "id": "138d681e305e",
+   "prompt": "Load 1CBS; show the protein as a grey cartoon and the ligands as purple ball-and-stick.",
+   "ref": "img/138d681e305e-ref.jpg",
+   "out": "img/138d681e305e-out.jpg"
+  },
+  {
+   "id": "4a7f16bf4f23",
+   "prompt": "Load 2HHB; protein as grey cartoon, and show the ions as purple spheres.",
+   "ref": "img/4a7f16bf4f23-ref.jpg",
+   "out": "img/4a7f16bf4f23-out.jpg"
+  },
+  {
+   "id": "9957b232dba3",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
+   "ref": "img/9957b232dba3-ref.jpg",
+   "out": "img/9957b232dba3-out.jpg"
+  },
+  {
+   "id": "0beb6c61989b",
+   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/0beb6c61989b-ref.jpg",
+   "out": "img/0beb6c61989b-out.jpg"
+  },
+  {
+   "id": "f5bfee36bdc5",
+   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
+   "ref": "img/f5bfee36bdc5-ref.jpg",
+   "out": "img/f5bfee36bdc5-out.jpg"
+  },
+  {
+   "id": "39d1e4dac0aa",
+   "prompt": "Load 1HHO; protein as grey cartoon, and show the ions as purple spheres.",
+   "ref": "img/39d1e4dac0aa-ref.jpg",
+   "out": "img/39d1e4dac0aa-out.jpg"
+  },
+  {
+   "id": "30a634aa6113",
+   "prompt": "Show me sperm whale myoglobin",
+   "ref": "img/30a634aa6113-ref.jpg",
+   "out": "img/30a634aa6113-out.jpg"
+  },
+  {
+   "id": "f46e9839299a",
+   "prompt": "Load 2HHB; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/f46e9839299a-ref.jpg",
+   "out": "img/f46e9839299a-out.jpg"
+  },
+  {
+   "id": "dc45e0157b5f",
+   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
+   "ref": "img/dc45e0157b5f-ref.jpg",
+   "out": "img/dc45e0157b5f-out.jpg"
+  },
+  {
+   "id": "3aed38efaf80",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant N239T as red ball-and-stick.",
+   "ref": "img/3aed38efaf80-ref.jpg",
+   "out": "img/3aed38efaf80-out.jpg"
+  },
+  {
+   "id": "39d40cc0e684",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
+   "ref": "img/39d40cc0e684-ref.jpg",
+   "out": "img/39d40cc0e684-out.jpg"
+  },
+  {
+   "id": "b5c58d01b544",
+   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/b5c58d01b544-ref.jpg",
+   "out": "img/b5c58d01b544-out.jpg"
+  },
+  {
+   "id": "0d2835220019",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
+   "ref": "img/0d2835220019-ref.jpg",
+   "out": "img/0d2835220019-out.jpg"
+  },
+  {
+   "id": "66a9282e0ad2",
+   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
+   "ref": "img/66a9282e0ad2-ref.jpg",
+   "out": "img/66a9282e0ad2-out.jpg"
+  },
+  {
+   "id": "da2221cc29b5",
+   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
+   "ref": "img/da2221cc29b5-ref.jpg",
+   "out": "img/da2221cc29b5-out.jpg"
+  },
+  {
+   "id": "b0c5d342cfa7",
+   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
+   "ref": "img/b0c5d342cfa7-ref.jpg",
+   "out": "img/b0c5d342cfa7-out.jpg"
+  },
+  {
+   "id": "4260a78d9848",
+   "prompt": "Show me sperm whale myoglobin",
+   "ref": "img/4260a78d9848-ref.jpg",
+   "out": "img/4260a78d9848-out.jpg"
+  },
+  {
+   "id": "17029974d97a",
+   "prompt": "I wanna see a structure of PDE5A",
+   "ref": "img/17029974d97a-ref.jpg",
+   "out": "img/17029974d97a-out.jpg"
+  },
+  {
+   "id": "73578539817a",
+   "prompt": "I wanna see a structure of PDE5A",
+   "ref": "img/73578539817a-ref.jpg",
+   "out": "img/73578539817a-out.jpg"
+  },
+  {
+   "id": "67a08ed82262",
+   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
+   "ref": "img/67a08ed82262-ref.jpg",
+   "out": "img/67a08ed82262-out.jpg"
+  },
+  {
+   "id": "385ade94050b",
+   "prompt": "Show me hen egg white lysozyme",
+   "ref": "img/385ade94050b-ref.jpg",
+   "out": "img/385ade94050b-out.jpg"
+  },
+  {
+   "id": "5b7a4e3e1dc1",
+   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
+   "ref": "img/5b7a4e3e1dc1-ref.jpg",
+   "out": "img/5b7a4e3e1dc1-out.jpg"
+  },
+  {
+   "id": "4f8ce0c6e897",
+   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/4f8ce0c6e897-ref.jpg",
+   "out": "img/4f8ce0c6e897-out.jpg"
+  },
+  {
+   "id": "4824a13df042",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
+   "ref": "img/4824a13df042-ref.jpg",
+   "out": "img/4824a13df042-out.jpg"
+  },
+  {
+   "id": "da4e58a43c0a",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
+   "ref": "img/da4e58a43c0a-ref.jpg",
+   "out": "img/da4e58a43c0a-out.jpg"
+  },
+  {
+   "id": "aa2feaf60a0c",
+   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/aa2feaf60a0c-ref.jpg",
+   "out": "img/aa2feaf60a0c-out.jpg"
+  },
+  {
+   "id": "d5a959f2faed",
+   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/d5a959f2faed-ref.jpg",
+   "out": "img/d5a959f2faed-out.jpg"
+  },
+  {
+   "id": "18eee0808289",
+   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
+   "ref": "img/18eee0808289-ref.jpg",
+   "out": "img/18eee0808289-out.jpg"
+  },
+  {
+   "id": "98c2b341231b",
+   "prompt": "Load 1HHO; render the protein as a steelblue molecular surface.",
+   "ref": "img/98c2b341231b-ref.jpg",
+   "out": "img/98c2b341231b-out.jpg"
+  },
+  {
+   "id": "465febe7a7db",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/465febe7a7db-ref.jpg",
+   "out": "img/465febe7a7db-out.jpg"
+  },
+  {
+   "id": "95024538b3b9",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 143 and show it as blue ball-and-stick.",
+   "ref": "img/95024538b3b9-ref.jpg",
+   "out": "img/95024538b3b9-out.jpg"
+  },
+  {
+   "id": "15805e69986f",
+   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
+   "ref": "img/15805e69986f-ref.jpg",
+   "out": "img/15805e69986f-out.jpg"
+  },
+  {
+   "id": "5cd5af7796f8",
+   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
+   "ref": "img/5cd5af7796f8-ref.jpg",
+   "out": "img/5cd5af7796f8-out.jpg"
+  },
+  {
+   "id": "00f5ca8438e3",
+   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
+   "ref": "img/00f5ca8438e3-ref.jpg",
+   "out": "img/00f5ca8438e3-out.jpg"
+  },
+  {
+   "id": "186fc67aebd2",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
+   "ref": "img/186fc67aebd2-ref.jpg",
+   "out": "img/186fc67aebd2-out.jpg"
+  },
+  {
+   "id": "15579b684558",
+   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
+   "ref": "img/15579b684558-ref.jpg",
+   "out": "img/15579b684558-out.jpg"
+  },
+  {
+   "id": "b287afaf0502",
+   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/b287afaf0502-ref.jpg",
+   "out": "img/b287afaf0502-out.jpg"
+  },
+  {
+   "id": "01568f2f615f",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
+   "ref": "img/01568f2f615f-ref.jpg",
+   "out": "img/01568f2f615f-out.jpg"
+  },
+  {
+   "id": "c5c6dd3dc042",
+   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
+   "ref": "img/c5c6dd3dc042-ref.jpg",
+   "out": "img/c5c6dd3dc042-out.jpg"
+  },
+  {
+   "id": "c920ba118993",
+   "prompt": "Load 1LYZ; render the protein as a khaki molecular surface.",
+   "ref": "img/c920ba118993-ref.jpg",
+   "out": "img/c920ba118993-out.jpg"
+  },
+  {
+   "id": "292c8089956d",
+   "prompt": "Load 4INS; protein as grey cartoon, and show the ions as purple spheres.",
+   "ref": "img/292c8089956d-ref.jpg",
+   "out": "img/292c8089956d-out.jpg"
+  },
+  {
+   "id": "17a40520cbaa",
+   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
+   "ref": "img/17a40520cbaa-ref.jpg",
+   "out": "img/17a40520cbaa-out.jpg"
+  },
+  {
+   "id": "b915748ebb7c",
+   "prompt": "Load 1CBS; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/b915748ebb7c-ref.jpg",
+   "out": "img/b915748ebb7c-out.jpg"
+  },
+  {
+   "id": "bf7e977c5d98",
+   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
+   "ref": "img/bf7e977c5d98-ref.jpg",
+   "out": "img/bf7e977c5d98-out.jpg"
+  },
+  {
+   "id": "798a928506d8",
+   "prompt": "show me the CFTR channel",
+   "ref": "img/798a928506d8-ref.jpg",
+   "out": "img/798a928506d8-out.jpg"
+  },
+  {
+   "id": "45089404aae2",
+   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
+   "ref": "img/45089404aae2-ref.jpg",
+   "out": "img/45089404aae2-out.jpg"
+  },
+  {
+   "id": "0c0333949131",
+   "prompt": "Load 1HHO; protein as grey cartoon, and show residues 30-90 of chain A as orange ball-and-stick.",
+   "ref": "img/0c0333949131-ref.jpg",
+   "out": "img/0c0333949131-out.jpg"
+  },
+  {
+   "id": "00239d9b02f6",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
+   "ref": "img/00239d9b02f6-ref.jpg",
+   "out": "img/00239d9b02f6-out.jpg"
+  },
+  {
+   "id": "88bf104bb70e",
+   "prompt": "show green fluorescent protein from Aequorea victoria",
+   "ref": "img/88bf104bb70e-ref.jpg",
+   "out": "img/88bf104bb70e-out.jpg"
+  },
+  {
+   "id": "93f78894aaa1",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
+   "ref": "img/93f78894aaa1-ref.jpg",
+   "out": "img/93f78894aaa1-out.jpg"
+  },
+  {
+   "id": "adbf6838d733",
+   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
+   "ref": "img/adbf6838d733-ref.jpg",
+   "out": "img/adbf6838d733-out.jpg"
+  },
+  {
+   "id": "00383d46209a",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/00383d46209a-ref.jpg",
+   "out": "img/00383d46209a-out.jpg"
+  },
+  {
+   "id": "2a699321f16f",
+   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
+   "ref": "img/2a699321f16f-ref.jpg",
+   "out": "img/2a699321f16f-out.jpg"
+  },
+  {
+   "id": "d6df4d8e76b9",
+   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/d6df4d8e76b9-ref.jpg",
+   "out": "img/d6df4d8e76b9-out.jpg"
+  },
+  {
+   "id": "00cf20fefdbe",
+   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
+   "ref": "img/00cf20fefdbe-ref.jpg",
+   "out": "img/00cf20fefdbe-out.jpg"
+  },
+  {
+   "id": "fb98220c13d6",
+   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/fb98220c13d6-ref.jpg",
+   "out": "img/fb98220c13d6-out.jpg"
+  },
+  {
+   "id": "855914311f68",
+   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/855914311f68-ref.jpg",
+   "out": "img/855914311f68-out.jpg"
+  },
+  {
+   "id": "734155bba3c3",
+   "prompt": "show the structure of PCSK9",
+   "ref": "img/734155bba3c3-ref.jpg",
+   "out": "img/734155bba3c3-out.jpg"
   }
  ]
 }
