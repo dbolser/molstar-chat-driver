@@ -3,7 +3,7 @@
 //   `items`  every item id in the set (from the set's items.json), so nothing needs seeding
 //   `answer` { item, label: 'same'|'different'|'unsure', ref_wrong?, model_better?, note?, ms? } — saved first (answering an item again replaces the earlier answer)
 //   `next`   the item to show next (one this evaluator hasn't rated, least-rated first), or null
-//   `done`   how many items of this set the evaluator has rated
+//   `done`   how many of `items` the evaluator has rated
 // The token must match a pre-issued invite (the `evaluators` allowlist) or the call is rejected.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { cors, json } from '../_shared/cors.ts';
@@ -66,8 +66,9 @@ Deno.serve(async (req) => {
     }
     const [next, done] = await Promise.all([
       supabase.rpc('next_rating_item', { p_token: token, p_set: set, p_items: items }),
+      // Only items still in the set count, so trimming a set doesn't credit old answers.
       supabase.from('ratings').select('item', { count: 'exact', head: true })
-        .eq('evaluator_token', token).eq('set_id', set),
+        .eq('evaluator_token', token).eq('set_id', set).in('item', items),
     ]);
     if (next.error || done.error) {
       console.error('rate lookup failed', next.error ?? done.error);

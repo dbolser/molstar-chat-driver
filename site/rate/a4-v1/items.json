@@ -3,16 +3,16 @@
  "question": "Ignore camera angle, zoom and orientation. Does the model's scene show the SAME visualization as the reference: same structure, same parts shown, equivalent representations (cartoon / surface / ball-and-stick), equivalent colours, and the same region highlighted or focused?",
  "items": [
   {
-   "id": "67a08ed82262",
-   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
-   "ref": "img/67a08ed82262-ref.jpg",
-   "out": "img/67a08ed82262-out.jpg"
+   "id": "1d74f1ee0263",
+   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
+   "ref": "img/1d74f1ee0263-ref.jpg",
+   "out": "img/1d74f1ee0263-out.jpg"
   },
   {
-   "id": "c71f334f7a0b",
-   "prompt": "show me the CFTR channel",
-   "ref": "img/c71f334f7a0b-ref.jpg",
-   "out": "img/c71f334f7a0b-out.jpg"
+   "id": "e2d14e816849",
+   "prompt": "Load trypsin (3PTB) and show the protein as a orange cartoon.",
+   "ref": "img/e2d14e816849-ref.jpg",
+   "out": "img/e2d14e816849-out.jpg"
   },
   {
    "id": "1e3df36f6211",
@@ -21,10 +21,10 @@
    "out": "img/1e3df36f6211-out.jpg"
   },
   {
-   "id": "3ac588d519c2",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/3ac588d519c2-ref.jpg",
-   "out": "img/3ac588d519c2-out.jpg"
+   "id": "4a9f811c39aa",
+   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
+   "ref": "img/4a9f811c39aa-ref.jpg",
+   "out": "img/4a9f811c39aa-out.jpg"
   },
   {
    "id": "7d2e1f2a72e7",
@@ -33,46 +33,22 @@
    "out": "img/7d2e1f2a72e7-out.jpg"
   },
   {
-   "id": "289a8612ba67",
-   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
-   "ref": "img/289a8612ba67-ref.jpg",
-   "out": "img/289a8612ba67-out.jpg"
+   "id": "56e81a854073",
+   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/56e81a854073-ref.jpg",
+   "out": "img/56e81a854073-out.jpg"
   },
   {
-   "id": "39199446962a",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/39199446962a-ref.jpg",
-   "out": "img/39199446962a-out.jpg"
+   "id": "80db3dbb63cb",
+   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/80db3dbb63cb-ref.jpg",
+   "out": "img/80db3dbb63cb-out.jpg"
   },
   {
-   "id": "8bf195036c2f",
-   "prompt": "Load 1HHO; show the protein as a grey cartoon and the ligands as red ball-and-stick.",
-   "ref": "img/8bf195036c2f-ref.jpg",
-   "out": "img/8bf195036c2f-out.jpg"
-  },
-  {
-   "id": "45089404aae2",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/45089404aae2-ref.jpg",
-   "out": "img/45089404aae2-out.jpg"
-  },
-  {
-   "id": "315896b47f08",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/315896b47f08-ref.jpg",
-   "out": "img/315896b47f08-out.jpg"
-  },
-  {
-   "id": "8e0fac82e49a",
-   "prompt": "show green fluorescent protein from Aequorea victoria",
-   "ref": "img/8e0fac82e49a-ref.jpg",
-   "out": "img/8e0fac82e49a-out.jpg"
-  },
-  {
-   "id": "b915748ebb7c",
-   "prompt": "Load 1CBS; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/b915748ebb7c-ref.jpg",
-   "out": "img/b915748ebb7c-out.jpg"
+   "id": "c71f334f7a0b",
+   "prompt": "show me the CFTR channel",
+   "ref": "img/c71f334f7a0b-ref.jpg",
+   "out": "img/c71f334f7a0b-out.jpg"
   },
   {
    "id": "347b64912653",
@@ -81,10 +57,34 @@
    "out": "img/347b64912653-out.jpg"
   },
   {
-   "id": "0beb6c61989b",
+   "id": "02c02d5b77b5",
+   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/02c02d5b77b5-ref.jpg",
+   "out": "img/02c02d5b77b5-out.jpg"
+  },
+  {
+   "id": "95e9f0fff7e0",
+   "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
+   "ref": "img/95e9f0fff7e0-ref.jpg",
+   "out": "img/95e9f0fff7e0-out.jpg"
+  },
+  {
+   "id": "aa778682ff30",
    "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/0beb6c61989b-ref.jpg",
-   "out": "img/0beb6c61989b-out.jpg"
+   "ref": "img/aa778682ff30-ref.jpg",
+   "out": "img/aa778682ff30-out.jpg"
+  },
+  {
+   "id": "194580fb41d4",
+   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
+   "ref": "img/194580fb41d4-ref.jpg",
+   "out": "img/194580fb41d4-out.jpg"
+  },
+  {
+   "id": "4677a97f7f62",
+   "prompt": "Show me sperm whale myoglobin",
+   "ref": "img/4677a97f7f62-ref.jpg",
+   "out": "img/4677a97f7f62-out.jpg"
   },
   {
    "id": "8448c68244af",
@@ -93,28 +93,28 @@
    "out": "img/8448c68244af-out.jpg"
   },
   {
-   "id": "bdaa30f793dc",
-   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/bdaa30f793dc-ref.jpg",
-   "out": "img/bdaa30f793dc-out.jpg"
+   "id": "c39cfb886aa4",
+   "prompt": "Load 1LYZ; render the protein as a khaki molecular surface.",
+   "ref": "img/c39cfb886aa4-ref.jpg",
+   "out": "img/c39cfb886aa4-out.jpg"
   },
   {
-   "id": "bee6ee272d99",
-   "prompt": "Load 2HHB; show the protein as a grey cartoon and the ligands as teal ball-and-stick.",
-   "ref": "img/bee6ee272d99-ref.jpg",
-   "out": "img/bee6ee272d99-out.jpg"
+   "id": "26eab33b6339",
+   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/26eab33b6339-ref.jpg",
+   "out": "img/26eab33b6339-out.jpg"
   },
   {
-   "id": "c5c6dd3dc042",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/c5c6dd3dc042-ref.jpg",
-   "out": "img/c5c6dd3dc042-out.jpg"
+   "id": "0b5a9fbd41c9",
+   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
+   "ref": "img/0b5a9fbd41c9-ref.jpg",
+   "out": "img/0b5a9fbd41c9-out.jpg"
   },
   {
-   "id": "15579b684558",
-   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
-   "ref": "img/15579b684558-ref.jpg",
-   "out": "img/15579b684558-out.jpg"
+   "id": "a6e301379dd1",
+   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/a6e301379dd1-ref.jpg",
+   "out": "img/a6e301379dd1-out.jpg"
   },
   {
    "id": "4843ce40a377",
@@ -129,10 +129,16 @@
    "out": "img/d6d5de5175b4-out.jpg"
   },
   {
-   "id": "95e9f0fff7e0",
+   "id": "289a8612ba67",
    "prompt": "Load 3PTB; show the protein as a grey cartoon and the CA as orange ball-and-stick.",
-   "ref": "img/95e9f0fff7e0-ref.jpg",
-   "out": "img/95e9f0fff7e0-out.jpg"
+   "ref": "img/289a8612ba67-ref.jpg",
+   "out": "img/289a8612ba67-out.jpg"
+  },
+  {
+   "id": "2d44cee70a25",
+   "prompt": "Load 1CBS; protein as grey cartoon, and show residues 20-60 of chain A as orange ball-and-stick.",
+   "ref": "img/2d44cee70a25-ref.jpg",
+   "out": "img/2d44cee70a25-out.jpg"
   },
   {
    "id": "a8ee4819f0a8",
@@ -141,34 +147,28 @@
    "out": "img/a8ee4819f0a8-out.jpg"
   },
   {
-   "id": "cfbd99b6f969",
+   "id": "4018166bde8a",
+   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/4018166bde8a-ref.jpg",
+   "out": "img/4018166bde8a-out.jpg"
+  },
+  {
+   "id": "1985b35f24bf",
    "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/cfbd99b6f969-ref.jpg",
-   "out": "img/cfbd99b6f969-out.jpg"
+   "ref": "img/1985b35f24bf-ref.jpg",
+   "out": "img/1985b35f24bf-out.jpg"
   },
   {
-   "id": "26eab33b6339",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/26eab33b6339-ref.jpg",
-   "out": "img/26eab33b6339-out.jpg"
+   "id": "0fdac8783113",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/0fdac8783113-ref.jpg",
+   "out": "img/0fdac8783113-out.jpg"
   },
   {
-   "id": "66a9282e0ad2",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/66a9282e0ad2-ref.jpg",
-   "out": "img/66a9282e0ad2-out.jpg"
-  },
-  {
-   "id": "0d882f6686db",
-   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
-   "ref": "img/0d882f6686db-ref.jpg",
-   "out": "img/0d882f6686db-out.jpg"
-  },
-  {
-   "id": "e2d14e816849",
-   "prompt": "Load trypsin (3PTB) and show the protein as a orange cartoon.",
-   "ref": "img/e2d14e816849-ref.jpg",
-   "out": "img/e2d14e816849-out.jpg"
+   "id": "7011518dde3e",
+   "prompt": "Show me hen egg white lysozyme",
+   "ref": "img/7011518dde3e-ref.jpg",
+   "out": "img/7011518dde3e-out.jpg"
   },
   {
    "id": "3529f0451ec6",
@@ -177,10 +177,10 @@
    "out": "img/3529f0451ec6-out.jpg"
   },
   {
-   "id": "987951bec6d5",
-   "prompt": "Load 2HHB; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/987951bec6d5-ref.jpg",
-   "out": "img/987951bec6d5-out.jpg"
+   "id": "88d0d306c836",
+   "prompt": "Load HIV-1 protease (1HVR); protein as grey cartoon, the bound inhibitor as magenta ball-and-stick, and focus the camera on the inhibitor.",
+   "ref": "img/88d0d306c836-ref.jpg",
+   "out": "img/88d0d306c836-out.jpg"
   },
   {
    "id": "6fe542594460",
@@ -189,136 +189,10 @@
    "out": "img/6fe542594460-out.jpg"
   },
   {
-   "id": "2812741e39dc",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/2812741e39dc-ref.jpg",
-   "out": "img/2812741e39dc-out.jpg"
-  },
-  {
-   "id": "f46e9839299a",
-   "prompt": "Load 2HHB; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/f46e9839299a-ref.jpg",
-   "out": "img/f46e9839299a-out.jpg"
-  },
-  {
-   "id": "00239d9b02f6",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/00239d9b02f6-ref.jpg",
-   "out": "img/00239d9b02f6-out.jpg"
-  },
-  {
-   "id": "52f13eb0c650",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
-   "ref": "img/52f13eb0c650-ref.jpg",
-   "out": "img/52f13eb0c650-out.jpg"
-  },
-  {
-   "id": "88d0d306c836",
-   "prompt": "Load HIV-1 protease (1HVR); protein as grey cartoon, the bound inhibitor as magenta ball-and-stick, and focus the camera on the inhibitor.",
-   "ref": "img/88d0d306c836-ref.jpg",
-   "out": "img/88d0d306c836-out.jpg"
-  },
-  {
-   "id": "0c0333949131",
-   "prompt": "Load 1HHO; protein as grey cartoon, and show residues 30-90 of chain A as orange ball-and-stick.",
-   "ref": "img/0c0333949131-ref.jpg",
-   "out": "img/0c0333949131-out.jpg"
-  },
-  {
-   "id": "1c1862cfb967",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
-   "ref": "img/1c1862cfb967-ref.jpg",
-   "out": "img/1c1862cfb967-out.jpg"
-  },
-  {
-   "id": "033e2d5c6a7b",
-   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
-   "ref": "img/033e2d5c6a7b-ref.jpg",
-   "out": "img/033e2d5c6a7b-out.jpg"
-  },
-  {
-   "id": "4035a41d5085",
-   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
-   "ref": "img/4035a41d5085-ref.jpg",
-   "out": "img/4035a41d5085-out.jpg"
-  },
-  {
-   "id": "194580fb41d4",
-   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
-   "ref": "img/194580fb41d4-ref.jpg",
-   "out": "img/194580fb41d4-out.jpg"
-  },
-  {
-   "id": "8ecb63809cb0",
-   "prompt": "show me the CFTR channel",
-   "ref": "img/8ecb63809cb0-ref.jpg",
-   "out": "img/8ecb63809cb0-out.jpg"
-  },
-  {
-   "id": "4018166bde8a",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/4018166bde8a-ref.jpg",
-   "out": "img/4018166bde8a-out.jpg"
-  },
-  {
-   "id": "4f8ce0c6e897",
-   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/4f8ce0c6e897-ref.jpg",
-   "out": "img/4f8ce0c6e897-out.jpg"
-  },
-  {
-   "id": "86c52a251c65",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
-   "ref": "img/86c52a251c65-ref.jpg",
-   "out": "img/86c52a251c65-out.jpg"
-  },
-  {
-   "id": "28e622a357c9",
-   "prompt": "show the structure of PCSK9",
-   "ref": "img/28e622a357c9-ref.jpg",
-   "out": "img/28e622a357c9-out.jpg"
-  },
-  {
-   "id": "0013b4661799",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/0013b4661799-ref.jpg",
-   "out": "img/0013b4661799-out.jpg"
-  },
-  {
-   "id": "922983410aad",
-   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
-   "ref": "img/922983410aad-ref.jpg",
-   "out": "img/922983410aad-out.jpg"
-  },
-  {
-   "id": "e305786c6e1d",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/e305786c6e1d-ref.jpg",
-   "out": "img/e305786c6e1d-out.jpg"
-  },
-  {
-   "id": "b287afaf0502",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/b287afaf0502-ref.jpg",
-   "out": "img/b287afaf0502-out.jpg"
-  },
-  {
-   "id": "d687f3d93fa5",
-   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
-   "ref": "img/d687f3d93fa5-ref.jpg",
-   "out": "img/d687f3d93fa5-out.jpg"
-  },
-  {
-   "id": "5cd5af7796f8",
-   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
-   "ref": "img/5cd5af7796f8-ref.jpg",
-   "out": "img/5cd5af7796f8-out.jpg"
-  },
-  {
-   "id": "c39cfb886aa4",
-   "prompt": "Load 1LYZ; render the protein as a khaki molecular surface.",
-   "ref": "img/c39cfb886aa4-ref.jpg",
-   "out": "img/c39cfb886aa4-out.jpg"
+   "id": "56a4cd9bdd09",
+   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
+   "ref": "img/56a4cd9bdd09-ref.jpg",
+   "out": "img/56a4cd9bdd09-out.jpg"
   },
   {
    "id": "407a76b857ba",
@@ -333,46 +207,40 @@
    "out": "img/7fdf60ed68c5-out.jpg"
   },
   {
-   "id": "5c90ea8300c8",
-   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
-   "ref": "img/5c90ea8300c8-ref.jpg",
-   "out": "img/5c90ea8300c8-out.jpg"
+   "id": "52f13eb0c650",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 175 and show it as blue ball-and-stick.",
+   "ref": "img/52f13eb0c650-ref.jpg",
+   "out": "img/52f13eb0c650-out.jpg"
   },
   {
-   "id": "bf7e977c5d98",
-   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
-   "ref": "img/bf7e977c5d98-ref.jpg",
-   "out": "img/bf7e977c5d98-out.jpg"
+   "id": "7abe4e4e444e",
+   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/7abe4e4e444e-ref.jpg",
+   "out": "img/7abe4e4e444e-out.jpg"
   },
   {
-   "id": "a6e301379dd1",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/a6e301379dd1-ref.jpg",
-   "out": "img/a6e301379dd1-out.jpg"
+   "id": "e8d9553880a4",
+   "prompt": "Show me hen egg white lysozyme",
+   "ref": "img/e8d9553880a4-ref.jpg",
+   "out": "img/e8d9553880a4-out.jpg"
   },
   {
-   "id": "da2221cc29b5",
+   "id": "1c1862cfb967",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the 6 mutational hotspot residues \u2014 the positions carrying the most pathogenic ClinVar variants \u2014 as red spheres.",
+   "ref": "img/1c1862cfb967-ref.jpg",
+   "out": "img/1c1862cfb967-out.jpg"
+  },
+  {
+   "id": "4035a41d5085",
    "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
-   "ref": "img/da2221cc29b5-ref.jpg",
-   "out": "img/da2221cc29b5-out.jpg"
+   "ref": "img/4035a41d5085-ref.jpg",
+   "out": "img/4035a41d5085-out.jpg"
   },
   {
-   "id": "2b6f70ce2460",
-   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
-   "ref": "img/2b6f70ce2460-ref.jpg",
-   "out": "img/2b6f70ce2460-out.jpg"
-  },
-  {
-   "id": "2d44cee70a25",
-   "prompt": "Load 1CBS; protein as grey cartoon, and show residues 20-60 of chain A as orange ball-and-stick.",
-   "ref": "img/2d44cee70a25-ref.jpg",
-   "out": "img/2d44cee70a25-out.jpg"
-  },
-  {
-   "id": "767ee24d7e1a",
-   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/767ee24d7e1a-ref.jpg",
-   "out": "img/767ee24d7e1a-out.jpg"
+   "id": "28e622a357c9",
+   "prompt": "show the structure of PCSK9",
+   "ref": "img/28e622a357c9-ref.jpg",
+   "out": "img/28e622a357c9-out.jpg"
   },
   {
    "id": "1784fe70592b",
@@ -381,10 +249,136 @@
    "out": "img/1784fe70592b-out.jpg"
   },
   {
-   "id": "d5a959f2faed",
-   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/d5a959f2faed-ref.jpg",
-   "out": "img/d5a959f2faed-out.jpg"
+   "id": "8bf195036c2f",
+   "prompt": "Load 1HHO; show the protein as a grey cartoon and the ligands as red ball-and-stick.",
+   "ref": "img/8bf195036c2f-ref.jpg",
+   "out": "img/8bf195036c2f-out.jpg"
+  },
+  {
+   "id": "057f3ef1d94f",
+   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/057f3ef1d94f-ref.jpg",
+   "out": "img/057f3ef1d94f-out.jpg"
+  },
+  {
+   "id": "315896b47f08",
+   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/315896b47f08-ref.jpg",
+   "out": "img/315896b47f08-out.jpg"
+  },
+  {
+   "id": "86c52a251c65",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant F109V as red ball-and-stick.",
+   "ref": "img/86c52a251c65-ref.jpg",
+   "out": "img/86c52a251c65-out.jpg"
+  },
+  {
+   "id": "e305786c6e1d",
+   "prompt": "Show me hen egg white lysozyme",
+   "ref": "img/e305786c6e1d-ref.jpg",
+   "out": "img/e305786c6e1d-out.jpg"
+  },
+  {
+   "id": "a4332ed28e89",
+   "prompt": "Load 2HHB; protein as grey cartoon, and show the ions as purple spheres.",
+   "ref": "img/a4332ed28e89-ref.jpg",
+   "out": "img/a4332ed28e89-out.jpg"
+  },
+  {
+   "id": "922983410aad",
+   "prompt": "In p53 (PDB 1TUP), chain A, select the residue at canonical UniProt position 248 and show it as blue ball-and-stick.",
+   "ref": "img/922983410aad-ref.jpg",
+   "out": "img/922983410aad-out.jpg"
+  },
+  {
+   "id": "8ecb63809cb0",
+   "prompt": "show me the CFTR channel",
+   "ref": "img/8ecb63809cb0-ref.jpg",
+   "out": "img/8ecb63809cb0-out.jpg"
+  },
+  {
+   "id": "d687f3d93fa5",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant S215T as red ball-and-stick.",
+   "ref": "img/d687f3d93fa5-ref.jpg",
+   "out": "img/d687f3d93fa5-out.jpg"
+  },
+  {
+   "id": "2469ae503ec3",
+   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
+   "ref": "img/2469ae503ec3-ref.jpg",
+   "out": "img/2469ae503ec3-out.jpg"
+  },
+  {
+   "id": "39199446962a",
+   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
+   "ref": "img/39199446962a-ref.jpg",
+   "out": "img/39199446962a-out.jpg"
+  },
+  {
+   "id": "bee6ee272d99",
+   "prompt": "Load 2HHB; show the protein as a grey cartoon and the ligands as teal ball-and-stick.",
+   "ref": "img/bee6ee272d99-ref.jpg",
+   "out": "img/bee6ee272d99-out.jpg"
+  },
+  {
+   "id": "9e9961c30706",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
+   "ref": "img/9e9961c30706-ref.jpg",
+   "out": "img/9e9961c30706-out.jpg"
+  },
+  {
+   "id": "5c90ea8300c8",
+   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
+   "ref": "img/5c90ea8300c8-ref.jpg",
+   "out": "img/5c90ea8300c8-out.jpg"
+  },
+  {
+   "id": "987951bec6d5",
+   "prompt": "Load 2HHB; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/987951bec6d5-ref.jpg",
+   "out": "img/987951bec6d5-out.jpg"
+  },
+  {
+   "id": "767ee24d7e1a",
+   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/767ee24d7e1a-ref.jpg",
+   "out": "img/767ee24d7e1a-out.jpg"
+  },
+  {
+   "id": "033e2d5c6a7b",
+   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
+   "ref": "img/033e2d5c6a7b-ref.jpg",
+   "out": "img/033e2d5c6a7b-out.jpg"
+  },
+  {
+   "id": "2b6f70ce2460",
+   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
+   "ref": "img/2b6f70ce2460-ref.jpg",
+   "out": "img/2b6f70ce2460-out.jpg"
+  },
+  {
+   "id": "0d239efcf944",
+   "prompt": "Load HIV-1 protease (1HVR); protein as grey cartoon, the bound inhibitor as magenta ball-and-stick, and focus the camera on the inhibitor.",
+   "ref": "img/0d239efcf944-ref.jpg",
+   "out": "img/0d239efcf944-out.jpg"
+  },
+  {
+   "id": "6ff1a964fd78",
+   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
+   "ref": "img/6ff1a964fd78-ref.jpg",
+   "out": "img/6ff1a964fd78-out.jpg"
+  },
+  {
+   "id": "cfbd99b6f969",
+   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
+   "ref": "img/cfbd99b6f969-ref.jpg",
+   "out": "img/cfbd99b6f969-out.jpg"
+  },
+  {
+   "id": "2812741e39dc",
+   "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
+   "ref": "img/2812741e39dc-ref.jpg",
+   "out": "img/2812741e39dc-out.jpg"
   },
   {
    "id": "0861f6920665",
@@ -393,10 +387,10 @@
    "out": "img/0861f6920665-out.jpg"
   },
   {
-   "id": "0b5a9fbd41c9",
-   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
-   "ref": "img/0b5a9fbd41c9-ref.jpg",
-   "out": "img/0b5a9fbd41c9-out.jpg"
+   "id": "57cbe684a66b",
+   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
+   "ref": "img/57cbe684a66b-ref.jpg",
+   "out": "img/57cbe684a66b-out.jpg"
   },
   {
    "id": "76478a20c8e4",
@@ -405,16 +399,16 @@
    "out": "img/76478a20c8e4-out.jpg"
   },
   {
-   "id": "4ab4f3258462",
-   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
-   "ref": "img/4ab4f3258462-ref.jpg",
-   "out": "img/4ab4f3258462-out.jpg"
+   "id": "6cc3e997a582",
+   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/6cc3e997a582-ref.jpg",
+   "out": "img/6cc3e997a582-out.jpg"
   },
   {
-   "id": "d6df4d8e76b9",
-   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/d6df4d8e76b9-ref.jpg",
-   "out": "img/d6df4d8e76b9-out.jpg"
+   "id": "0f5f7cbca5ff",
+   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
+   "ref": "img/0f5f7cbca5ff-ref.jpg",
+   "out": "img/0f5f7cbca5ff-out.jpg"
   },
   {
    "id": "52f50b3b43bc",
@@ -423,22 +417,22 @@
    "out": "img/52f50b3b43bc-out.jpg"
   },
   {
-   "id": "18eee0808289",
-   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
-   "ref": "img/18eee0808289-ref.jpg",
-   "out": "img/18eee0808289-out.jpg"
+   "id": "0d882f6686db",
+   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
+   "ref": "img/0d882f6686db-ref.jpg",
+   "out": "img/0d882f6686db-out.jpg"
   },
   {
-   "id": "4677a97f7f62",
-   "prompt": "Show me sperm whale myoglobin",
-   "ref": "img/4677a97f7f62-ref.jpg",
-   "out": "img/4677a97f7f62-out.jpg"
+   "id": "bdaa30f793dc",
+   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/bdaa30f793dc-ref.jpg",
+   "out": "img/bdaa30f793dc-out.jpg"
   },
   {
-   "id": "292c8089956d",
-   "prompt": "Load 4INS; protein as grey cartoon, and show the ions as purple spheres.",
-   "ref": "img/292c8089956d-ref.jpg",
-   "out": "img/292c8089956d-out.jpg"
+   "id": "0013b4661799",
+   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
+   "ref": "img/0013b4661799-ref.jpg",
+   "out": "img/0013b4661799-out.jpg"
   },
   {
    "id": "955f9c59f578",
@@ -453,28 +447,28 @@
    "out": "img/9ac38217d4c8-out.jpg"
   },
   {
-   "id": "7011518dde3e",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/7011518dde3e-ref.jpg",
-   "out": "img/7011518dde3e-out.jpg"
+   "id": "8e0fac82e49a",
+   "prompt": "show green fluorescent protein from Aequorea victoria",
+   "ref": "img/8e0fac82e49a-ref.jpg",
+   "out": "img/8e0fac82e49a-out.jpg"
   },
   {
-   "id": "aa2feaf60a0c",
-   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/aa2feaf60a0c-ref.jpg",
-   "out": "img/aa2feaf60a0c-out.jpg"
+   "id": "4ba0b218e5da",
+   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
+   "ref": "img/4ba0b218e5da-ref.jpg",
+   "out": "img/4ba0b218e5da-out.jpg"
   },
   {
-   "id": "fb98220c13d6",
-   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/fb98220c13d6-ref.jpg",
-   "out": "img/fb98220c13d6-out.jpg"
+   "id": "4ab4f3258462",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/4ab4f3258462-ref.jpg",
+   "out": "img/4ab4f3258462-out.jpg"
   },
   {
-   "id": "6ff1a964fd78",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/6ff1a964fd78-ref.jpg",
-   "out": "img/6ff1a964fd78-out.jpg"
+   "id": "3ac588d519c2",
+   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
+   "ref": "img/3ac588d519c2-ref.jpg",
+   "out": "img/3ac588d519c2-out.jpg"
   },
   {
    "id": "2bc711fb1a16",
@@ -483,10 +477,10 @@
    "out": "img/2bc711fb1a16-out.jpg"
   },
   {
-   "id": "00383d46209a",
-   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
-   "ref": "img/00383d46209a-ref.jpg",
-   "out": "img/00383d46209a-out.jpg"
+   "id": "138d681e305e",
+   "prompt": "Load 1CBS; show the protein as a grey cartoon and the ligands as purple ball-and-stick.",
+   "ref": "img/138d681e305e-ref.jpg",
+   "out": "img/138d681e305e-out.jpg"
   },
   {
    "id": "4a7f16bf4f23",
@@ -501,22 +495,22 @@
    "out": "img/9957b232dba3-out.jpg"
   },
   {
+   "id": "0beb6c61989b",
+   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/0beb6c61989b-ref.jpg",
+   "out": "img/0beb6c61989b-out.jpg"
+  },
+  {
+   "id": "f5bfee36bdc5",
+   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
+   "ref": "img/f5bfee36bdc5-ref.jpg",
+   "out": "img/f5bfee36bdc5-out.jpg"
+  },
+  {
    "id": "39d1e4dac0aa",
    "prompt": "Load 1HHO; protein as grey cartoon, and show the ions as purple spheres.",
    "ref": "img/39d1e4dac0aa-ref.jpg",
    "out": "img/39d1e4dac0aa-out.jpg"
-  },
-  {
-   "id": "5b7a4e3e1dc1",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/5b7a4e3e1dc1-ref.jpg",
-   "out": "img/5b7a4e3e1dc1-out.jpg"
-  },
-  {
-   "id": "c920ba118993",
-   "prompt": "Load 1LYZ; render the protein as a khaki molecular surface.",
-   "ref": "img/c920ba118993-ref.jpg",
-   "out": "img/c920ba118993-out.jpg"
   },
   {
    "id": "30a634aa6113",
@@ -525,16 +519,16 @@
    "out": "img/30a634aa6113-out.jpg"
   },
   {
-   "id": "4ba0b218e5da",
-   "prompt": "Load haemoglobin (1HHO); show the protein as a grey cartoon and the heme groups as orange ball-and-stick.",
-   "ref": "img/4ba0b218e5da-ref.jpg",
-   "out": "img/4ba0b218e5da-out.jpg"
+   "id": "f46e9839299a",
+   "prompt": "Load 2HHB; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/f46e9839299a-ref.jpg",
+   "out": "img/f46e9839299a-out.jpg"
   },
   {
-   "id": "e8d9553880a4",
-   "prompt": "Show me hen egg white lysozyme",
-   "ref": "img/e8d9553880a4-ref.jpg",
-   "out": "img/e8d9553880a4-out.jpg"
+   "id": "dc45e0157b5f",
+   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
+   "ref": "img/dc45e0157b5f-ref.jpg",
+   "out": "img/dc45e0157b5f-out.jpg"
   },
   {
    "id": "3aed38efaf80",
@@ -561,22 +555,22 @@
    "out": "img/0d2835220019-out.jpg"
   },
   {
-   "id": "057f3ef1d94f",
-   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/057f3ef1d94f-ref.jpg",
-   "out": "img/057f3ef1d94f-out.jpg"
+   "id": "66a9282e0ad2",
+   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
+   "ref": "img/66a9282e0ad2-ref.jpg",
+   "out": "img/66a9282e0ad2-out.jpg"
   },
   {
-   "id": "b8a16cf28626",
-   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/b8a16cf28626-ref.jpg",
-   "out": "img/b8a16cf28626-out.jpg"
+   "id": "da2221cc29b5",
+   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
+   "ref": "img/da2221cc29b5-ref.jpg",
+   "out": "img/da2221cc29b5-out.jpg"
   },
   {
-   "id": "00cf20fefdbe",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/00cf20fefdbe-ref.jpg",
-   "out": "img/00cf20fefdbe-out.jpg"
+   "id": "b0c5d342cfa7",
+   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
+   "ref": "img/b0c5d342cfa7-ref.jpg",
+   "out": "img/b0c5d342cfa7-out.jpg"
   },
   {
    "id": "4260a78d9848",
@@ -585,22 +579,22 @@
    "out": "img/4260a78d9848-out.jpg"
   },
   {
-   "id": "465febe7a7db",
-   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
-   "ref": "img/465febe7a7db-ref.jpg",
-   "out": "img/465febe7a7db-out.jpg"
+   "id": "17029974d97a",
+   "prompt": "I wanna see a structure of PDE5A",
+   "ref": "img/17029974d97a-ref.jpg",
+   "out": "img/17029974d97a-out.jpg"
   },
   {
-   "id": "0fdac8783113",
-   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
-   "ref": "img/0fdac8783113-ref.jpg",
-   "out": "img/0fdac8783113-out.jpg"
+   "id": "73578539817a",
+   "prompt": "I wanna see a structure of PDE5A",
+   "ref": "img/73578539817a-ref.jpg",
+   "out": "img/73578539817a-out.jpg"
   },
   {
-   "id": "4a9f811c39aa",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/4a9f811c39aa-ref.jpg",
-   "out": "img/4a9f811c39aa-out.jpg"
+   "id": "67a08ed82262",
+   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
+   "ref": "img/67a08ed82262-ref.jpg",
+   "out": "img/67a08ed82262-out.jpg"
   },
   {
    "id": "385ade94050b",
@@ -609,16 +603,16 @@
    "out": "img/385ade94050b-out.jpg"
   },
   {
-   "id": "56a4cd9bdd09",
-   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
-   "ref": "img/56a4cd9bdd09-ref.jpg",
-   "out": "img/56a4cd9bdd09-out.jpg"
+   "id": "5b7a4e3e1dc1",
+   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
+   "ref": "img/5b7a4e3e1dc1-ref.jpg",
+   "out": "img/5b7a4e3e1dc1-out.jpg"
   },
   {
-   "id": "7abe4e4e444e",
-   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/7abe4e4e444e-ref.jpg",
-   "out": "img/7abe4e4e444e-out.jpg"
+   "id": "4f8ce0c6e897",
+   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/4f8ce0c6e897-ref.jpg",
+   "out": "img/4f8ce0c6e897-out.jpg"
   },
   {
    "id": "4824a13df042",
@@ -633,34 +627,34 @@
    "out": "img/da4e58a43c0a-out.jpg"
   },
   {
-   "id": "855914311f68",
-   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/855914311f68-ref.jpg",
-   "out": "img/855914311f68-out.jpg"
+   "id": "aa2feaf60a0c",
+   "prompt": "Load 1HHO; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/aa2feaf60a0c-ref.jpg",
+   "out": "img/aa2feaf60a0c-out.jpg"
   },
   {
-   "id": "0d239efcf944",
-   "prompt": "Load HIV-1 protease (1HVR); protein as grey cartoon, the bound inhibitor as magenta ball-and-stick, and focus the camera on the inhibitor.",
-   "ref": "img/0d239efcf944-ref.jpg",
-   "out": "img/0d239efcf944-out.jpg"
+   "id": "d5a959f2faed",
+   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/d5a959f2faed-ref.jpg",
+   "out": "img/d5a959f2faed-out.jpg"
   },
   {
-   "id": "00f5ca8438e3",
-   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
-   "ref": "img/00f5ca8438e3-ref.jpg",
-   "out": "img/00f5ca8438e3-out.jpg"
+   "id": "18eee0808289",
+   "prompt": "Load 1LYZ; show everything as a grey cartoon, then colour chain A green.",
+   "ref": "img/18eee0808289-ref.jpg",
+   "out": "img/18eee0808289-out.jpg"
   },
   {
-   "id": "aa778682ff30",
-   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
-   "ref": "img/aa778682ff30-ref.jpg",
-   "out": "img/aa778682ff30-out.jpg"
+   "id": "98c2b341231b",
+   "prompt": "Load 1HHO; render the protein as a steelblue molecular surface.",
+   "ref": "img/98c2b341231b-ref.jpg",
+   "out": "img/98c2b341231b-out.jpg"
   },
   {
-   "id": "2a80934e95b2",
-   "prompt": "Load 1HHO; show everything as a grey cartoon, then colour chain A red.",
-   "ref": "img/2a80934e95b2-ref.jpg",
-   "out": "img/2a80934e95b2-out.jpg"
+   "id": "465febe7a7db",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/465febe7a7db-ref.jpg",
+   "out": "img/465febe7a7db-out.jpg"
   },
   {
    "id": "95024538b3b9",
@@ -669,22 +663,22 @@
    "out": "img/95024538b3b9-out.jpg"
   },
   {
-   "id": "b0c5d342cfa7",
-   "prompt": "In trypsin (3PTB), show the protein as a grey cartoon and the catalytic triad (His57, Asp102, Ser195) as ball-and-stick. Draw the two triad hydrogen bonds as dashed lines with their lengths.",
-   "ref": "img/b0c5d342cfa7-ref.jpg",
-   "out": "img/b0c5d342cfa7-out.jpg"
-  },
-  {
-   "id": "57cbe684a66b",
+   "id": "15805e69986f",
    "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/57cbe684a66b-ref.jpg",
-   "out": "img/57cbe684a66b-out.jpg"
+   "ref": "img/15805e69986f-ref.jpg",
+   "out": "img/15805e69986f-out.jpg"
   },
   {
-   "id": "17a40520cbaa",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/17a40520cbaa-ref.jpg",
-   "out": "img/17a40520cbaa-out.jpg"
+   "id": "5cd5af7796f8",
+   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
+   "ref": "img/5cd5af7796f8-ref.jpg",
+   "out": "img/5cd5af7796f8-out.jpg"
+  },
+  {
+   "id": "00f5ca8438e3",
+   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
+   "ref": "img/00f5ca8438e3-ref.jpg",
+   "out": "img/00f5ca8438e3-out.jpg"
   },
   {
    "id": "186fc67aebd2",
@@ -693,16 +687,16 @@
    "out": "img/186fc67aebd2-out.jpg"
   },
   {
-   "id": "15805e69986f",
-   "prompt": "Load 1A6M with the protein as a grey cartoon. Show the heme and the proximal histidine as ball-and-stick and measure the distance from the heme iron to the histidine's coordinating nitrogen.",
-   "ref": "img/15805e69986f-ref.jpg",
-   "out": "img/15805e69986f-out.jpg"
+   "id": "15579b684558",
+   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
+   "ref": "img/15579b684558-ref.jpg",
+   "out": "img/15579b684558-out.jpg"
   },
   {
-   "id": "43a974e31b52",
-   "prompt": "In oxymyoglobin 1A6M, show the protein as a grey cartoon, His64 and the bound O2 as ball-and-stick, and draw the hydrogen bond from His64 NE2 to the O2 molecule's terminal oxygen (atom O2) as a dashed line labelled with its length.",
-   "ref": "img/43a974e31b52-ref.jpg",
-   "out": "img/43a974e31b52-out.jpg"
+   "id": "b287afaf0502",
+   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/b287afaf0502-ref.jpg",
+   "out": "img/b287afaf0502-out.jpg"
   },
   {
    "id": "01568f2f615f",
@@ -711,40 +705,40 @@
    "out": "img/01568f2f615f-out.jpg"
   },
   {
-   "id": "17029974d97a",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/17029974d97a-ref.jpg",
-   "out": "img/17029974d97a-out.jpg"
+   "id": "c5c6dd3dc042",
+   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
+   "ref": "img/c5c6dd3dc042-ref.jpg",
+   "out": "img/c5c6dd3dc042-out.jpg"
   },
   {
-   "id": "80db3dbb63cb",
-   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/80db3dbb63cb-ref.jpg",
-   "out": "img/80db3dbb63cb-out.jpg"
+   "id": "c920ba118993",
+   "prompt": "Load 1LYZ; render the protein as a khaki molecular surface.",
+   "ref": "img/c920ba118993-ref.jpg",
+   "out": "img/c920ba118993-out.jpg"
   },
   {
-   "id": "a4332ed28e89",
-   "prompt": "Load 2HHB; protein as grey cartoon, and show the ions as purple spheres.",
-   "ref": "img/a4332ed28e89-ref.jpg",
-   "out": "img/a4332ed28e89-out.jpg"
+   "id": "292c8089956d",
+   "prompt": "Load 4INS; protein as grey cartoon, and show the ions as purple spheres.",
+   "ref": "img/292c8089956d-ref.jpg",
+   "out": "img/292c8089956d-out.jpg"
   },
   {
-   "id": "0f5f7cbca5ff",
-   "prompt": "Load 4INS; show everything as a grey cartoon, then colour chain B blue.",
-   "ref": "img/0f5f7cbca5ff-ref.jpg",
-   "out": "img/0f5f7cbca5ff-out.jpg"
+   "id": "17a40520cbaa",
+   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
+   "ref": "img/17a40520cbaa-ref.jpg",
+   "out": "img/17a40520cbaa-out.jpg"
   },
   {
-   "id": "138d681e305e",
-   "prompt": "Load 1CBS; show the protein as a grey cartoon and the ligands as purple ball-and-stick.",
-   "ref": "img/138d681e305e-ref.jpg",
-   "out": "img/138d681e305e-out.jpg"
+   "id": "b915748ebb7c",
+   "prompt": "Load 1CBS; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
+   "ref": "img/b915748ebb7c-ref.jpg",
+   "out": "img/b915748ebb7c-out.jpg"
   },
   {
-   "id": "2469ae503ec3",
-   "prompt": "Show trypsin 3PTB as a grey cartoon and display the interactions between the benzamidine inhibitor and the protein.",
-   "ref": "img/2469ae503ec3-ref.jpg",
-   "out": "img/2469ae503ec3-out.jpg"
+   "id": "bf7e977c5d98",
+   "prompt": "Load 1A6M with the protein as a grey cartoon and show all the non-covalent interactions (hydrogen bonds, metal contacts) around the bound oxygen molecule.",
+   "ref": "img/bf7e977c5d98-ref.jpg",
+   "out": "img/bf7e977c5d98-out.jpg"
   },
   {
    "id": "798a928506d8",
@@ -753,22 +747,22 @@
    "out": "img/798a928506d8-out.jpg"
   },
   {
-   "id": "1985b35f24bf",
-   "prompt": "Load 3PTB; show everything as a grey cartoon, then colour chain A orange.",
-   "ref": "img/1985b35f24bf-ref.jpg",
-   "out": "img/1985b35f24bf-out.jpg"
+   "id": "45089404aae2",
+   "prompt": "Load 2HHB; show everything as a grey cartoon, then colour chain B teal.",
+   "ref": "img/45089404aae2-ref.jpg",
+   "out": "img/45089404aae2-out.jpg"
   },
   {
-   "id": "dc45e0157b5f",
-   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
-   "ref": "img/dc45e0157b5f-ref.jpg",
-   "out": "img/dc45e0157b5f-out.jpg"
+   "id": "0c0333949131",
+   "prompt": "Load 1HHO; protein as grey cartoon, and show residues 30-90 of chain A as orange ball-and-stick.",
+   "ref": "img/0c0333949131-ref.jpg",
+   "out": "img/0c0333949131-out.jpg"
   },
   {
-   "id": "9e9961c30706",
+   "id": "00239d9b02f6",
    "prompt": "In p53 (PDB 1TUP), chain A, highlight the residue affected by the pathogenic ClinVar variant D281Y as red ball-and-stick.",
-   "ref": "img/9e9961c30706-ref.jpg",
-   "out": "img/9e9961c30706-out.jpg"
+   "ref": "img/00239d9b02f6-ref.jpg",
+   "out": "img/00239d9b02f6-out.jpg"
   },
   {
    "id": "88bf104bb70e",
@@ -789,10 +783,10 @@
    "out": "img/adbf6838d733-out.jpg"
   },
   {
-   "id": "98c2b341231b",
-   "prompt": "Load 1HHO; render the protein as a steelblue molecular surface.",
-   "ref": "img/98c2b341231b-ref.jpg",
-   "out": "img/98c2b341231b-out.jpg"
+   "id": "00383d46209a",
+   "prompt": "Load 1CBS; show everything as a grey cartoon, then colour chain A purple.",
+   "ref": "img/00383d46209a-ref.jpg",
+   "out": "img/00383d46209a-out.jpg"
   },
   {
    "id": "2a699321f16f",
@@ -801,28 +795,28 @@
    "out": "img/2a699321f16f-out.jpg"
   },
   {
-   "id": "02c02d5b77b5",
-   "prompt": "Load 3PTB; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
-   "ref": "img/02c02d5b77b5-ref.jpg",
-   "out": "img/02c02d5b77b5-out.jpg"
+   "id": "d6df4d8e76b9",
+   "prompt": "Load 1LYZ; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/d6df4d8e76b9-ref.jpg",
+   "out": "img/d6df4d8e76b9-out.jpg"
   },
   {
-   "id": "73578539817a",
-   "prompt": "I wanna see a structure of PDE5A",
-   "ref": "img/73578539817a-ref.jpg",
-   "out": "img/73578539817a-out.jpg"
+   "id": "00cf20fefdbe",
+   "prompt": "Load haemoglobin 1HHO; show the protein as a 50% transparent surface and the heme groups as ball-and-stick.",
+   "ref": "img/00cf20fefdbe-ref.jpg",
+   "out": "img/00cf20fefdbe-out.jpg"
   },
   {
-   "id": "6cc3e997a582",
-   "prompt": "Load 2HHB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/6cc3e997a582-ref.jpg",
-   "out": "img/6cc3e997a582-out.jpg"
+   "id": "fb98220c13d6",
+   "prompt": "Load 4INS; protein as grey cartoon, and highlight the disulfide-bonded cysteines as yellow ball-and-stick.",
+   "ref": "img/fb98220c13d6-ref.jpg",
+   "out": "img/fb98220c13d6-out.jpg"
   },
   {
-   "id": "56e81a854073",
-   "prompt": "Load 3PTB; grey cartoon protein, magenta ball-and-stick ligands, and focus the camera on the ligand.",
-   "ref": "img/56e81a854073-ref.jpg",
-   "out": "img/56e81a854073-out.jpg"
+   "id": "855914311f68",
+   "prompt": "Load 1HHO; show the protein as a grey cartoon and the HEM as orange ball-and-stick.",
+   "ref": "img/855914311f68-ref.jpg",
+   "out": "img/855914311f68-out.jpg"
   },
   {
    "id": "734155bba3c3",
