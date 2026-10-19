@@ -20,7 +20,7 @@ const CLIENT_VERSION = typeof __MCD_CLIENT_VERSION__ === 'string' ? __MCD_CLIENT
 
 const SET = 'a4-v1';
 const GOAL = 35; // ~two ratings per pair across the volunteer panel; about 10 minutes
-const MILESTONES = new Set([1, 5, 10, GOAL]); // confetti when the count reaches one
+const MILESTONES = [1, 5, 10, GOAL]; // confetti when the count reaches or passes one of these
 
 /** A short burst of confetti. Plain DOM + CSS (no library); skipped if the user asks for less motion. */
 function confetti(): void {
@@ -141,10 +141,13 @@ async function main(): Promise<void> {
   let lastDone: number | null = null;
   const progress = (done: number) => {
     // Celebrate only a count reached by answering now — not on load, not on a re-answer.
-    if (lastDone !== null && done > lastDone && MILESTONES.has(done)) confetti();
+    // A jump (another tab rated too) still celebrates a milestone it passes, once.
+    if (lastDone !== null && MILESTONES.some((m) => lastDone! < m && m <= done)) confetti();
     lastDone = done;
     $('done').textContent = String(done);
-    ($('bar') as HTMLProgressElement).value = Math.min(done, GOAL);
+    const bar = $('bar') as HTMLProgressElement;
+    bar.max = GOAL;
+    bar.value = Math.min(done, GOAL);
     $('goal-note').textContent = done >= GOAL ? 'Goal reached, thank you! Carry on if you like.' : `aim for ${GOAL}`;
   };
 
