@@ -40,6 +40,9 @@
       #gate .card { text-align: center; max-width: 380px; }
       #gate input { font: inherit; padding: 8px; border: 1px solid #ccc; border-radius: 6px; width: 220px; }
       #gate button { font: inherit; padding: 8px 16px; border: none; background: #1a66ff; color: #fff; border-radius: 6px; cursor: pointer; margin-left: 6px; }
+      .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+      .confetti i { position: absolute; top: -12px; width: 8px; height: 14px; border-radius: 2px; animation: confetti-fall linear forwards; }
+      @keyframes confetti-fall { to { transform: translate(var(--drift), 105vh) rotate(var(--spin)); opacity: .9; } }
       @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
     </style>
   </head>
@@ -56,7 +59,7 @@
         <p>The reference isn't always right. Before answering, you can also flag
           <b>Reference looks wrong</b> (<kbd>W</kbd>) and/or <b>Model looks better</b> (<kbd>B</kbd>).</p>
       </details>
-      <div id="progress"><span><b id="done">0</b> rated</span><progress id="bar" max="70" value="0"></progress><span id="goal-note"></span></div>
+      <div id="progress"><span><b id="done">0</b> rated</span><progress id="bar" max="35" value="0"></progress><span id="goal-note"></span></div>
       <section id="pair" style="display:none">
         <div id="prompt"></div>
         <div class="pair">

@@ -19,7 +19,28 @@ declare const __MCD_CLIENT_VERSION__: string;
 const CLIENT_VERSION = typeof __MCD_CLIENT_VERSION__ === 'string' ? __MCD_CLIENT_VERSION__ : 'dev';
 
 const SET = 'a4-v1';
-const GOAL = 70; // ~two ratings per pair across the volunteer panel; about 20 minutes
+const GOAL = 35; // ~two ratings per pair across the volunteer panel; about 10 minutes
+const MILESTONES = new Set([1, 5, 10, GOAL]); // confetti when the count reaches one
+
+/** A short burst of confetti. Plain DOM + CSS (no library); skipped if the user asks for less motion. */
+function confetti(): void {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const colors = ['#1a66ff', '#1a7f37', '#e8a400', '#d93f8a', '#7a3cff', '#ff6a00'];
+  const layer = document.createElement('div');
+  layer.className = 'confetti';
+  for (let i = 0; i < 120; i++) {
+    const bit = document.createElement('i');
+    bit.style.left = `${Math.random() * 100}vw`;
+    bit.style.background = colors[i % colors.length];
+    bit.style.setProperty('--drift', `${(Math.random() - 0.5) * 30}vw`);
+    bit.style.setProperty('--spin', `${(Math.random() - 0.5) * 1440}deg`);
+    bit.style.animationDelay = `${Math.random() * 0.4}s`;
+    bit.style.animationDuration = `${1.8 + Math.random() * 1.4}s`;
+    layer.append(bit);
+  }
+  document.body.append(layer);
+  setTimeout(() => layer.remove(), 4000);
+}
 
 const cfg = window.MCD_CONFIG;
 const tokenKey = 'mcd-token';
@@ -117,7 +138,11 @@ async function main(): Promise<void> {
   };
   const history: Answer[] = []; // answered this session, for "Back"
 
+  let lastDone: number | null = null;
   const progress = (done: number) => {
+    // Celebrate only a count reached by answering now — not on load, not on a re-answer.
+    if (lastDone !== null && done > lastDone && MILESTONES.has(done)) confetti();
+    lastDone = done;
     $('done').textContent = String(done);
     ($('bar') as HTMLProgressElement).value = Math.min(done, GOAL);
     $('goal-note').textContent = done >= GOAL ? 'Goal reached, thank you! Carry on if you like.' : `aim for ${GOAL}`;
