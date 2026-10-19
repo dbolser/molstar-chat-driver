@@ -389,6 +389,10 @@ verify_jwt = false
 [functions.suggest]
 verify_jwt = false
 
+# Rating page (site/rate.html) — same invite-token + publishable-key call shape.
+[functions.rate]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

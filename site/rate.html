@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mol* chat — rate scenes</title>
+    <script src="./config.js"></script>
+    <style>
+      body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #222; }
+      #banner { display: flex; align-items: center; gap: 12px; padding: 6px 12px; background: #fff7e6; border-bottom: 1px solid #ffe2a8; color: #7a5b00; font-size: 13px; }
+      #banner a { margin-left: auto; color: inherit; white-space: nowrap; }
+      main { max-width: 1240px; margin: 0 auto; padding: 12px 16px 32px; }
+      details { background: #f5f7fb; border: 1px solid #dde3ee; border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+      details summary { cursor: pointer; font-weight: 600; }
+      #progress { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-size: 14px; }
+      #progress progress { flex: 0 0 200px; }
+      #prompt { font-size: 18px; margin: 8px 0 12px; padding: 10px 12px; border-left: 4px solid #1a66ff; background: #fafbff; }
+      .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      figure { margin: 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #fff; }
+      figure img { display: block; width: 100%; height: auto; }
+      figcaption { padding: 6px 10px; font-size: 13px; background: #f4f4f4; display: flex; justify-content: space-between; }
+      figcaption a { color: #555; }
+      #answers { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+      #answers button, #back { font: inherit; font-size: 16px; padding: 10px 18px; border-radius: 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+      #answers button.on { outline: 3px solid #1a66ff; }
+      #answers button[disabled] { opacity: .45; cursor: default; }
+      #answers button kbd { font-size: 12px; color: #777; margin-left: 6px; }
+      #answers [data-label=same] { border-color: #1a7f37; color: #1a7f37; }
+      #answers [data-label=different] { border-color: #b3261e; color: #b3261e; }
+      #back { margin-left: auto; font-size: 14px; }
+      #back[disabled] { opacity: .4; cursor: default; }
+      #note { width: 100%; box-sizing: border-box; margin-top: 10px; min-height: 40px; border: 1px solid #ccc; border-radius: 6px; padding: 8px; font: inherit; }
+      #status { min-height: 20px; color: #b3261e; font-size: 14px; margin-top: 6px; }
+      #finished { font-size: 18px; padding: 40px 0; text-align: center; }
+      #gate { position: fixed; inset: 0; background: rgba(255,255,255,.97); display: flex; align-items: center; justify-content: center; z-index: 10; }
+      #gate .card { text-align: center; max-width: 380px; }
+      #gate input { font: inherit; padding: 8px; border: 1px solid #ccc; border-radius: 6px; width: 220px; }
+      #gate button { font: inherit; padding: 8px 16px; border: none; background: #1a66ff; color: #fff; border-radius: 6px; cursor: pointer; margin-left: 6px; }
+      @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div id="banner"><span>● Rating study: your answers help check an automatic judge for an open benchmark. Please keep this link private.</span><a href="./">Chat ↗</a></div>
+    <main>
+      <details open>
+        <summary>What to do</summary>
+        <p>Each pair shows a request, the <b>reference</b> (a correct answer) and a <b>model's scene</b>.
+          Say whether the model's scene shows the same thing.</p>
+        <p id="question"></p>
+        <p>Pick <b>Can't tell</b> if the images don't let you decide. Keys: <kbd>1</kbd> same,
+          <kbd>2</kbd> different, <kbd>3</kbd> can't tell. A note is optional. Stop whenever you like.</p>
+      </details>
+      <div id="progress"><span><b id="done">0</b> rated</span><progress id="bar" max="70" value="0"></progress><span id="goal-note"></span></div>
+      <section id="pair" style="display:none">
+        <div id="prompt"></div>
+        <div class="pair">
+          <figure><img id="img-ref" alt="Reference render" /><figcaption><b>Reference (correct)</b><a id="link-ref" target="_blank" rel="noopener">full size</a></figcaption></figure>
+          <figure><img id="img-out" alt="Model's render" /><figcaption><b>Model's scene</b><a id="link-out" target="_blank" rel="noopener">full size</a></figcaption></figure>
+        </div>
+        <div id="answers">
+          <button data-label="same">Same<kbd>1</kbd></button>
+          <button data-label="different">Different<kbd>2</kbd></button>
+          <button data-label="unsure">Can't tell<kbd>3</kbd></button>
+          <button id="back" disabled>← Back</button>
+        </div>
+        <textarea id="note" aria-label="Optional note" placeholder="Optional note (what's different, or why you can't tell)"></textarea>
+      </section>
+      <div id="finished" style="display:none">🎉 You've rated every pair. Thank you!</div>
+      <div id="status" role="status" aria-live="polite"></div>
+    </main>
+    <div id="gate"><div class="card"><h2>Rate some scenes</h2><p>Loading…</p></div></div>
+    <script type="module" src="./dist/rate.js"></script>
+  </body>
+</html>
