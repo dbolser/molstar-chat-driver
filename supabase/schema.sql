@@ -146,15 +146,18 @@ create table if not exists ratings (
   set_id          text not null,
   item            text not null,
   label           text not null check (label in ('same', 'different', 'unsure')),
-  prefer          text check (prefer in ('reference', 'model', 'equal')),  -- optional: which scene is better
+  ref_wrong       boolean not null default false,  -- rater flagged the reference as wrong
+  model_better    boolean not null default false,  -- rater flagged the model's scene as better
   note            text,
   ms              integer,     -- time on the item before answering
   client          text,        -- site build stamp
   created_at      timestamptz not null default now(),
   unique (evaluator_token, set_id, item)
 );
--- (idempotent for projects created before `prefer` existed)
-alter table ratings add column if not exists prefer text check (prefer in ('reference', 'model', 'equal'));
+-- (idempotent for projects created before the flags existed; `prefer` was their short-lived predecessor)
+alter table ratings add column if not exists ref_wrong boolean not null default false;
+alter table ratings add column if not exists model_better boolean not null default false;
+alter table ratings drop column if exists prefer;
 alter table ratings enable row level security;  -- no policies → anon has no direct access
 grant select, insert, update, delete on ratings to service_role;
 create index if not exists ratings_item_idx on ratings (set_id, item);
