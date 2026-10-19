@@ -30,8 +30,8 @@ const nameKey = `mcd-name-${token}`;
 
 type Label = 'same' | 'different' | 'unsure';
 interface Item { id: string; prompt: string; ref: string; out: string }
-type Prefer = 'reference' | 'model' | 'equal';
-interface Answer { item: string; label: Label; prefer: Prefer | null; note: string; ms: number }
+type Flag = 'ref_wrong' | 'model_better';
+interface Answer { item: string; label: Label; ref_wrong: boolean; model_better: boolean; note: string; ms: number }
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const base = `./rate/${SET}/`;
@@ -98,14 +98,15 @@ async function main(): Promise<void> {
   let current: Item | null = null;
   let shownAt = 0;
   let busy = false;
-  // Optional side question: which scene is better? Chosen before answering, sent with it.
-  let prefer: Prefer | null = null;
-  const preferButtons = document.querySelectorAll<HTMLButtonElement>('#prefer button');
-  const setPrefer = (p: Prefer | null) => {
-    prefer = p;
-    preferButtons.forEach((b) => {
-      b.classList.toggle('on', b.dataset.prefer === p);
-      b.setAttribute('aria-pressed', String(b.dataset.prefer === p));
+  // Optional flags on the pair (either, both or neither), set before answering and sent with it.
+  const flags: Record<Flag, boolean> = { ref_wrong: false, model_better: false };
+  const flagButtons = document.querySelectorAll<HTMLButtonElement>('#flags button');
+  const setFlag = (f: Flag, on: boolean) => {
+    flags[f] = on;
+    flagButtons.forEach((b) => {
+      if (b.dataset.flag !== f) return;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', String(on));
     });
   };
   let ready = false; // both renders on screen; until then answers are ignored
@@ -142,7 +143,8 @@ async function main(): Promise<void> {
     });
     $<HTMLTextAreaElement>('note').value = prior?.note ?? '';
     answerButtons.forEach((b) => b.classList.toggle('on', b.dataset.label === prior?.label));
-    setPrefer(prior?.prefer ?? null);
+    setFlag('ref_wrong', prior?.ref_wrong ?? false);
+    setFlag('model_better', prior?.model_better ?? false);
     // Start the clock once both renders are visible, so a slow load can't be rated blind.
     Promise.all(loads).then(
       () => {
@@ -178,13 +180,13 @@ async function main(): Promise<void> {
 
   const answer = (label: Label) => {
     if (!current || !ready || busy) return;
-    void step({ item: current.id, label, prefer, note: $<HTMLTextAreaElement>('note').value.trim(),
+    void step({ item: current.id, label, ...flags, note: $<HTMLTextAreaElement>('note').value.trim(),
       ms: performance.now() - shownAt });
   };
 
-  preferButtons.forEach((b) => b.addEventListener('click', () => {
-    const p = b.dataset.prefer as Prefer;
-    setPrefer(prefer === p ? null : p); // click again to clear
+  flagButtons.forEach((b) => b.addEventListener('click', () => {
+    const f = b.dataset.flag as Flag;
+    setFlag(f, !flags[f]);
   }));
 
   answerButtons.forEach((b) => b.addEventListener('click', () => answer(b.dataset.label as Label)));
@@ -199,8 +201,8 @@ async function main(): Promise<void> {
     if (e.target instanceof Element && e.target.closest('textarea, input')) return;
     const label = ({ 1: 'same', 2: 'different', 3: 'unsure' } as Record<string, Label>)[e.key];
     if (label) answer(label);
-    const p = ({ r: 'reference', m: 'model', e: 'equal' } as Record<string, Prefer>)[e.key.toLowerCase()];
-    if (p) setPrefer(prefer === p ? null : p);
+    const f = ({ w: 'ref_wrong', b: 'model_better' } as Record<string, Flag>)[e.key.toLowerCase()];
+    if (f) setFlag(f, !flags[f]);
   });
 
   $('gate').style.display = 'none';

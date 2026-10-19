@@ -122,8 +122,8 @@ Above the composer the site shows tappable prompt chips with a 🎲 to reshuffle
 
 ## 10. Rating page (judge-agreement study)
 `rate.html?e=<token>` shows evaluators one render pair at a time — a task prompt, the reference
-render and a model's render — and asks *same / different / can't tell*, plus an optional *which
-do you prefer?* (reference / model / about equal) that flags references a model beat. It's MolBench's A4 study:
+render and a model's render — and asks *same / different / can't tell*, plus two optional flags,
+*Reference looks wrong* and *Model looks better*, that point at references to fix. It's MolBench's A4 study:
 do humans agree with the VLM judge that rescues scenes the tree grader under-scores?
 - The pairs live in `site/rate/<set>/` (`items.json` + images), built by MolBench's
   `scripts/build_rating_set.py`. They carry opaque ids only; the answer key (model, VLM verdict,
