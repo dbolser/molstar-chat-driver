@@ -100,7 +100,7 @@ async function main(): Promise<void> {
   let busy = false;
   // Optional flags on the pair (either, both or neither), set before answering and sent with it.
   const flags: Record<Flag, boolean> = { ref_wrong: false, model_better: false };
-  const flagButtons = document.querySelectorAll<HTMLButtonElement>('#flags button');
+  const flagButtons = document.querySelectorAll<HTMLButtonElement>('#flags button[data-flag]');
   const setFlag = (f: Flag, on: boolean) => {
     flags[f] = on;
     flagButtons.forEach((b) => {
