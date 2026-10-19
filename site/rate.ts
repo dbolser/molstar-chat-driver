@@ -97,6 +97,12 @@ async function main(): Promise<void> {
   let current: Item | null = null;
   let shownAt = 0;
   let busy = false;
+  let ready = false; // both renders on screen; until then answers are ignored
+  const answerButtons = document.querySelectorAll<HTMLButtonElement>('#answers button[data-label]');
+  const setReady = (on: boolean) => {
+    ready = on;
+    answerButtons.forEach((b) => b.toggleAttribute('disabled', !on));
+  };
   const history: Answer[] = []; // answered this session, for "Back"
 
   const progress = (done: number) => {
@@ -116,15 +122,26 @@ async function main(): Promise<void> {
     $('finished').style.display = 'none';
     $('pair').style.display = '';
     $('prompt').textContent = item.prompt;
-    for (const side of ['ref', 'out'] as const) {
+    setReady(false);
+    const loads = (['ref', 'out'] as const).map((side) => {
       const img = $<HTMLImageElement>(`img-${side}`);
       img.src = base + item[side];
       ($(`link-${side}`) as HTMLAnchorElement).href = base + item[side];
-    }
+      return img.decode();
+    });
     $<HTMLTextAreaElement>('note').value = prior?.note ?? '';
-    document.querySelectorAll<HTMLButtonElement>('#answers button[data-label]')
-      .forEach((b) => b.classList.toggle('on', b.dataset.label === prior?.label));
-    shownAt = performance.now();
+    answerButtons.forEach((b) => b.classList.toggle('on', b.dataset.label === prior?.label));
+    // Start the clock once both renders are visible, so a slow load can't be rated blind.
+    Promise.all(loads).then(
+      () => {
+        if (current !== item) return;
+        setReady(true);
+        shownAt = performance.now();
+      },
+      () => {
+        if (current === item) $('status').textContent = 'The images did not load. Please refresh the page.';
+      },
+    );
   };
 
   const step = async (answer?: Answer) => {
@@ -139,26 +156,30 @@ async function main(): Promise<void> {
       show(r.next ? items.get(r.next) ?? null : null);
     } catch (e) {
       console.error('rate failed', e);
-      $('status').textContent = `Could not save: ${(e as Error).message}. Please try again.`;
+      $('status').textContent = answer
+        ? `Could not save: ${(e as Error).message}. Please try again.`
+        : `Could not load: ${(e as Error).message}. Please refresh the page.`;
     } finally {
       busy = false;
     }
   };
 
   const answer = (label: Label) => {
-    if (!current) return;
+    if (!current || !ready || busy) return;
     void step({ item: current.id, label, note: $<HTMLTextAreaElement>('note').value.trim(),
       ms: performance.now() - shownAt });
   };
 
-  document.querySelectorAll<HTMLButtonElement>('#answers button[data-label]')
-    .forEach((b) => b.addEventListener('click', () => answer(b.dataset.label as Label)));
+  answerButtons.forEach((b) => b.addEventListener('click', () => answer(b.dataset.label as Label)));
   $('back').addEventListener('click', () => {
+    if (busy) return; // a save in flight would overwrite the item we go back to
     const prev = history.pop();
     if (prev) show(items.get(prev.item) ?? null, prev);
   });
   document.addEventListener('keydown', (e) => {
-    if ((e.target as HTMLElement).closest('textarea, input') || e.ctrlKey || e.metaKey || e.altKey) return;
+    // A held key repeats; only a fresh press answers, so one keypress can't rate the next pair too.
+    if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target instanceof Element && e.target.closest('textarea, input')) return;
     const label = ({ 1: 'same', 2: 'different', 3: 'unsure' } as Record<string, Label>)[e.key];
     if (label) answer(label);
   });
