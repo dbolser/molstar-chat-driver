@@ -56,6 +56,7 @@ supabase functions deploy chat
 supabase functions deploy capture
 supabase functions deploy waitlist   # public email signup for §8
 supabase functions deploy suggest    # prompt-suggestion chips for §9
+supabase functions deploy rate       # rating page for §10
 ```
 (The shared code in `supabase/functions/_shared/` — including the vendored MolBench prompt — is
 bundled automatically.)
@@ -118,3 +119,16 @@ Above the composer the site shows tappable prompt chips with a 🎲 to reshuffle
   grounded in the evaluator's recent prompts. It's gated by its own per-invite daily cap
   (`MCD_SUGGEST_DAILY_CAP`); over the cap — or with no model key — it degrades to a deterministic
   fallback list, so the row is never empty.
+
+## 10. Rating page (judge-agreement study)
+`rate.html?e=<token>` shows evaluators one render pair at a time — a task prompt, the reference
+render and a model's render — and asks *same / different / can't tell*. It's MolBench's A4 study:
+do humans agree with the VLM judge that rescues scenes the tree grader under-scores?
+- The pairs live in `site/rate/<set>/` (`items.json` + images), built by MolBench's
+  `scripts/build_rating_set.py`. They carry opaque ids only; the answer key (model, VLM verdict,
+  attention-check answers) stays in MolBench, so raters are blind.
+- The `rate` Edge Function saves each answer to `ratings` (answering again replaces it) and hands
+  out the next pair, least-rated first, so every pair gets two raters before any gets a third.
+- Same invite tokens as the chat; send people `…/rate.html?e=<token>`.
+- Analyse with MolBench's `scripts/agreement.py <key> --from-supabase` (needs `SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY`).

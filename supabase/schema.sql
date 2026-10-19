@@ -136,3 +136,37 @@ begin
   return true;
 end;
 $$;
+
+-- Human ratings of render pairs (the MolBench A4 judge-agreement study, site/rate.html). One row
+-- per evaluator × item; answering again replaces the earlier answer. `set_id` is the rating set
+-- (site/rate/<set_id>/items.json); the answer key lives in MolBench, never on the site.
+create table if not exists ratings (
+  id              uuid primary key default gen_random_uuid(),
+  evaluator_token text not null,
+  set_id          text not null,
+  item            text not null,
+  label           text not null check (label in ('same', 'different', 'unsure')),
+  note            text,
+  ms              integer,     -- time on the item before answering
+  client          text,        -- site build stamp
+  created_at      timestamptz not null default now(),
+  unique (evaluator_token, set_id, item)
+);
+alter table ratings enable row level security;  -- no policies → anon has no direct access
+grant select, insert, update, delete on ratings to service_role;
+create index if not exists ratings_item_idx on ratings (set_id, item);
+
+-- The next item for this evaluator: one they haven't rated, with the fewest ratings so far (so
+-- every item gets two raters before any gets a third), ties broken by a per-evaluator shuffle.
+-- The item list comes from the caller (the set's items.json), so nothing needs seeding.
+create or replace function next_rating_item(p_token text, p_set text, p_items text[])
+returns text
+language sql stable
+as $$
+  select i
+  from unnest(p_items) as i
+  where not exists (select 1 from ratings r
+                    where r.evaluator_token = p_token and r.set_id = p_set and r.item = i)
+  order by (select count(*) from ratings r where r.set_id = p_set and r.item = i), md5(p_token || i)
+  limit 1;
+$$;

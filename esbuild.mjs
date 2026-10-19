@@ -64,11 +64,11 @@ if (mode === 'build') {
   // talks to the Supabase Edge Functions. See site/ and SETUP.md.
   await esbuild.build({
     ...shared,
-    entryPoints: ['site/main.ts'],
-    outfile: 'site/dist/site.js',
+    entryPoints: { site: 'site/main.ts', rate: 'site/rate.ts' },
+    outdir: 'site/dist',
     define: { __MCD_CLIENT_VERSION__: JSON.stringify(siteVersion()) },
   });
-  console.log('✓ built site/dist/site.js');
+  console.log('✓ built site/dist/site.js + rate.js');
 } else {
   console.error(`unknown mode: ${mode} (use "build", "demo", "build-demo", or "build-site")`);
   process.exit(1);
