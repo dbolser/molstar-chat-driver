@@ -29,6 +29,10 @@
       #answers [data-label=different] { border-color: #b3261e; color: #b3261e; }
       #back { margin-left: auto; font-size: 14px; }
       #back[disabled] { opacity: .4; cursor: default; }
+      #prefer { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 14px; color: #444; flex-wrap: wrap; }
+      #prefer button { font: inherit; font-size: 14px; padding: 5px 12px; border-radius: 16px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+      #prefer button.on { background: #eef3ff; border-color: #1a66ff; color: #1a66ff; }
+      #prefer button kbd { font-size: 11px; color: #777; margin-left: 4px; }
       #note { width: 100%; box-sizing: border-box; margin-top: 10px; min-height: 40px; border: 1px solid #ccc; border-radius: 6px; padding: 8px; font: inherit; }
       #status { min-height: 20px; color: #b3261e; font-size: 14px; margin-top: 6px; }
       #finished { font-size: 18px; padding: 40px 0; text-align: center; }
@@ -49,6 +53,8 @@
         <p id="question"></p>
         <p>Pick <b>Can't tell</b> if the images don't let you decide. Keys: <kbd>1</kbd> same,
           <kbd>2</kbd> different, <kbd>3</kbd> can't tell. A note is optional. Stop whenever you like.</p>
+        <p>The reference isn't always the best scene. If you have a preference, pick it <i>before</i>
+          answering: <kbd>R</kbd> reference, <kbd>M</kbd> model, <kbd>E</kbd> about equal.</p>
       </details>
       <div id="progress"><span><b id="done">0</b> rated</span><progress id="bar" max="70" value="0"></progress><span id="goal-note"></span></div>
       <section id="pair" style="display:none">
@@ -56,6 +62,12 @@
         <div class="pair">
           <figure><img id="img-ref" alt="Reference render" /><figcaption><b>Reference (correct)</b><a id="link-ref" target="_blank" rel="noopener">full size</a></figcaption></figure>
           <figure><img id="img-out" alt="Model's render" /><figcaption><b>Model's scene</b><a id="link-out" target="_blank" rel="noopener">full size</a></figcaption></figure>
+        </div>
+        <div id="prefer" role="group" aria-label="Which do you prefer? (optional)">
+          <span>Which do you prefer? (optional)</span>
+          <button type="button" data-prefer="reference" aria-pressed="false">Reference<kbd>R</kbd></button>
+          <button type="button" data-prefer="model" aria-pressed="false">Model<kbd>M</kbd></button>
+          <button type="button" data-prefer="equal" aria-pressed="false">About equal<kbd>E</kbd></button>
         </div>
         <div id="answers">
           <button data-label="same">Same<kbd>1</kbd></button>

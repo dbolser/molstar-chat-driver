@@ -1,8 +1,8 @@
 // Edge Function `rate` — the judge-agreement rating page (site/rate.html).
 // POST { token, set, items, answer? } -> { next, done }
 //   `items`  every item id in the set (from the set's items.json), so nothing needs seeding
-//   `answer` { item, label: 'same'|'different'|'unsure', note?, ms? } — saved first (answering an
-//            item again replaces the earlier answer)
+//   `answer` { item, label: 'same'|'different'|'unsure', prefer?: 'reference'|'model'|'equal',
+//            note?, ms? } — saved first (answering an item again replaces the earlier answer)
 //   `next`   the item to show next (one this evaluator hasn't rated, least-rated first), or null
 //   `done`   how many items of this set the evaluator has rated
 // The token must match a pre-issued invite (the `evaluators` allowlist) or the call is rejected.
@@ -13,6 +13,7 @@ import { isInvited } from '../_shared/auth.ts';
 const SET_RE = /^[a-z0-9-]{1,40}$/;
 const ITEM_RE = /^[0-9a-f]{12}$/;
 const LABELS = new Set(['same', 'different', 'unsure']);
+const PREFER = new Set(['reference', 'model', 'equal']);
 const MAX_ITEMS = 2000;
 
 Deno.serve(async (req) => {
@@ -53,6 +54,7 @@ Deno.serve(async (req) => {
         set_id: set,
         item: a.item,
         label: a.label,
+        prefer: typeof a.prefer === 'string' && PREFER.has(a.prefer) ? a.prefer : null,
         note: typeof a.note === 'string' && a.note.trim() ? a.note.slice(0, 2000) : null,
         ms: typeof a.ms === 'number' && Number.isFinite(a.ms) ? Math.min(Math.max(0, Math.round(a.ms)), 2_000_000_000) : null,
         client: req.headers.get('x-mcd-client')?.slice(0, 80) ?? null,
