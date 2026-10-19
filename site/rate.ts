@@ -30,7 +30,8 @@ const nameKey = `mcd-name-${token}`;
 
 type Label = 'same' | 'different' | 'unsure';
 interface Item { id: string; prompt: string; ref: string; out: string }
-interface Answer { item: string; label: Label; note: string; ms: number }
+type Prefer = 'reference' | 'model' | 'equal';
+interface Answer { item: string; label: Label; prefer: Prefer | null; note: string; ms: number }
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const base = `./rate/${SET}/`;
@@ -97,6 +98,13 @@ async function main(): Promise<void> {
   let current: Item | null = null;
   let shownAt = 0;
   let busy = false;
+  // Optional side question: which scene is better? Chosen before answering, sent with it.
+  let prefer: Prefer | null = null;
+  const preferButtons = document.querySelectorAll<HTMLButtonElement>('#prefer button');
+  const setPrefer = (p: Prefer | null) => {
+    prefer = p;
+    preferButtons.forEach((b) => b.classList.toggle('on', b.dataset.prefer === p));
+  };
   let ready = false; // both renders on screen; until then answers are ignored
   const answerButtons = document.querySelectorAll<HTMLButtonElement>('#answers button[data-label]');
   const setReady = (on: boolean) => {
@@ -131,6 +139,7 @@ async function main(): Promise<void> {
     });
     $<HTMLTextAreaElement>('note').value = prior?.note ?? '';
     answerButtons.forEach((b) => b.classList.toggle('on', b.dataset.label === prior?.label));
+    setPrefer(prior?.prefer ?? null);
     // Start the clock once both renders are visible, so a slow load can't be rated blind.
     Promise.all(loads).then(
       () => {
@@ -166,9 +175,14 @@ async function main(): Promise<void> {
 
   const answer = (label: Label) => {
     if (!current || !ready || busy) return;
-    void step({ item: current.id, label, note: $<HTMLTextAreaElement>('note').value.trim(),
+    void step({ item: current.id, label, prefer, note: $<HTMLTextAreaElement>('note').value.trim(),
       ms: performance.now() - shownAt });
   };
+
+  preferButtons.forEach((b) => b.addEventListener('click', () => {
+    const p = b.dataset.prefer as Prefer;
+    setPrefer(prefer === p ? null : p); // click again to clear
+  }));
 
   answerButtons.forEach((b) => b.addEventListener('click', () => answer(b.dataset.label as Label)));
   $('back').addEventListener('click', () => {
@@ -182,6 +196,8 @@ async function main(): Promise<void> {
     if (e.target instanceof Element && e.target.closest('textarea, input')) return;
     const label = ({ 1: 'same', 2: 'different', 3: 'unsure' } as Record<string, Label>)[e.key];
     if (label) answer(label);
+    const p = ({ r: 'reference', m: 'model', e: 'equal' } as Record<string, Prefer>)[e.key.toLowerCase()];
+    if (p) setPrefer(prefer === p ? null : p);
   });
 
   $('gate').style.display = 'none';
