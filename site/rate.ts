@@ -103,7 +103,10 @@ async function main(): Promise<void> {
   const preferButtons = document.querySelectorAll<HTMLButtonElement>('#prefer button');
   const setPrefer = (p: Prefer | null) => {
     prefer = p;
-    preferButtons.forEach((b) => b.classList.toggle('on', b.dataset.prefer === p));
+    preferButtons.forEach((b) => {
+      b.classList.toggle('on', b.dataset.prefer === p);
+      b.setAttribute('aria-pressed', String(b.dataset.prefer === p));
+    });
   };
   let ready = false; // both renders on screen; until then answers are ignored
   const answerButtons = document.querySelectorAll<HTMLButtonElement>('#answers button[data-label]');
