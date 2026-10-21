@@ -38,6 +38,7 @@ test('typedIds reads PDB ids the user spelled out, not plain numbers or ordinals
   assert.deepEqual(typedIds('Load 1HHO and 4hhb side by side, 1hho on the left'), ['1HHO', '4HHB']);
   assert.deepEqual(typedIds('colour the 20th residue of 1ubq at 10am in 2024'), ['1UBQ']);
   assert.deepEqual(typedIds('show 1hho in a 10nm box, 1.25nm sticks, 1.5e10 scale, 5min, 60fps, 200k'), ['1HHO']);
+  assert.deepEqual(typedIds('the first 10bp of 1ubq, 10px wide, 100a apart'), ['1UBQ']);
   assert.deepEqual(typedIds('show hemoglobin'), []);
 });
 

@@ -179,6 +179,10 @@ test('a structure that draws nothing gets a default representation', () => {
   ]);
   assert.deepEqual(lintScene(focusOnly), []);
 
+  // an empty primitives group draws nothing
+  const emptyPrims = scene([{ kind: 'primitives', children: [] }]);
+  assert.equal(lintScene(emptyPrims).length, 1);
+
   // interactions count as drawing
   const inter = scene([{ kind: 'component', params: { selector: 'ligand' }, custom: { molstar_show_non_covalent_interactions: true } }]);
   assert.deepEqual(lintScene(inter), []);

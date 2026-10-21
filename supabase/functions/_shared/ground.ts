@@ -41,7 +41,7 @@ export function pdbIds(mvsj: string): string[] {
 // match the rest of the request (1HH0 → 3O7Q for "indicate the transmembrane region"). So typed
 // ids are pinned into the scene and never put through the loop.
 const TYPED_RE = /(?<!\.)\b([1-9][a-z0-9]{3})\b/gi; // not the "5e10" in "1.5e10"
-const NOT_AN_ID = /^\d+(st|nd|rd|th|am|pm|nm|mm|um|ms|ns|ps|px|fps|min|sec|hrs?|[kmg]b?|e\d+)$/i; // "20th", "10nm", "5min"
+const NOT_AN_ID = /^\d+(st|nd|rd|th|am|pm|a|nm|mm|um|ms|ns|ps|us|px|bp|hz|ev|fps|min|sec|hrs?|[kmg]b?|e\d+)$/i; // "20th", "10nm", "5min", "10bp"
 
 /** PDB ids the user spelled out in the prompt (upper-cased, deduped). */
 export function typedIds(prompt: string): string[] {

@@ -148,6 +148,7 @@ const CHAINS = new Set(['all', 'polymer', 'protein', 'nucleic', 'coarse']);
 
 /** Does anything under this node put pixels on screen? */
 function draws(n: Node): boolean {
+  if (n.kind === 'primitives') return kids(n).some((c) => c.kind === 'primitive'); // an empty group draws nothing
   if (DRAWING.has(String(n.kind)) || n.custom?.molstar_show_non_covalent_interactions) return true;
   return kids(n).some(draws);
 }

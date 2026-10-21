@@ -254,7 +254,7 @@ export async function generateScene(
   // editing the structure already on screen has nothing new to check. An id the user typed is
   // authoritative: it is pinned into the scene and never second-guessed by the model.
   const known = new Set((history ?? []).flatMap((h) => (h.mvsj ? pdbIds(h.mvsj) : [])));
-  const typed = typedIds(prompt).filter((id) => !known.has(id));
+  const typed = typedIds(prompt); // also ids already on screen: "load 1hh0 again" must not drift
   let fresh = pdbIds(scene.mvsj).filter((id) => !known.has(id));
   if (fresh.length || typed.length) {
     try {
@@ -266,6 +266,14 @@ export async function generateScene(
 
       const typedEntries = await lookupCached(typed);
       const real = typedEntries.filter((e) => e.title).map((e) => e.id);
+      // A typed id that does not exist: say so, rather than show whatever the model substituted.
+      const typo = typedEntries.filter((e) => !e.title).map((e) => e.id);
+      if (typo.length) {
+        return {
+          mvsj: null, raw, tier0: true, repaired: scene.repaired, lint: notes,
+          error: `PDB entry ${typo.join(', ')} does not exist. Check the id (0 vs O, 1 vs l).`,
+        };
+      }
       const pinned = pinTypedIds(scene.mvsj, real, fresh);
       if (pinned.note) {
         scene = { ...scene, mvsj: pinned.mvsj };
@@ -303,16 +311,19 @@ export async function generateScene(
       const missing = entries.filter((e) => !e.title);
       if (missing.length) {
         // Still pointing at a non-existent entry: say so plainly rather than render an empty viewer.
-        const ids = missing.map((e) => e.id).join(', ');
-        const error = missing.some((e) => typed.includes(e.id))
-          ? `PDB entry ${ids} does not exist. Check the id (0 vs O, 1 vs l).`
-          : `PDB entry ${ids} does not exist — the model made it up. Try naming a real PDB id.`;
-        return { mvsj: null, raw, tier0: true, repaired: scene.repaired, lint: notes, error };
+        return {
+          mvsj: null, raw, tier0: true, repaired: scene.repaired, lint: notes,
+          error: `PDB entry ${missing.map((e) => e.id).join(', ')} does not exist — the model made it up. Try naming a real PDB id.`,
+        };
       }
-      // A typed id that does not exist and that the model quietly replaced: say so, visibly.
+      // Pinning handles the one-for-one swap; anything else (two typed ids, one drawn) is shown
+      // as built, but the user is told what is not on screen.
       const shown = pdbIds(scene.mvsj);
-      const typo = typedEntries.filter((e) => !e.title && !shown.includes(e.id)).map((e) => e.id);
-      if (typo.length && shown.length) text = `Note: ${typo.join(', ')} is not a PDB entry (check 0 vs O, 1 vs l); showing ${shown.join(', ')} instead.`;
+      const dropped = real.filter((id) => !shown.includes(id));
+      if (dropped.length) {
+        notes.push(`typed id not in scene: ${dropped.join(',')}`);
+        text = `Note: the scene does not include ${dropped.join(', ')} as you typed.`;
+      }
       text = [text, loadedText(entries)].filter(Boolean).join('\n') || undefined;
     } catch (e) {
       console.error('grounding skipped', e); // RCSB hiccup: the ungrounded scene is still worth showing
