@@ -35,6 +35,34 @@ export function pdbIds(mvsj: string): string[] {
   return [...new Set([...mvsj.matchAll(ID_RE)].map((m) => m[1].toUpperCase()))];
 }
 
+// An id the user typed is authoritative. Left to itself the model "corrects" a typed id to a
+// better-known neighbour (Haiku turned `1hh0` into 1HHO, haemoglobin, 2026-10-20) and the
+// check/search loop above then searches a correctly-copied id away because its title does not
+// match the rest of the request (1HH0 → 3O7Q for "indicate the transmembrane region"). So typed
+// ids are pinned into the scene and never put through the loop.
+const TYPED_RE = /(?<!\.)\b([1-9][a-z0-9]{3})\b/gi; // not the "5e10" in "1.5e10"
+const NOT_AN_ID = /^\d+(st|nd|rd|th|am|pm|a|nm|mm|um|ms|ns|ps|us|px|bp|hz|ev|fps|min|sec|hrs?|[kmg]b?|e\d+)$/i; // "20th", "10nm", "5min", "10bp"
+
+/** PDB ids the user spelled out in the prompt (upper-cased, deduped). */
+export function typedIds(prompt: string): string[] {
+  const ids = [...prompt.matchAll(TYPED_RE)].map((m) => m[1].toUpperCase());
+  return [...new Set(ids.filter((id) => /[A-Z]/.test(id) && !NOT_AN_ID.test(id)))];
+}
+
+/**
+ * Swap the one id the model chose for the one the user typed, when exactly one of each is
+ * unaccounted for. `typed` = typed ids known to exist; `fresh` = ids the scene introduces.
+ * Returns the rewritten MVSJ and a note, or the input unchanged and null.
+ */
+export function pinTypedIds(mvsj: string, typed: string[], fresh: string[]): { mvsj: string; note: string | null } {
+  const have = new Set(pdbIds(mvsj));
+  const wanted = typed.filter((id) => !have.has(id));
+  const stray = fresh.filter((id) => !typed.includes(id));
+  if (wanted.length !== 1 || stray.length !== 1) return { mvsj, note: null };
+  const re = new RegExp(`(files\\.rcsb\\.org/download/)${stray[0]}(\\.(?:cif|bcif|pdb))`, 'gi');
+  return { mvsj: mvsj.replace(re, `$1${wanted[0].toLowerCase()}$2`), note: `kept your id ${wanted[0]} (model wrote ${stray[0]})` };
+}
+
 /** Title lookup via the RCSB Data API. A 404 means the entry does not exist. Throws on other failures. */
 export async function lookup(ids: string[]): Promise<Entry[]> {
   return Promise.all(
