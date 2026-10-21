@@ -272,10 +272,6 @@ export async function generateScene(
         notes.push(pinned.note);
         fresh = pdbIds(scene.mvsj).filter((id) => !known.has(id));
       }
-      // A typed id that does not exist and that the model quietly replaced: say so, visibly.
-      const typo = typedEntries.filter((e) => !e.title && !fresh.includes(e.id)).map((e) => e.id);
-      if (typo.length && fresh.length) text = `Note: ${typo.join(', ')} is not a PDB entry (check 0 vs O, 1 vs l); showing ${fresh.join(', ')} instead.`;
-
       let entries = await lookupCached(fresh);
       const unpinned = entries.filter((e) => !typed.includes(e.id)); // the model's own picks
       if (unpinned.length) {
@@ -291,10 +287,14 @@ export async function generateScene(
             const raw2 = await callModel(prov, key, convo);
             const scene2 = toScene(raw2);
             if (scene2) {
+              // The regenerated scene may have dropped a typed id: pin it again.
               const ids2 = pdbIds(scene2.mvsj);
-              notes.push(`grounding: ${fresh.join(',')} → ${ids2.join(',')} via "${phrase}"`, ...scene2.lint);
-              entries = await lookupCached(ids2.filter((id) => !known.has(id)));
-              scene = scene2;
+              const repin = pinTypedIds(scene2.mvsj, real, ids2.filter((id) => !known.has(id)));
+              if (repin.note) notes.push(repin.note);
+              const ids3 = pdbIds(repin.mvsj);
+              notes.push(`grounding: ${fresh.join(',')} → ${ids3.join(',')} via "${phrase}"`, ...scene2.lint);
+              entries = await lookupCached(ids3.filter((id) => !known.has(id)));
+              scene = { ...scene2, mvsj: repin.mvsj };
               raw = raw2;
             }
           }
@@ -309,6 +309,10 @@ export async function generateScene(
           : `PDB entry ${ids} does not exist — the model made it up. Try naming a real PDB id.`;
         return { mvsj: null, raw, tier0: true, repaired: scene.repaired, lint: notes, error };
       }
+      // A typed id that does not exist and that the model quietly replaced: say so, visibly.
+      const shown = pdbIds(scene.mvsj);
+      const typo = typedEntries.filter((e) => !e.title && !shown.includes(e.id)).map((e) => e.id);
+      if (typo.length && shown.length) text = `Note: ${typo.join(', ')} is not a PDB entry (check 0 vs O, 1 vs l); showing ${shown.join(', ')} instead.`;
       text = [text, loadedText(entries)].filter(Boolean).join('\n') || undefined;
     } catch (e) {
       console.error('grounding skipped', e); // RCSB hiccup: the ungrounded scene is still worth showing

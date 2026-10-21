@@ -164,11 +164,13 @@ test('a structure that draws nothing gets a default representation', () => {
   const comps = scene([
     { kind: 'component', params: { selector: 'polymer' } },
     { kind: 'component', params: { selector: 'ligand' }, children: [{ kind: 'label', params: { text: 'heme' } }] },
+    { kind: 'component', params: { selector: { label_comp_id: 'HEM' } } }, // a specific ligand: cartoon would draw nothing
   ]);
   assert.equal(lintScene(comps).length, 1);
-  const [poly, lig] = (comps.children[0].children[0].children[0] as any).children;
+  const [poly, lig, hem] = (comps.children[0].children[0].children[0] as any).children;
   assert.equal(poly.children[0].params.type, 'cartoon');
   assert.equal(lig.children[1].params.type, 'ball_and_stick');
+  assert.equal(hem.children[0].params.type, 'ball_and_stick');
 
   // a component that only exists to be focused, beside one that draws: untouched
   const focusOnly = scene([

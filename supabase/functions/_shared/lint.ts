@@ -144,7 +144,7 @@ export function lintScene(root: Node): string[] {
 }
 
 const DRAWING = new Set(['representation', 'primitives', 'primitives_from_uri', 'volume_representation']);
-const SMALL = new Set(['ligand', 'ion', 'water', 'branched']);
+const CHAINS = new Set(['all', 'polymer', 'protein', 'nucleic', 'coarse']);
 
 /** Does anything under this node put pixels on screen? */
 function draws(n: Node): boolean {
@@ -152,6 +152,7 @@ function draws(n: Node): boolean {
   return kids(n).some(draws);
 }
 
+// Cartoon only draws polymer; a ligand class or a specific residue/ligand expression needs sticks.
 function defaultRepresentation(selector: unknown): string {
-  return typeof selector === 'string' && SMALL.has(selector) ? 'ball_and_stick' : 'cartoon';
+  return typeof selector === 'string' && CHAINS.has(selector) ? 'cartoon' : 'ball_and_stick';
 }
