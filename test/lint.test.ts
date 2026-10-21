@@ -152,3 +152,32 @@ test('primitives, opacity, canvas, camera, tooltip and custom keys are left alon
   assert.deepEqual(lintScene(root), []);
   assert.equal(JSON.stringify(root), before);
 });
+
+test('a structure that draws nothing gets a default representation', () => {
+  // download → parse → structure and stop ("load 1jxh as a monomer", 2026-10-20)
+  const bare = scene([]);
+  assert.deepEqual(lintScene(bare), ['added a default representation (scene drew nothing)']);
+  const s = bare.children[0].children[0].children[0] as any;
+  assert.deepEqual(s.children, [{ kind: 'component', params: { selector: 'polymer' }, children: [{ kind: 'representation', params: { type: 'cartoon' } }] }]);
+
+  // components with no representation: each gets one that suits its selector
+  const comps = scene([
+    { kind: 'component', params: { selector: 'polymer' } },
+    { kind: 'component', params: { selector: 'ligand' }, children: [{ kind: 'label', params: { text: 'heme' } }] },
+  ]);
+  assert.equal(lintScene(comps).length, 1);
+  const [poly, lig] = (comps.children[0].children[0].children[0] as any).children;
+  assert.equal(poly.children[0].params.type, 'cartoon');
+  assert.equal(lig.children[1].params.type, 'ball_and_stick');
+
+  // a component that only exists to be focused, beside one that draws: untouched
+  const focusOnly = scene([
+    { kind: 'component', params: { selector: 'polymer' }, children: [rep([color('red')])] },
+    { kind: 'component', params: { selector: { auth_seq_id: 64 } }, children: [{ kind: 'focus' }] },
+  ]);
+  assert.deepEqual(lintScene(focusOnly), []);
+
+  // interactions count as drawing
+  const inter = scene([{ kind: 'component', params: { selector: 'ligand' }, custom: { molstar_show_non_covalent_interactions: true } }]);
+  assert.deepEqual(lintScene(inter), []);
+});

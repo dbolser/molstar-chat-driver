@@ -124,5 +124,34 @@ export function lintScene(root: Node): string[] {
   };
   reparent(root, []);
 
+  // A structure that draws nothing renders as an empty viewer (seen for "load 1jxh as a monomer"
+  // and "load 1igt as a monomer", 2026-10-20: download → parse → structure and stop, or
+  // components with no representation). Give each bare component a representation that suits
+  // its selector; with no components at all, draw the polymer as cartoon.
+  for (const s of structures) {
+    if (draws(s)) continue;
+    const comps = kids(s).filter((c) => c.kind === 'component');
+    if (comps.length === 0) {
+      s.children = [...kids(s), { kind: 'component', params: { selector: 'polymer' }, children: [] }];
+    }
+    for (const c of kids(s).filter((c) => c.kind === 'component')) {
+      c.children = [...kids(c), { kind: 'representation', params: { type: defaultRepresentation(c.params?.selector) } }];
+    }
+    notes.push('added a default representation (scene drew nothing)');
+  }
+
   return notes;
+}
+
+const DRAWING = new Set(['representation', 'primitives', 'primitives_from_uri', 'volume_representation']);
+const SMALL = new Set(['ligand', 'ion', 'water', 'branched']);
+
+/** Does anything under this node put pixels on screen? */
+function draws(n: Node): boolean {
+  if (DRAWING.has(String(n.kind)) || n.custom?.molstar_show_non_covalent_interactions) return true;
+  return kids(n).some(draws);
+}
+
+function defaultRepresentation(selector: unknown): string {
+  return typeof selector === 'string' && SMALL.has(selector) ? 'ball_and_stick' : 'cartoon';
 }

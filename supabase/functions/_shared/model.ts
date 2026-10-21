@@ -9,7 +9,7 @@ import { SYSTEM } from './prompt.ts';
 // on complex multi-component scenes, e.g. "colour by chain"). Not hand-rolled.
 import { jsonrepair } from 'https://esm.sh/jsonrepair@3.15.0';
 import { lintScene } from './lint.ts';
-import { candidatesMessage, checkMessage, loadedText, lookup, pdbIds, search, searchPhrase } from './ground.ts';
+import { candidatesMessage, checkMessage, loadedText, lookup, pdbIds, pinTypedIds, search, searchPhrase, typedIds } from './ground.ts';
 import { type Atom, checkScene, isStructureUrl, parseAtomSite } from './selections.ts';
 
 type Kind = 'anthropic' | 'openai';
@@ -251,41 +251,65 @@ export async function generateScene(
   let text: string | undefined;
 
   // Grounding (see ground.ts): only for entries this turn introduces — a follow-up that keeps
-  // editing the structure already on screen has nothing new to check.
+  // editing the structure already on screen has nothing new to check. An id the user typed is
+  // authoritative: it is pinned into the scene and never second-guessed by the model.
   const known = new Set((history ?? []).flatMap((h) => (h.mvsj ? pdbIds(h.mvsj) : [])));
-  const fresh = pdbIds(scene.mvsj).filter((id) => !known.has(id));
-  if (fresh.length) {
+  const typed = typedIds(prompt).filter((id) => !known.has(id));
+  let fresh = pdbIds(scene.mvsj).filter((id) => !known.has(id));
+  if (fresh.length || typed.length) {
     try {
-      let entries = await lookup(fresh);
-      const convo: Msg[] = [...messages, { role: 'assistant', content: raw }, { role: 'user', content: checkMessage(entries) }];
-      const verdict = await callModel(prov, key, convo);
-      const phrase = searchPhrase(verdict);
-      if (phrase) {
-        const hits = await search(phrase);
-        if (hits.length === 0) {
-          notes.push(`grounding: no RCSB hits for "${phrase}"`);
-        } else {
-          convo.push({ role: 'assistant', content: verdict }, { role: 'user', content: candidatesMessage(phrase, hits) });
-          const raw2 = await callModel(prov, key, convo);
-          const scene2 = toScene(raw2);
-          if (scene2) {
-            const ids2 = pdbIds(scene2.mvsj);
-            notes.push(`grounding: ${fresh.join(',')} → ${ids2.join(',')} via "${phrase}"`, ...scene2.lint);
-            entries = await lookup(ids2.filter((id) => !known.has(id)));
-            scene = scene2;
-            raw = raw2;
+      const titles = new Map<string, string | null>();
+      const lookupCached = async (ids: string[]) => {
+        for (const e of await lookup(ids.filter((id) => !titles.has(id)))) titles.set(e.id, e.title);
+        return ids.map((id) => ({ id, title: titles.get(id) ?? null }));
+      };
+
+      const typedEntries = await lookupCached(typed);
+      const real = typedEntries.filter((e) => e.title).map((e) => e.id);
+      const pinned = pinTypedIds(scene.mvsj, real, fresh);
+      if (pinned.note) {
+        scene = { ...scene, mvsj: pinned.mvsj };
+        notes.push(pinned.note);
+        fresh = pdbIds(scene.mvsj).filter((id) => !known.has(id));
+      }
+      // A typed id that does not exist and that the model quietly replaced: say so, visibly.
+      const typo = typedEntries.filter((e) => !e.title && !fresh.includes(e.id)).map((e) => e.id);
+      if (typo.length && fresh.length) text = `Note: ${typo.join(', ')} is not a PDB entry (check 0 vs O, 1 vs l); showing ${fresh.join(', ')} instead.`;
+
+      let entries = await lookupCached(fresh);
+      const unpinned = entries.filter((e) => !typed.includes(e.id)); // the model's own picks
+      if (unpinned.length) {
+        const convo: Msg[] = [...messages, { role: 'assistant', content: raw }, { role: 'user', content: checkMessage(unpinned) }];
+        const verdict = await callModel(prov, key, convo);
+        const phrase = searchPhrase(verdict);
+        if (phrase) {
+          const hits = await search(phrase);
+          if (hits.length === 0) {
+            notes.push(`grounding: no RCSB hits for "${phrase}"`);
+          } else {
+            convo.push({ role: 'assistant', content: verdict }, { role: 'user', content: candidatesMessage(phrase, hits) });
+            const raw2 = await callModel(prov, key, convo);
+            const scene2 = toScene(raw2);
+            if (scene2) {
+              const ids2 = pdbIds(scene2.mvsj);
+              notes.push(`grounding: ${fresh.join(',')} → ${ids2.join(',')} via "${phrase}"`, ...scene2.lint);
+              entries = await lookupCached(ids2.filter((id) => !known.has(id)));
+              scene = scene2;
+              raw = raw2;
+            }
           }
         }
       }
       const missing = entries.filter((e) => !e.title);
       if (missing.length) {
         // Still pointing at a non-existent entry: say so plainly rather than render an empty viewer.
-        return {
-          mvsj: null, raw, tier0: true, repaired: scene.repaired, lint: notes,
-          error: `PDB entry ${missing.map((e) => e.id).join(', ')} does not exist — the model made it up. Try naming a real PDB id.`,
-        };
+        const ids = missing.map((e) => e.id).join(', ');
+        const error = missing.some((e) => typed.includes(e.id))
+          ? `PDB entry ${ids} does not exist. Check the id (0 vs O, 1 vs l).`
+          : `PDB entry ${ids} does not exist — the model made it up. Try naming a real PDB id.`;
+        return { mvsj: null, raw, tier0: true, repaired: scene.repaired, lint: notes, error };
       }
-      text = loadedText(entries) || undefined;
+      text = [text, loadedText(entries)].filter(Boolean).join('\n') || undefined;
     } catch (e) {
       console.error('grounding skipped', e); // RCSB hiccup: the ungrounded scene is still worth showing
     }
