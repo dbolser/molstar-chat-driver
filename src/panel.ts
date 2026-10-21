@@ -256,7 +256,7 @@ export function mountChatDriver(
         let text = result.response.text;
         if (result.rendered) {
           status.className = 'mcd-status ok';
-          const [headline, ...rest] = (text ?? '').split('\n');
+          const [headline, ...rest] = (text ?? '').trim().split(/\r?\n/);
           status.textContent = headline ? `✓ ${headline}` : '✓ Rendered in the viewer.';
           text = rest.join('\n').trim() || undefined;
         } else if (result.response.mvsj) {

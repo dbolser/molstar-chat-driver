@@ -247,10 +247,12 @@ export async function generateScene(
     return ids.map((id) => ({ id, title: titles.get(id) ?? null }));
   };
   const known = new Set((history ?? []).flatMap((h) => (h.mvsj ? pdbIds(h.mvsj) : [])));
+  // Each rendered scene replaces the viewer, so "on screen" is the latest scene, not all of them.
+  const latest = (history ?? []).filter((h) => h.mvsj).at(-1)?.mvsj;
   let onScreen: string | undefined;
-  if (known.size) {
+  if (latest) {
     try {
-      onScreen = (await lookupCached([...known])).filter((e) => e.title).map((e) => `${e.id} — ${e.title}`).join('; ') || undefined;
+      onScreen = (await lookupCached(pdbIds(latest))).filter((e) => e.title).map((e) => `${e.id} — ${e.title}`).join('; ') || undefined;
     } catch (e) {
       console.error('on-screen lookup skipped', e);
     }
