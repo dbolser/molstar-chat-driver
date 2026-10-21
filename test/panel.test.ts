@@ -218,6 +218,18 @@ async function outcome(response: { mvsj: string | null; text?: string; error?: s
   return { className: status.className, text: status.textContent, reply: document.querySelector('.mcd-text')?.textContent };
 }
 
+test('a rendered scene puts the reply headline in the status, the rest below', async () => {
+  const mvsj = '{"metadata":{"version":"1"},"root":{"kind":"root"}}';
+  const o = await outcome({ mvsj, text: 'Loaded 1HH0 — Filamentous Bacteriophage PH75\nSkipped an empty selection.' });
+  assert.equal(o.className, 'mcd-status ok');
+  assert.equal(o.text, '✓ Loaded 1HH0 — Filamentous Bacteriophage PH75');
+  assert.equal(o.reply, 'Skipped an empty selection.');
+  document.body.innerHTML = '<div id="chat"></div>';
+  const plain = await outcome({ mvsj });
+  assert.equal(plain.text, '✓ Rendered in the viewer.');
+  assert.equal(plain.reply, undefined);
+});
+
 test('a text-only reply is shown as a message, not a warning', async () => {
   const o = await outcome({ mvsj: null, text: 'PDB 1CRN, crambin, is loaded.' });
   assert.equal(o.className, 'mcd-status msg');

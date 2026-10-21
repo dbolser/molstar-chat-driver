@@ -250,9 +250,15 @@ export function mountChatDriver(
     void driver
       .submit(prompt, model)
       .then((result) => {
+        // The reply's first line is the headline ("Loaded 1HH0 — Filamentous Bacteriophage PH75"):
+        // promote it into the status so what actually loaded is hard to miss — a typo'd id almost
+        // always hits a real, wrong entry, and that line is the user's only tell.
+        let text = result.response.text;
         if (result.rendered) {
           status.className = 'mcd-status ok';
-          status.textContent = '✓ Rendered in the viewer.';
+          const [headline, ...rest] = (text ?? '').split('\n');
+          status.textContent = headline ? `✓ ${headline}` : '✓ Rendered in the viewer.';
+          text = rest.join('\n').trim() || undefined;
         } else if (result.response.mvsj) {
           // A scene was produced but Mol* rejected it — show why, don't swallow it.
           status.className = 'mcd-status err';
@@ -272,9 +278,7 @@ export function mountChatDriver(
           status.className = 'mcd-status warn';
           status.textContent = '⚠ No scene produced for that prompt.';
         }
-        if (result.response.text) {
-          turn.append(el('div', { class: 'mcd-text' }, result.response.text));
-        }
+        if (text) turn.append(el('div', { class: 'mcd-text' }, text));
       })
       .catch((err) => {
         status.className = 'mcd-status err';
