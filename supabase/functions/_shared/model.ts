@@ -69,7 +69,10 @@ interface Msg {
 
 // Replay prior turns as an alternating user/assistant conversation so a follow-up prompt edits
 // the current scene. The assistant's earlier reply is the MVSJ it produced (what it should edit).
-function buildMessages(prompt: string, history?: HistoryTurn[]): Msg[] {
+// `onScreen` names what those scenes actually loaded ("1HH0 — Filamentous Bacteriophage PH75"):
+// the MVSJ only carries the id, and asked "what is loaded?" the model otherwise answers from its
+// own idea of the id (it called 1HH0 "human hemoglobin", 2026-10-21).
+function buildMessages(prompt: string, history?: HistoryTurn[], onScreen?: string): Msg[] {
   const msgs: Msg[] = [];
   // Only turns that put a scene on screen are replayed. A failed turn used to be replayed as
   // "(no scene produced for that prompt)", and the model learned to answer with exactly that —
@@ -79,7 +82,7 @@ function buildMessages(prompt: string, history?: HistoryTurn[]): Msg[] {
     msgs.push({ role: 'user', content: h.prompt });
     msgs.push({ role: 'assistant', content: h.mvsj });
   }
-  msgs.push({ role: 'user', content: prompt });
+  msgs.push({ role: 'user', content: onScreen && msgs.length ? `(On screen: ${onScreen})\n\n${prompt}` : prompt });
   return msgs;
 }
 
@@ -237,7 +240,25 @@ export async function generateScene(
   const key = Deno.env.get(prov.keyVar);
   if (!key) return { mvsj: null, error: `server is missing ${prov.keyVar}`, raw: '', tier0: false };
 
-  const messages = buildMessages(prompt, history);
+  // One RCSB title cache per turn (see ground.ts); every call is best-effort.
+  const titles = new Map<string, string | null>();
+  const lookupCached = async (ids: string[]) => {
+    for (const e of await lookup(ids.filter((id) => !titles.has(id)))) titles.set(e.id, e.title);
+    return ids.map((id) => ({ id, title: titles.get(id) ?? null }));
+  };
+  const known = new Set((history ?? []).flatMap((h) => (h.mvsj ? pdbIds(h.mvsj) : [])));
+  // Each rendered scene replaces the viewer, so "on screen" is the latest scene, not all of them.
+  const latest = (history ?? []).filter((h) => h.mvsj).at(-1)?.mvsj;
+  let onScreen: string | undefined;
+  if (latest) {
+    try {
+      onScreen = (await lookupCached(pdbIds(latest))).filter((e) => e.title).map((e) => `${e.id} — ${e.title}`).join('; ') || undefined;
+    } catch (e) {
+      console.error('on-screen lookup skipped', e);
+    }
+  }
+
+  const messages = buildMessages(prompt, history, onScreen);
   let raw: string;
   try {
     raw = await callModel(prov, key, messages);
@@ -253,17 +274,10 @@ export async function generateScene(
   // Grounding (see ground.ts): only for entries this turn introduces — a follow-up that keeps
   // editing the structure already on screen has nothing new to check. An id the user typed is
   // authoritative: it is pinned into the scene and never second-guessed by the model.
-  const known = new Set((history ?? []).flatMap((h) => (h.mvsj ? pdbIds(h.mvsj) : [])));
   const typed = typedIds(prompt); // also ids already on screen: "load 1hh0 again" must not drift
   let fresh = pdbIds(scene.mvsj).filter((id) => !known.has(id));
   if (fresh.length || typed.length) {
     try {
-      const titles = new Map<string, string | null>();
-      const lookupCached = async (ids: string[]) => {
-        for (const e of await lookup(ids.filter((id) => !titles.has(id)))) titles.set(e.id, e.title);
-        return ids.map((id) => ({ id, title: titles.get(id) ?? null }));
-      };
-
       const typedEntries = await lookupCached(typed);
       const real = typedEntries.filter((e) => e.title).map((e) => e.id);
       // A typed id that does not exist: say so, rather than show whatever the model substituted.
