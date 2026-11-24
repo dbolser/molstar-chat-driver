@@ -393,6 +393,10 @@ verify_jwt = false
 [functions.rate]
 verify_jwt = false
 
+# Liveness + keep-alive (.github/workflows/keepalive.yml) — publishable key only, returns ok/not-ok.
+[functions.health]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

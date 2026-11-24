@@ -57,6 +57,7 @@ supabase functions deploy capture
 supabase functions deploy waitlist   # public email signup for §8
 supabase functions deploy suggest    # prompt-suggestion chips for §9
 supabase functions deploy rate       # rating page for §10
+supabase functions deploy health     # keep-alive ping for §11
 ```
 (The shared code in `supabase/functions/_shared/` — including the vendored MolBench prompt — is
 bundled automatically.)
@@ -133,3 +134,12 @@ do humans agree with the VLM judge that rescues scenes the tree grader under-sco
 - Same invite tokens as the chat; send people `…/rate.html?e=<token>`.
 - Analyse with MolBench's `scripts/agreement.py <key> --from-supabase` (needs `SUPABASE_URL` +
   `SUPABASE_SERVICE_ROLE_KEY`).
+
+## 11. Keep-alive (stop the project pausing)
+Supabase pauses a Free-plan project after a week with too little database activity, and a quiet
+preview site gets none. `.github/workflows/keepalive.yml` calls the `health` function once a day;
+it does one real database read and returns `{"ok":true}`. It reads the URL and publishable key
+from `config.js`, so it needs no secrets. If the project is already paused the job fails and
+GitHub emails you — restore it from the dashboard (data, functions and secrets survive a pause).
+Run it by hand from the Actions tab (*Supabase keep-alive* → *Run workflow*). GitHub switches off
+scheduled workflows after 60 days with no commits to the repo; re-enable it there if that happens.

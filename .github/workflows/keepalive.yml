@@ -1,0 +1,39 @@
+name: Supabase keep-alive
+
+# Supabase pauses a Free-plan project after a week with too little database activity, which takes
+# the preview site down until someone restores it. Once a day, call the `health` Edge Function,
+# which does one real database read. If the project is already paused (or the function is down)
+# this job fails, and GitHub emails the repo owner. Uses only the public values in site/config.js.
+on:
+  schedule:
+    - cron: '17 6 * * *' # daily, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: site/config.js
+          sparse-checkout-cone-mode: false
+      - name: Call the health function
+        run: |
+          eval "$(node -e '
+            const ctx = { window: {} };
+            require("vm").runInNewContext(require("fs").readFileSync("site/config.js", "utf8"), ctx);
+            const c = ctx.window.MCD_CONFIG;
+            console.log(`URL=${c.functionsUrl}/health KEY=${c.anonKey}`);
+          ')"
+          body=$(curl -sS --fail-with-body --retry 3 --retry-all-errors --max-time 30 \
+            -H "apikey: $KEY" "$URL")
+          echo "$body"
+          [ "$(jq -r .ok <<<"$body")" = true ]
+      - name: Say what to do
+        if: failure()
+        run: |
+          echo "::error::Supabase did not answer. It may be paused: restore it from the project dashboard (https://supabase.com/dashboard/projects)."
